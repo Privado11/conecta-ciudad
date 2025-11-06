@@ -23,7 +23,7 @@ api.interceptors.request.use(
           console.warn("Token expirado, redirigiendo al login...");
           localStorage.removeItem("token");
           localStorage.removeItem("user");
-          window.location.href = "/login";
+          window.location.href = "/auth/login";
           return Promise.reject(new axios.Cancel("Token expirado"));
         }
   
@@ -47,7 +47,7 @@ api.interceptors.response.use(
         console.warn("Token inválido o expirado, cerrando sesión...");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        window.location.href = "/login";
+        window.location.href = "/auth/login";
       } else {
         console.warn("No autorizado para este recurso (401).");
       }

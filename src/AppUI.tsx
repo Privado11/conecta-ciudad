@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./route/ProtectedRoute";
 import LoginPage from "./views/auth/Login";
 import RegisterPage from "./views/auth/Register";
+import { Layout } from "./shared/layout/Layout";
 import Home from "./views/home/Home";
 
 function AppUI() {
@@ -11,13 +12,14 @@ function AppUI() {
       <Route path="/auth/register" element={<RegisterPage />} />
 
       <Route
-        path="/home"
         element={
           <ProtectedRoute>
-            <Home />
+            <Layout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route path="/home" element={<Home />} />
+      </Route>
 
       <Route path="*" element={<Navigate to="/auth/login" replace />} />
     </Routes>

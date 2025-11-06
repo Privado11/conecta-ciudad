@@ -6,12 +6,17 @@ type User = {
   id: string;
   name: string;
   email: string;
+  roles: string[];
 };
 
 type AuthContextType = {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: { name: string; email: string; password: string }) => Promise<void>;
+  register: (data: {
+    name: string;
+    email: string;
+    password: string;
+  }) => Promise<void>;
   logout: () => void;
   isAuthenticated: () => boolean;
   loading: boolean;
@@ -33,7 +38,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (data: { name: string; email: string; password: string }) => {
+  const register = async (data: {
+    name: string;
+    email: string;
+    password: string;
+  }) => {
     setLoading(true);
     try {
       await AuthService.register(data);
@@ -45,9 +54,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     AuthService.logout();
     setUser(null);
+
   };
 
-  
   const isAuthenticated = (): boolean => {
     return AuthService.isAuthenticated();
   };
@@ -58,7 +67,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isAuthenticated, loading }}>
+    <AuthContext.Provider
+      value={{ user, login, register, logout, isAuthenticated, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );
