@@ -25,11 +25,28 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
     if (!token || isTokenExpired(token)) {
       setMenu([]);
       setUser(null);
+      MenuService.clearMenu(); 
       return;
     }
 
     setLoading(true);
     try {
+     
+      const cachedMenu = MenuService.getCurrentMenu();
+      
+     
+      if (
+        cachedMenu && 
+        authContext?.user?.email && 
+        cachedMenu.user.username === authContext.user.email
+      ) {
+        setMenu(cachedMenu.menu);
+        setUser(cachedMenu.user);
+        setLoading(false);
+        return;
+      }
+
+      
       const data = await MenuService.getMenu();
       setMenu(data.menu);
       setUser(data.user);
@@ -37,11 +54,11 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error cargando menú:", err);
       setMenu([]);
       setUser(null);
+      MenuService.clearMenu(); 
     } finally {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     if (authContext?.user) {
@@ -49,6 +66,7 @@ export const MenuProvider = ({ children }: { children: ReactNode }) => {
     } else {
       setMenu([]);
       setUser(null);
+      MenuService.clearMenu(); 
     }
   }, [authContext?.user]);
 
