@@ -12,7 +12,7 @@ class AuthService {
     return user;
   }
 
-  async register(data: { name: string; email: string; password: string }) {
+  async register(data: { name: string; email: string; password: string, nationalId: string, phone: string}) {
     const response = await api.post("/auth/register", data);
     return response.data;
   }

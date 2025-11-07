@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
   Mail,
   Lock,
-  Zap,
+  Handshake,
   ArrowRight,
   AlertCircle,
   Eye,
@@ -106,7 +106,9 @@ function LoginPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>): Promise<void> => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLButtonElement>
+  ): Promise<void> => {
     e.preventDefault();
 
     const validation: ValidationResult = validateForm({ email, password });
@@ -121,7 +123,7 @@ function LoginPage() {
 
     try {
       await login(email, password);
-      navigate("/home");
+      navigate("/dashboard");
     } catch (err: any) {
       setPassword("");
       setErrors((prev) => ({
@@ -142,7 +144,7 @@ function LoginPage() {
           <div className="p-8">
             <div className="flex justify-center mb-8">
               <div className="bg-blue-600 p-3 rounded-lg">
-                <Zap size={28} className="text-white" />
+                <Handshake size={32} className="text-white" />
               </div>
             </div>
 
@@ -241,6 +243,22 @@ function LoginPage() {
                   </>
                 )}
               </Button>
+
+              <div className="text-center pt-4">
+                <p className="text-sm text-slate-600">
+                  ¿No tienes una cuenta?{" "}
+                  <a
+                    href="/auth/register"
+                    className="text-blue-600 hover:underline font-medium"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate("/auth/register");
+                    }}
+                  >
+                    Regístrate aquí
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
         </div>

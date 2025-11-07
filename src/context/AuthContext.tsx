@@ -16,6 +16,8 @@ type AuthContextType = {
     name: string;
     email: string;
     password: string;
+    nationalId: string;
+    phone: string;
   }) => Promise<void>;
   logout: () => void;
   isAuthenticated: () => boolean;
@@ -42,6 +44,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     name: string;
     email: string;
     password: string;
+    nationalId: string;
+    phone: string;
   }) => {
     setLoading(true);
     try {
@@ -54,7 +58,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     AuthService.logout();
     setUser(null);
-
   };
 
   const isAuthenticated = (): boolean => {
