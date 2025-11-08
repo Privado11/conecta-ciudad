@@ -122,7 +122,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           h-[calc(100vh-4rem)] flex flex-col transition-all duration-300 ease-in-out shadow-xl overflow-hidden
         `}
       >
-       <nav className="flex-1 py-4 space-y-1 overflow-y-auto scrollbar-hide">
+       <nav className="flex-1 py-4 space-y-4 overflow-y-auto scrollbar-hide">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />

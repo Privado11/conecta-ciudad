@@ -1,13 +1,9 @@
 import AuthService from "@/service/AuthService";
+import type { User } from "@/shared/types/userTYpes";
 import { createContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  roles: string[];
-};
+
 
 type AuthContextType = {
   user: User | null;

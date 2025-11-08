@@ -5,6 +5,7 @@ import RegisterPage from "./views/auth/Register";
 import { Layout } from "./shared/layout/Layout";
 import Home from "./views/home/Home";
 import PublicRoute from "./route/PublicRoute";
+import ListUsers from "./views/auth/ListUsers";
 
 
 function AppUI() {
@@ -35,6 +36,7 @@ function AppUI() {
         }
       >
         <Route path="/dashboard" element={<Home />} />
+        <Route path="/admin/users" element={<ListUsers />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/auth/login" replace />} />
