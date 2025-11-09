@@ -104,18 +104,39 @@ export function DynamicForm<T = any>({
         } as T);
 
         if (!result.available) {
-          if (result.message.toLowerCase().includes("correo")) {
-            form.setError("email", { message: result.message });
-          } else if (
-            result.message.toLowerCase().includes("cédula") ||
-            result.message.toLowerCase().includes("identificación")
-          ) {
-            form.setError("nationalId", { message: result.message });
-          }
+          const message = result.message.toLowerCase();
+  
 
+          const emailError = message.includes("email") || message.includes("correo");
+          const idError =
+            message.includes("cédula") ||
+            message.includes("cedula") ||
+            message.includes("identificación") ||
+            message.includes("identificacion");
+
+          if (emailError) {
+            form.setError("email", {
+              message: "El correo ya está registrado",
+            });
+          }
+  
+          if (idError) {
+            form.setError("nationalId", {
+              message: "La cédula ya está registrada",
+            });
+          }
+  
+
+          if (!emailError && !idError) {
+            form.setError("root", {
+              message: result.message,
+            });
+          }
+  
           return;
         }
       }
+      
 
       const cleanedData = Object.entries(data).reduce((acc, [key, value]) => {
         const field = config.sections
@@ -143,6 +164,10 @@ export function DynamicForm<T = any>({
   };
 
   const formData = form.watch();
+  
+
+  const hasErrors = Object.keys(form.formState.errors).length > 0;
+  const isSubmitDisabled = loading || hasErrors || !form.formState.isValid;
 
   return (
     <Form {...form}>
@@ -194,7 +219,11 @@ export function DynamicForm<T = any>({
               {config.cancelLabel || "Cancelar"}
             </Button>
           )}
-          <Button type="submit" disabled={loading} className="cursor-pointer">
+          <Button 
+            type="submit" 
+            disabled={isSubmitDisabled} 
+            className="cursor-pointer"
+          >
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

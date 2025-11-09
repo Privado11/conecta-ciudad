@@ -5,7 +5,7 @@ import RegisterPage from "./views/auth/Register";
 import { Layout } from "./shared/layout/Layout";
 import Home from "./views/home/Home";
 import PublicRoute from "./route/PublicRoute";
-import ListUsers from "./views/auth/ListUsers";
+import ListUsers from "./views/users/ListUsers";
 
 
 function AppUI() {

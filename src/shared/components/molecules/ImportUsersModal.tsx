@@ -10,7 +10,21 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
+
+interface UserImportError {
+  rowNumber: number;
+  email: string;
+  nationalId: string;
+  role: string;
+  errorMessage: string;
+}
+
+interface BulkUserImportResult {
+  totalProcessed: number;
+  successfulImports: number;
+  failedImports: number;
+  errors: UserImportError[];
+}
 
 interface ImportUsersModalProps {
   isOpen: boolean;
@@ -18,7 +32,7 @@ interface ImportUsersModalProps {
   onImport: (file: File) => Promise<BulkUserImportResult>;
 }
 
-export function ImportUsersModal({
+export default function ImportUsersModal({
   isOpen,
   onClose,
   onImport,
@@ -72,12 +86,12 @@ export function ImportUsersModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Importar Usuarios desde CSV</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1 overflow-y-auto pr-2">
           <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
             <CardContent className="p-4">
               <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
@@ -135,7 +149,7 @@ export function ImportUsersModal({
                   size="icon"
                   onClick={handleRemoveFile}
                   disabled={loading}
-                  className="cursor-pointer "
+                  className="cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -190,27 +204,36 @@ export function ImportUsersModal({
                       <AlertCircle className="w-4 h-4 text-destructive" />
                       Errores detectados:
                     </h4>
-                    <div className="max-h-48 overflow-y-auto space-y-2">
+                    <div className="space-y-2">
                       {result.errors.map((error, index) => (
                         <Card
                           key={index}
                           className="bg-destructive/5 border-destructive/20"
                         >
                           <CardContent className="p-3">
-                            <div className="flex justify-between items-start gap-2">
-                              <div className="flex-1">
-                                <div className="text-xs font-medium mb-1">
+                            <div className="space-y-2">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="text-xs font-medium">
                                   Fila {error.rowNumber}
                                 </div>
-                                <div className="text-xs text-muted-foreground space-y-0.5">
-                                  <div>Email: {error.email}</div>
-                                  <div>Cédula: {error.nationalId}</div>
-                                  <div>Rol: {error.role}</div>
+                                <Badge 
+                                  variant="destructive" 
+                                  className="text-xs whitespace-normal text-left max-w-[60%]"
+                                >
+                                  {error.errorMessage}
+                                </Badge>
+                              </div>
+                              <div className="text-xs text-muted-foreground space-y-0.5 pl-2 border-l-2 border-muted">
+                                <div className="break-all">
+                                  <span className="font-medium">Email:</span> {error.email || 'N/A'}
+                                </div>
+                                <div className="break-all">
+                                  <span className="font-medium">Cédula:</span> {error.nationalId || 'N/A'}
+                                </div>
+                                <div>
+                                  <span className="font-medium">Rol:</span> {error.role || 'N/A'}
                                 </div>
                               </div>
-                              <Badge variant="destructive" className="text-xs">
-                                {error.errorMessage}
-                              </Badge>
                             </div>
                           </CardContent>
                         </Card>
@@ -231,13 +254,21 @@ export function ImportUsersModal({
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={loading} className="cursor-pointer">
+        <DialogFooter className="mt-4">
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            disabled={loading}
+            className="cursor-pointer"
+          >
             {result ? "Cerrar" : "Cancelar"}
-
           </Button>
           {!result && (
-            <Button onClick={handleImport} disabled={!file || loading} className="cursor-pointer">
+            <Button
+              onClick={handleImport}
+              disabled={!file || loading}
+              className="cursor-pointer"
+            >
               {loading ? "Importando..." : "Importar"}
             </Button>
           )}

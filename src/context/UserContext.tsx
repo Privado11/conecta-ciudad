@@ -1,6 +1,10 @@
 import UserService from "@/service/UserService";
+import { ROLE_BADGE_CONFIG } from "@/shared/constants/userRoles";
 import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
-import type { PaginatedResponse } from "@/shared/interface/PaginatedResponse";
+import type {
+  PagedUserResponse,
+  UserStatistics,
+} from "@/shared/interface/PaginatedResponse";
 import type { LoadingState } from "@/shared/types/loadingTypes";
 import type { User, UserRole } from "@/shared/types/userTYpes";
 import { createContext, useState } from "react";
@@ -17,6 +21,7 @@ type UserContextType = {
     totalElements: number;
     pageSize: number;
   };
+  statistics: UserStatistics | null;
 
   getUsers: (filters?: {
     name?: string;
@@ -47,7 +52,10 @@ type UserContextType = {
   removeRole: (id: number, role: UserRole) => Promise<void>;
   toggleActive: (id: number) => Promise<void>;
   setSelectedUser: (user: User | null) => void;
-  validateUniqueFields: (params: { email?: string; nationalId?: string }) => Promise<{ available: boolean; message: string }>;
+  validateUniqueFields: (params: {
+    email?: string;
+    nationalId?: string;
+  }) => Promise<{ available: boolean; message: string }>;
   exportUsers: (filters?: {
     name?: string;
     role?: string;
@@ -62,6 +70,7 @@ export const UserContext = createContext<UserContextType | null>(null);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [statistics, setStatistics] = useState<UserStatistics | null>(null);
   const [pagination, setPagination] = useState({
     currentPage: 0,
     totalPages: 0,
@@ -76,7 +85,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     togglingActive: false,
     addingRole: false,
     removingRole: false,
-    
   });
 
   const updateLoadingState = (key: keyof LoadingState, value: boolean) => {
@@ -97,23 +105,25 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     updateLoadingState("fetching", true);
     try {
       const data = await UserService.getUsers(filters);
-      if (Array.isArray(data)) {
-        setUsers(data);
+
+      if ("email" in data && "id" in data) {
+        setUsers([data as User]);
         setPagination({
           currentPage: 0,
           totalPages: 1,
-          totalElements: data.length,
-          pageSize: data.length,
+          totalElements: 1,
+          pageSize: 1,
         });
       } else {
-        const paginatedData = data as PaginatedResponse<User>;
-        setUsers(paginatedData.content);
+        const pagedData = data as PagedUserResponse;
+        setUsers(pagedData.page.content);
         setPagination({
-          currentPage: paginatedData.number,
-          totalPages: paginatedData.totalPages,
-          totalElements: paginatedData.totalElements,
-          pageSize: paginatedData.size,
+          currentPage: pagedData.page.number,
+          totalPages: pagedData.page.totalPages,
+          totalElements: pagedData.page.totalElements,
+          pageSize: pagedData.page.size,
         });
+        setStatistics(pagedData.statistics); 
       }
     } catch (err: any) {
       toast.error(err.message || "Error al obtener usuarios", {
@@ -228,9 +238,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             : user
         )
       );
+
+      const roleLabel = ROLE_BADGE_CONFIG[role]?.label || role;
+      
       toast.success(
-        "Se ha asignado correctamente el rol" +
-          role +
+        "Se ha asignado correctamente el rol " +
+          roleLabel +
           " al usuario " +
           updatedUser.name
       );
@@ -303,12 +316,18 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const validateUniqueFields = async (params: { email?: string; nationalId?: string }) => {
+  const validateUniqueFields = async (params: {
+    email?: string;
+    nationalId?: string;
+  }) => {
     try {
       const response = await UserService.validateUniqueFields(params);
       return response;
     } catch (err: any) {
-      const message = err.response?.data?.message || err.message || "Error al validar datos únicos";
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Error al validar datos únicos";
       toast.error(message);
       return { available: false, message };
     }
@@ -330,14 +349,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        
+
         const timestamp = new Date().toISOString().split("T")[0];
-        const filterInfo = filters?.role || filters?.active !== undefined 
-          ? "_filtrado" 
-          : "";
+        const filterInfo =
+          filters?.role || filters?.active !== undefined ? "_filtrado" : "";
         const filename = `usuarios${filterInfo}_${timestamp}.csv`;
         link.download = filename;
-        
+
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -353,7 +371,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
-   const exportAllUsers = async () => {
+  const exportAllUsers = async () => {
     toast.promise(
       async () => {
         const blob = await UserService.exportAllUsers();
@@ -361,11 +379,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        
+
         const timestamp = new Date().toISOString().split("T")[0];
         const filename = `usuarios_completo_${timestamp}.csv`;
         link.download = filename;
-        
+
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -384,7 +402,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const importUsers = async (file: File): Promise<BulkUserImportResult> => {
     try {
       const result = await UserService.importUsers(file);
-      
+
       if (result.failedImports === 0) {
         toast.success(
           `${result.successfulImports} usuario(s) importado(s) exitosamente`
@@ -399,14 +417,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
 
       await getUsers();
-      
+
       return result;
     } catch (err: any) {
       toast.error(err.message || "Error al importar usuarios");
       throw err;
     }
   };
-  
 
   return (
     <UserContext.Provider
@@ -415,6 +432,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         selectedUser,
         loading,
         pagination,
+        statistics,
         getUsers,
         getUserById,
         createUser,

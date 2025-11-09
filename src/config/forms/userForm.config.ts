@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { USER_ROLES, ROLE_DESCRIPTIONS } from "@/shared/constants/userRoles";
 import type { DynamicFormConfig } from "@/shared/types/dynamicForm.types";
+import { COMMON_VALIDATIONS } from "@/shared/constants/validationUtils";
 
 const roleOptions = Object.entries(USER_ROLES).map(([key, label]) => ({
   value: key,
@@ -22,6 +23,8 @@ export const userFormConfig: DynamicFormConfig = {
           type: "text",
           placeholder: "Nombre completo",
           validation: z.string().min(1, "El nombre es requerido"),
+          customValidations: COMMON_VALIDATIONS.name,
+          maxLength: 100,
           cols: 2
         },
         {
@@ -38,6 +41,8 @@ export const userFormConfig: DynamicFormConfig = {
           type: "text",
           placeholder: "Número de cédula",
           validation: z.string().min(1, "La cédula es requerida"),
+          customValidations: COMMON_VALIDATIONS.nationalId,
+          maxLength: 10,
         },
         {
           name: "phone",
@@ -45,6 +50,8 @@ export const userFormConfig: DynamicFormConfig = {
           type: "tel",
           placeholder: "Número de teléfono",
           validation: z.string().min(1, "El teléfono es requerido"),
+          customValidations: COMMON_VALIDATIONS.phone,
+          maxLength: 15,
         }
       ]
     },
@@ -63,6 +70,8 @@ export const userFormConfig: DynamicFormConfig = {
             z.literal("")
           ]).optional(),
           hidden: (formData) => !!formData?.id,
+          minLength: 6,
+          maxLength: 20,
         },
         {
           name: "confirmPassword",
@@ -70,7 +79,8 @@ export const userFormConfig: DynamicFormConfig = {
           type: "password",
           placeholder: "••••••",
           hidden: (formData) => !!formData?.id,
-          excludeFromSubmit: true
+          excludeFromSubmit: true,
+          maxLength: 20,
         },
         {
           name: "active",

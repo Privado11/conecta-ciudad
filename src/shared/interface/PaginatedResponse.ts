@@ -1,3 +1,5 @@
+import type { User } from "../types/userTYpes";
+
 export interface PaginatedResponse<T> {
     content: T[];
     pageable: {
@@ -20,4 +22,15 @@ export interface PaginatedResponse<T> {
     number: number;
     numberOfElements: number;
     empty: boolean;
+}
+
+export interface UserStatistics {
+  total: number;
+  active: number;
+  inactive: number;
+}
+
+export interface PagedUserResponse {
+  page: PaginatedResponse<User>;
+  statistics: UserStatistics;
 }

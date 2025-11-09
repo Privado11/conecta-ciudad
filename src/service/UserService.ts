@@ -1,6 +1,6 @@
 import type { User, UserRole } from "@/shared/types/userTYpes";
 import api from "./api";
-import type { PaginatedResponse } from "@/shared/interface/PaginatedResponse";
+import type { PagedUserResponse } from "@/shared/interface/PaginatedResponse";
 import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
 
 class UserService {
@@ -14,7 +14,7 @@ class UserService {
     size?: number;
     sortBy?: string;
     sortDirection?: "asc" | "desc";
-  }): Promise<User[] | PaginatedResponse<User>> {
+  }): Promise<User | PagedUserResponse> {
     const params = new URLSearchParams();
 
     if (filters?.email) {
@@ -29,7 +29,7 @@ class UserService {
       return response.data;
     }
 
-   if (filters?.name) params.append("name", filters.name);
+    if (filters?.name) params.append("name", filters.name);
     if (filters?.role) params.append("role", filters.role);
     if (filters?.active !== undefined) params.append("active", filters.active.toString());
     

@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { StatCard } from "../atoms/StatCard";
 import { SearchAndFilters } from "../atoms/SearchAndFilters";
 import { UserTable } from "./UserTable";
-import { Modal } from "../atoms/Modal";
+import { DeleteUserModal } from "./DeleteUserModal";
+import { ChangeRoleModal } from "./ChangeRoleModal";
 import type { UserRole, UserStatus } from "@/shared/types/userTYpes";
 import { useUser } from "@/hooks/useUser";
-import {
-  ROLE_BADGE_CONFIG,
-  ROLE_DESCRIPTIONS,
-} from "@/shared/constants/userRoles";
+import { ROLE_BADGE_CONFIG } from "@/shared/constants/userRoles";
 import { USER_STATS } from "@/shared/constants/userStats";
 import { DynamicFormModal } from "./DynamicFormModal";
 import { userFormConfig } from "@/config/forms/userForm.config";
-import { ImportUsersModal } from "./ImportUsersModal";
+import ImportUsersModal from "./ImportUsersModal";
 
 export default function UserManagement() {
   const {
@@ -24,6 +20,7 @@ export default function UserManagement() {
     selectedUser,
     loading,
     pagination,
+    statistics,
     createUser,
     updateUser,
     deleteUser,
@@ -51,8 +48,8 @@ export default function UserManagement() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log("loading", loading);
-  }, [loading]);
+    console.log("pagination", pagination, statistics);
+  }, [pagination, statistics]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -127,16 +124,20 @@ export default function UserManagement() {
     });
   };
 
-  const updateUserRole = (userId: number, newRole: UserRole) => {
-    addRole(userId, newRole).then(() => {
+  const updateUserRole = (newRole: UserRole) => {
+    if (!selectedUser) return;
+    addRole(selectedUser.id, newRole).then(() => {
       setModalType(null);
+      setSelectedUser(null);
       loadUsers();
     });
   };
 
-  const handleDelete = (userId: number) => {
-    deleteUser(userId).then(() => {
+  const handleDelete = () => {
+    if (!selectedUser) return;
+    deleteUser(selectedUser.id).then(() => {
       setModalType(null);
+      setSelectedUser(null);
       if (users.length === 1 && currentPage > 0) {
         setCurrentPage(currentPage - 1);
       } else {
@@ -199,8 +200,8 @@ export default function UserManagement() {
     }
   };
 
-  const activeCount = users.filter((u) => u.active).length;
-  const inactiveCount = users.filter((u) => !u.active).length;
+  const activeCount = statistics?.active || 0;
+  const inactiveCount = statistics?.inactive || 0;
 
   const getActiveFiltersMessage = () => {
     const filters = [];
@@ -327,68 +328,28 @@ export default function UserManagement() {
         onImport={importUsers}
       />
 
-      <Modal
+      <DeleteUserModal
         isOpen={modalType === "delete"}
-        onClose={() => setModalType(null)}
-        title="Confirmar eliminación"
-      >
-        <p className="text-sm text-muted-foreground mb-6">
-          ¿Estás seguro de que deseas eliminar a{" "}
-          <strong>{selectedUser?.name}</strong>? Esta acción no se puede
-          deshacer.
-        </p>
-        <div className="flex gap-3 justify-end">
-          <Button variant="outline" onClick={() => setModalType(null)}>
-            Cancelar
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => selectedUser && handleDelete(selectedUser.id)}
-          >
-            Eliminar
-          </Button>
-        </div>
-      </Modal>
+        userName={selectedUser?.name}
+        onClose={() => {
+          setModalType(null);
+          setSelectedUser(null);
+        }}
+        onConfirm={handleDelete}
+        loading={loading.deleting}
+      />
 
-      <Modal
+      <ChangeRoleModal
         isOpen={modalType === "role"}
-        onClose={() => setModalType(null)}
-        title="Cambiar rol de usuario"
-      >
-        <div className="mb-6">
-          <p className="text-sm text-muted-foreground mb-4">
-            Selecciona el nuevo rol para <strong>{selectedUser?.name}</strong>
-          </p>
-          <div className="space-y-2">
-            {(Object.keys(ROLE_BADGE_CONFIG) as UserRole[]).map((role) => {
-              const badge = ROLE_BADGE_CONFIG[role];
-              return (
-                <button
-                  key={role}
-                  onClick={() =>
-                    selectedUser && updateUserRole(selectedUser.id, role)
-                  }
-                  className={cn(
-                    "w-full p-3 border rounded-lg text-left hover:bg-accent transition-colors",
-                    selectedUser?.roles?.includes(role) &&
-                      "border-primary bg-primary/5"
-                  )}
-                >
-                  <div className="font-medium mb-1">{badge.label}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {ROLE_DESCRIPTIONS[role]}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <div className="flex gap-3 justify-end">
-          <Button variant="outline" onClick={() => setModalType(null)}>
-            Cancelar
-          </Button>
-        </div>
-      </Modal>
+        userName={selectedUser?.name}
+        currentRoles={selectedUser?.roles}
+        onClose={() => {
+          setModalType(null);
+          setSelectedUser(null);
+        }}
+        onConfirm={updateUserRole}
+        loading={loading.addingRole || loading.removingRole}
+      />
     </div>
   );
 }
