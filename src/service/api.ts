@@ -3,7 +3,7 @@ import { isTokenExpired } from "@/utils/tokenUtils";
 import axios from "axios";
 
 
-const API_URL = import.meta.env.VITE_API_URL_DEV  ;
+const API_URL = import.meta.env.VITE_API_URL_DEV;
 
 const api = axios.create({
   baseURL: API_URL,

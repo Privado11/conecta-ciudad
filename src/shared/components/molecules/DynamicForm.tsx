@@ -6,7 +6,6 @@ import { Form } from "@/components/ui/form";
 import type { DynamicFormProps } from "@/shared/types/dynamicForm.types";
 import { DynamicField } from "../organisms/DynamicField";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 
 export function DynamicForm<T = any>({
   config,
@@ -76,7 +75,21 @@ export function DynamicForm<T = any>({
 
   useEffect(() => {
     if (initialData) {
-      form.reset(initialData);
+      const flattenedData: Record<string, any> = { ...initialData };
+
+      config.sections.forEach((section) => {
+        section.fields.forEach((field) => {
+          const fieldName = field.name;
+          if (
+            field.type === "radio" &&
+            Array.isArray(flattenedData[fieldName])
+          ) {
+            flattenedData[fieldName] = flattenedData[fieldName][0];
+          }
+        });
+      });
+
+      form.reset(flattenedData);
     } else {
       form.reset(getDefaultValues());
     }
@@ -84,12 +97,12 @@ export function DynamicForm<T = any>({
 
   const handleSubmit = async (data: any) => {
     try {
-      if (onValidate && (data.email || data.nationalId)) {
+      if (!isEditMode && onValidate && (data.email || data.nationalId)) {
         const result = await onValidate({
           email: data.email,
           nationalId: data.nationalId,
         } as T);
-  
+
         if (!result.available) {
           if (result.message.toLowerCase().includes("correo")) {
             form.setError("email", { message: result.message });
@@ -99,39 +112,35 @@ export function DynamicForm<T = any>({
           ) {
             form.setError("nationalId", { message: result.message });
           }
-  
-          toast.error(result.message || "El email o la cédula ya están registrados");
-          return; 
+
+          return;
         }
       }
-  
+
       const cleanedData = Object.entries(data).reduce((acc, [key, value]) => {
         const field = config.sections
           .flatMap((section) => section.fields)
           .find((f) => f.name === key);
-  
+
         if (field?.excludeFromSubmit) return acc;
-  
+
         if (field?.transformOnSubmit) {
           acc[key] = field.transformOnSubmit(value);
           return acc;
         }
-  
+
         if (value !== "" && value !== undefined) {
           acc[key] = value;
         }
-  
+
         return acc;
       }, {} as any);
-  
+
       await onSubmit(cleanedData as T);
     } catch (error) {
       console.error("Error submitting form:", error);
     }
   };
-  
-  
-  
 
   const formData = form.watch();
 
@@ -180,11 +189,12 @@ export function DynamicForm<T = any>({
               variant="outline"
               onClick={onCancel}
               disabled={loading}
+              className="cursor-pointer"
             >
               {config.cancelLabel || "Cancelar"}
             </Button>
           )}
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} className="cursor-pointer">
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

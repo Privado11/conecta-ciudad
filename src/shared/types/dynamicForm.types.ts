@@ -49,7 +49,7 @@ export interface DynamicFormConfig {
   schema?: z.ZodObject<any>;
 }
 
-export interface DynamicFormProps<T = any> {
+export interface DynamicFormProps<T = Record<string, any>> {
   config: DynamicFormConfig;
   initialData?: T | null;
   onValidate?: (data: T) => Promise<{ available: boolean; message: string }>;

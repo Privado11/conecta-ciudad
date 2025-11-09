@@ -1,4 +1,5 @@
 import UserService from "@/service/UserService";
+import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
 import type { PaginatedResponse } from "@/shared/interface/PaginatedResponse";
 import type { LoadingState } from "@/shared/types/loadingTypes";
 import type { User, UserRole } from "@/shared/types/userTYpes";
@@ -47,6 +48,13 @@ type UserContextType = {
   toggleActive: (id: number) => Promise<void>;
   setSelectedUser: (user: User | null) => void;
   validateUniqueFields: (params: { email?: string; nationalId?: string }) => Promise<{ available: boolean; message: string }>;
+  exportUsers: (filters?: {
+    name?: string;
+    role?: string;
+    active?: boolean;
+  }) => Promise<void>;
+  exportAllUsers: () => Promise<void>;
+  importUsers: (file: File) => Promise<BulkUserImportResult>;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -68,6 +76,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     togglingActive: false,
     addingRole: false,
     removingRole: false,
+    
   });
 
   const updateLoadingState = (key: keyof LoadingState, value: boolean) => {
@@ -304,6 +313,99 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       return { available: false, message };
     }
   };
+
+  const exportUsers = async (filters?: {
+    name?: string;
+    role?: string;
+    active?: boolean;
+  }) => {
+    toast.promise(
+      async () => {
+        const blob = await UserService.exportUsers({
+          ...filters,
+          page: 0,
+          size: 1000,
+        });
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        
+        const timestamp = new Date().toISOString().split("T")[0];
+        const filterInfo = filters?.role || filters?.active !== undefined 
+          ? "_filtrado" 
+          : "";
+        const filename = `usuarios${filterInfo}_${timestamp}.csv`;
+        link.download = filename;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        return { filename, count: 0 };
+      },
+      {
+        loading: "Exportando usuarios...",
+        success: (data) => `Archivo ${data.filename} descargado exitosamente`,
+        error: (err) => err.message || "Error al exportar usuarios",
+      }
+    );
+  };
+
+   const exportAllUsers = async () => {
+    toast.promise(
+      async () => {
+        const blob = await UserService.exportAllUsers();
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        
+        const timestamp = new Date().toISOString().split("T")[0];
+        const filename = `usuarios_completo_${timestamp}.csv`;
+        link.download = filename;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        return { filename };
+      },
+      {
+        loading: "Exportando todos los usuarios...",
+        success: (data) => `${data.filename} descargado exitosamente`,
+        error: (err) => err.message || "Error al exportar usuarios",
+      }
+    );
+  };
+
+  const importUsers = async (file: File): Promise<BulkUserImportResult> => {
+    try {
+      const result = await UserService.importUsers(file);
+      
+      if (result.failedImports === 0) {
+        toast.success(
+          `${result.successfulImports} usuario(s) importado(s) exitosamente`
+        );
+      } else {
+        toast.warning(
+          `Importación parcial: ${result.successfulImports} exitosos, ${result.failedImports} fallidos`,
+          {
+            description: "Revisa los errores en el detalle",
+          }
+        );
+      }
+
+      await getUsers();
+      
+      return result;
+    } catch (err: any) {
+      toast.error(err.message || "Error al importar usuarios");
+      throw err;
+    }
+  };
   
 
   return (
@@ -323,6 +425,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         toggleActive,
         setSelectedUser,
         validateUniqueFields,
+        exportUsers,
+        exportAllUsers,
+        importUsers,
       }}
     >
       {children}

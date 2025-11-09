@@ -1,4 +1,4 @@
-import { Search, Download, Plus } from "lucide-react";
+import { Search, Download, Plus, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -14,6 +14,7 @@ interface SearchAndFiltersProps {
   onStatusChange: (value: UserStatus | "all") => void;
   onOpenModal?: () => void;
   onExport?: () => void;
+  onImport?: () => void;
 }
 
 export function SearchAndFilters({
@@ -25,6 +26,7 @@ export function SearchAndFilters({
   onStatusChange,
   onOpenModal,
   onExport,
+  onImport,
 }: SearchAndFiltersProps) {
   return (
     <Card className="mb-6 border-border shadow-sm">
@@ -34,13 +36,35 @@ export function SearchAndFilters({
             <CardTitle className="text-lg font-semibold text-foreground">
               Gestión de Usuarios
             </CardTitle>
+
             <div className="flex gap-2 flex-wrap">
-              <Button variant="outline" size="icon" onClick={onExport} className="cursor-pointer">
-                <Download className="w-4 h-4" />
+              <Button
+                variant="outline"
+                onClick={onImport}
+                title="Importar usuarios desde CSV"
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Upload className="w-4 h-4" />
+                <span>Importar CSV</span>
               </Button>
-              <Button onClick={onOpenModal} className="cursor-pointer">
-                <Plus className="w-4 h-4 mr-2" />
-                Nuevo Usuario
+
+              <Button
+                variant="outline"
+                onClick={onExport}
+                title="Exportar usuarios a CSV"
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Download className="w-4 h-4" />
+                <span>Exportar CSV</span>
+              </Button>
+
+              <Button
+                onClick={onOpenModal}
+                title="Crear nuevo usuario"
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Nuevo Usuario</span>
               </Button>
             </div>
           </div>

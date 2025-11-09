@@ -24,6 +24,11 @@ export function DynamicFormModal<T = any>({
   const isEditMode = !!initialData;
   const modalTitle = `${isEditMode ? "Editar" : "Nuevo"} ${config.title}`;
 
+  const dynamicSubmitLabel = isEditMode
+    ? `Actualizar ${config.title}`
+    : `Guardar ${config.title}`;
+
+
   if (!isOpen) return null;
 
   return (
@@ -36,7 +41,10 @@ export function DynamicFormModal<T = any>({
     >
       <div className="px-6">
         <DynamicForm
-          config={config}
+          config={{
+            ...config,
+            submitLabel: dynamicSubmitLabel,
+          }}
           initialData={initialData}
           onValidate={onValidate}
           onSubmit={onSubmit}
