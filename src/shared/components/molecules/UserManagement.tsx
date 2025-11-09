@@ -239,8 +239,8 @@ export default function UserManagement() {
               valueKey === "total"
                 ? pagination.totalElements
                 : valueKey === "active"
-                ? activeCount
-                : inactiveCount
+                  ? activeCount
+                  : inactiveCount
             }
             icon={<Icon className="w-8 h-8" />}
             iconColor={color}
@@ -248,8 +248,8 @@ export default function UserManagement() {
               valueKey === "active"
                 ? "text-green-600"
                 : valueKey === "inactive"
-                ? "text-red-600"
-                : undefined
+                  ? "text-red-600"
+                  : undefined
             }
           />
         ))}
@@ -371,7 +371,7 @@ export default function UserManagement() {
                   className={cn(
                     "w-full p-3 border rounded-lg text-left hover:bg-accent transition-colors",
                     selectedUser?.roles?.includes(role) &&
-                      "border-primary bg-primary/5"
+                    "border-primary bg-primary/5"
                   )}
                 >
                   <div className="font-medium mb-1">{badge.label}</div>

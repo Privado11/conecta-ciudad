@@ -13,7 +13,8 @@ export type FieldType =
   | "radio"
   | "multi-checkbox"
   | "switch"
-  | "file";
+  | "file"
+  | "datetime";
 
 export interface FieldConfig {
   name: string;
