@@ -1,4 +1,4 @@
-export type LoadingState = {
+export type LoadingUserState = {
   fetching: boolean;
   creating: boolean;
   updating: boolean;
@@ -7,3 +7,9 @@ export type LoadingState = {
   addingRole: boolean;
   removingRole: boolean;
 };
+
+export type LoadingAuditState = {
+  fetching: boolean;
+  fetchingStatistics: boolean;
+};
+

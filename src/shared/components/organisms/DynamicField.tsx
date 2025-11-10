@@ -18,7 +18,7 @@ import {
   FormDescription,
   FormMessage,
 } from "@/components/ui/form";
-import type { FieldConfig } from "@/shared/types/dynamicForm.types";
+import type { FieldConfig } from "@/shared/types/dynamicFormTypes";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { useState } from "react";
@@ -43,10 +43,12 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
       ? field.disabled(formData)
       : field.disabled;
 
-
-  const handleCustomValidation = (value: any, onChange: (...event: any[]) => void) => {
+  const handleCustomValidation = (
+    value: any,
+    onChange: (...event: any[]) => void
+  ) => {
     onChange(value);
-    
+
     if (field.customValidations) {
       const error = validateField(value, field.customValidations);
       setCustomError(error);
@@ -66,7 +68,9 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
             disabled={isDisabled}
             maxLength={field.maxLength}
             {...fieldProps}
-            onChange={(e) => handleCustomValidation(e.target.value, fieldProps.onChange)}
+            onChange={(e) =>
+              handleCustomValidation(e.target.value, fieldProps.onChange)
+            }
           />
         );
 
@@ -90,7 +94,9 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
             type="date"
             disabled={isDisabled}
             {...fieldProps}
-            onChange={(e) => handleCustomValidation(e.target.value, fieldProps.onChange)}
+            onChange={(e) =>
+              handleCustomValidation(e.target.value, fieldProps.onChange)
+            }
           />
         );
 
@@ -102,14 +108,18 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
             rows={4}
             maxLength={field.maxLength}
             {...fieldProps}
-            onChange={(e) => handleCustomValidation(e.target.value, fieldProps.onChange)}
+            onChange={(e) =>
+              handleCustomValidation(e.target.value, fieldProps.onChange)
+            }
           />
         );
 
       case "select":
         return (
           <Select
-            onValueChange={(value) => handleCustomValidation(value, fieldProps.onChange)}
+            onValueChange={(value) =>
+              handleCustomValidation(value, fieldProps.onChange)
+            }
             defaultValue={fieldProps.value}
             disabled={isDisabled}
           >
@@ -258,7 +268,9 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
           <div className="min-h-3 mt-1">
             <FormMessage />
             {customError && !fieldState.error && (
-              <p className="text-sm font-medium text-destructive">{customError}</p>
+              <p className="text-sm font-medium text-destructive">
+                {customError}
+              </p>
             )}
           </div>
         </FormItem>

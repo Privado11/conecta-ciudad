@@ -48,10 +48,6 @@ export default function UserManagement() {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log("pagination", pagination, statistics);
-  }, [pagination, statistics]);
-
-  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
       setCurrentPage(0);
@@ -108,13 +104,23 @@ export default function UserManagement() {
   });
 
   const handleSubmit = async (data: any) => {
-    if (selectedUser) {
-      await updateUser(selectedUser.id, data);
-    } else {
-      await createUser(data);
+    try {
+      if (selectedUser) {
+        await updateUser(selectedUser.id, data);
+      } else {
+        await createUser(data);
+      }
+  
+      setIsOpenModal(false);
+      setSelectedUser(null);
+      loadUsers();
+    } catch (error: any) {
+      console.error("Error al guardar usuario:", error);
+      throw error;
     }
-    setIsOpenModal(false);
   };
+  
+  
 
   const toggleUserStatus = (userId: number) => {
     const user = users.find((u) => u.id === userId);

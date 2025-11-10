@@ -5,7 +5,7 @@ import type {
   PagedUserResponse,
   UserStatistics,
 } from "@/shared/interface/PaginatedResponse";
-import type { LoadingState } from "@/shared/types/loadingTypes";
+import type { LoadingUserState } from "@/shared/types/loadingTypes";
 import type { User, UserRole } from "@/shared/types/userTYpes";
 import { createContext, useState } from "react";
 import type { ReactNode } from "react";
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 type UserContextType = {
   users: User[];
   selectedUser: User | null;
-  loading: LoadingState;
+  loading: LoadingUserState;
   pagination: {
     currentPage: number;
     totalPages: number;
@@ -77,7 +77,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     totalElements: 0,
     pageSize: 10,
   });
-  const [loading, setLoading] = useState<LoadingState>({
+  const [loading, setLoading] = useState<LoadingUserState>({
     fetching: false,
     creating: false,
     updating: false,
@@ -87,7 +87,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     removingRole: false,
   });
 
-  const updateLoadingState = (key: keyof LoadingState, value: boolean) => {
+  const updateLoadingState = (key: keyof LoadingUserState, value: boolean) => {
     setLoading((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -123,7 +123,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           totalElements: pagedData.page.totalElements,
           pageSize: pagedData.page.size,
         });
-        setStatistics(pagedData.statistics); 
+        setStatistics(pagedData.statistics);
       }
     } catch (err: any) {
       toast.error(err.message || "Error al obtener usuarios", {
@@ -170,12 +170,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setUsers((prev) => [...prev, newUser]);
       toast.success("El usuario " + newUser.name + " creado exitosamente");
     } catch (err: any) {
-      toast.error(err.message || "Error al crear usuario", {
+      const apiError =
+        err.response?.data?.message || err.message || "Error al crear usuario";
+      toast.error(apiError, {
         action: {
           label: "Reintentar",
           onClick: () => createUser(data),
         },
       });
+      throw err;
     } finally {
       updateLoadingState("creating", false);
     }
@@ -197,12 +200,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         "El usuario " + updatedUser.name + " actualizado exitosamente"
       );
     } catch (err: any) {
-      toast.error(err.message || "Error al actualizar usuario", {
+      const apiError =
+        err.response?.data?.message || err.message || "Error al actualizar usuario";
+      toast.error(apiError, {
         action: {
           label: "Reintentar",
           onClick: () => updateUser(id, data),
         },
       });
+      throw err;
     } finally {
       updateLoadingState("updating", false);
     }
@@ -240,7 +246,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       );
 
       const roleLabel = ROLE_BADGE_CONFIG[role]?.label || role;
-      
+
       toast.success(
         "Se ha asignado correctamente el rol " +
           roleLabel +

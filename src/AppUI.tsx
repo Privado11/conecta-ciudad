@@ -7,7 +7,6 @@ import Home from "./views/home/Home";
 import PublicRoute from "./route/PublicRoute";
 import ListUsers from "./views/users/ListUsers";
 
-
 function AppUI() {
   return (
     <Routes>
@@ -43,6 +42,5 @@ function AppUI() {
     </Routes>
   );
 }
-
 
 export default AppUI;

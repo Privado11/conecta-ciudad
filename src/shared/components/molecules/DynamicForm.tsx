@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import type { DynamicFormProps } from "@/shared/types/dynamicForm.types";
+import type { DynamicFormProps } from "@/shared/types/dynamicFormTypes";
 import { DynamicField } from "../organisms/DynamicField";
 import { Loader2 } from "lucide-react";
 
@@ -105,9 +105,9 @@ export function DynamicForm<T = any>({
 
         if (!result.available) {
           const message = result.message.toLowerCase();
-  
 
-          const emailError = message.includes("email") || message.includes("correo");
+          const emailError =
+            message.includes("email") || message.includes("correo");
           const idError =
             message.includes("cédula") ||
             message.includes("cedula") ||
@@ -119,24 +119,22 @@ export function DynamicForm<T = any>({
               message: "El correo ya está registrado",
             });
           }
-  
+
           if (idError) {
             form.setError("nationalId", {
               message: "La cédula ya está registrada",
             });
           }
-  
 
           if (!emailError && !idError) {
             form.setError("root", {
               message: result.message,
             });
           }
-  
+
           return;
         }
       }
-      
 
       const cleanedData = Object.entries(data).reduce((acc, [key, value]) => {
         const field = config.sections
@@ -164,7 +162,6 @@ export function DynamicForm<T = any>({
   };
 
   const formData = form.watch();
-  
 
   const hasErrors = Object.keys(form.formState.errors).length > 0;
   const isSubmitDisabled = loading || hasErrors || !form.formState.isValid;
@@ -219,9 +216,9 @@ export function DynamicForm<T = any>({
               {config.cancelLabel || "Cancelar"}
             </Button>
           )}
-          <Button 
-            type="submit" 
-            disabled={isSubmitDisabled} 
+          <Button
+            type="submit"
+            disabled={isSubmitDisabled}
             className="cursor-pointer"
           >
             {loading ? (

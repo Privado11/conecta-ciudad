@@ -1,5 +1,5 @@
 import { DynamicForm } from "./DynamicForm";
-import type { DynamicFormConfig } from "@/shared/types/dynamicForm.types";
+import type { DynamicFormConfig } from "@/shared/types/dynamicFormTypes";
 import { Modal } from "../atoms/Modal";
 
 interface DynamicFormModalProps<T = any> {
@@ -27,7 +27,6 @@ export function DynamicFormModal<T = any>({
   const dynamicSubmitLabel = isEditMode
     ? `Actualizar ${config.title}`
     : `Guardar ${config.title}`;
-
 
   if (!isOpen) return null;
 
