@@ -1,9 +1,7 @@
-import UserManagement from "@/shared/components/molecules/UserManagement"
-
+import UserManagement from "@/shared/components/molecules/user/UserManagement";
 
 function ListUsers() {
-  return <UserManagement />
+  return <UserManagement />;
 }
 
-export default ListUsers
-
+export default ListUsers;

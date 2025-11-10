@@ -30,11 +30,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { User, UserRole } from "@/shared/types/userTYpes";
-import type { LoadingState } from "@/shared/types/loadingTypes";
+import type { LoadingUserState } from "@/shared/types/loadingTypes";
 
 interface UserTableProps {
   users: User[];
-  loading: LoadingState;
+  loading: LoadingUserState;
   roleBadgeConfig: Record<
     UserRole,
     {

@@ -1,7 +1,8 @@
 import type { User, UserRole } from "@/shared/types/userTYpes";
 import api from "./api";
-import type { PagedUserResponse } from "@/shared/interface/PaginatedResponse";
+
 import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
+import type { PagedResponse } from "@/shared/interface/PaginatedResponse";
 
 class UserService {
   async getUsers(filters?: {
@@ -14,7 +15,7 @@ class UserService {
     size?: number;
     sortBy?: string;
     sortDirection?: "asc" | "desc";
-  }): Promise<User | PagedUserResponse> {
+  }): Promise<User | PagedResponse<User>> {
     const params = new URLSearchParams();
 
     if (filters?.email) {

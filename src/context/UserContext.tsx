@@ -1,9 +1,9 @@
 import UserService from "@/service/UserService";
-import { ROLE_BADGE_CONFIG } from "@/shared/constants/userRoles";
+import { ROLE_BADGE_CONFIG } from "@/shared/constants/user/userRoles";
 import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
 import type {
-  PagedUserResponse,
-  UserStatistics,
+  PagedResponse,
+  Statistics,
 } from "@/shared/interface/PaginatedResponse";
 import type { LoadingUserState } from "@/shared/types/loadingTypes";
 import type { User, UserRole } from "@/shared/types/userTYpes";
@@ -21,7 +21,7 @@ type UserContextType = {
     totalElements: number;
     pageSize: number;
   };
-  statistics: UserStatistics | null;
+  statistics: Statistics<User> | null;
 
   getUsers: (filters?: {
     name?: string;
@@ -70,7 +70,7 @@ export const UserContext = createContext<UserContextType | null>(null);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [statistics, setStatistics] = useState<UserStatistics | null>(null);
+  const [statistics, setStatistics] = useState<Statistics<User> | null>(null);
   const [pagination, setPagination] = useState({
     currentPage: 0,
     totalPages: 0,
@@ -115,7 +115,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           pageSize: 1,
         });
       } else {
-        const pagedData = data as PagedUserResponse;
+        const pagedData = data as PagedResponse<User>;
         setUsers(pagedData.page.content);
         setPagination({
           currentPage: pagedData.page.number,
@@ -201,7 +201,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       );
     } catch (err: any) {
       const apiError =
-        err.response?.data?.message || err.message || "Error al actualizar usuario";
+        err.response?.data?.message ||
+        err.message ||
+        "Error al actualizar usuario";
       toast.error(apiError, {
         action: {
           label: "Reintentar",

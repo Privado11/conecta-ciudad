@@ -1,3 +1,5 @@
+import type { User } from "./userTYpes";
+
 export type ActionResult = "SUCCESS" | "FAILED" | "PARTIAL";
 
 export type EntityType = 
@@ -7,6 +9,23 @@ export type EntityType =
   | "ROLE" 
   | "ACCESS" 
   | "SYSTEM";
+
+export type ActionType = 
+  | "PROJECT" 
+  | "USER" 
+  | "CITIZEN";
+  
+
+export interface Access {
+    id: number;
+    accessAt: string;
+    user: User;
+    ipAddress: string;
+    userAgent: string;
+    location: string;
+    success: boolean;
+  }
+  
 
 export interface ActionDto {
   id: number;
@@ -18,18 +37,10 @@ export interface ActionDto {
   metadata: string | null;
   ipAddress: string | null;
   actionAt: string; 
-  userId: number;
-  accessId: number | null;
+  user: User;
+  access: Access;
 }
 
 
-export interface PagedAuditResponse {
-  content: ActionDto[];
-  number: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-  first: boolean;
-  last: boolean;
-  empty: boolean;
-}
+
+

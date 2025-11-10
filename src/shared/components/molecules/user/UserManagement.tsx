@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
-import { StatCard } from "../atoms/StatCard";
-import { SearchAndFilters } from "../atoms/SearchAndFilters";
+import { StatCard } from "../../atoms/StatCard";
+import { SearchAndFilters } from "../../atoms/SearchAndFilters";
 import { UserTable } from "./UserTable";
 import { DeleteUserModal } from "./DeleteUserModal";
 import { ChangeRoleModal } from "./ChangeRoleModal";
 import type { UserRole, UserStatus } from "@/shared/types/userTYpes";
 import { useUser } from "@/hooks/useUser";
-import { ROLE_BADGE_CONFIG } from "@/shared/constants/userRoles";
-import { USER_STATS } from "@/shared/constants/userStats";
-import { DynamicFormModal } from "./DynamicFormModal";
+import { ROLE_BADGE_CONFIG } from "@/shared/constants/user/userRoles";
+import { USER_STATS } from "@/shared/constants/user/userStats";
+import { DynamicFormModal } from "../DynamicFormModal";
 import { userFormConfig } from "@/config/forms/userForm.config";
 import ImportUsersModal from "./ImportUsersModal";
 
@@ -110,7 +110,7 @@ export default function UserManagement() {
       } else {
         await createUser(data);
       }
-  
+
       setIsOpenModal(false);
       setSelectedUser(null);
       loadUsers();
@@ -119,8 +119,6 @@ export default function UserManagement() {
       throw error;
     }
   };
-  
-  
 
   const toggleUserStatus = (userId: number) => {
     const user = users.find((u) => u.id === userId);
@@ -206,9 +204,6 @@ export default function UserManagement() {
     }
   };
 
-  const activeCount = statistics?.active || 0;
-  const inactiveCount = statistics?.inactive || 0;
-
   const getActiveFiltersMessage = () => {
     const filters = [];
     if (debouncedSearchTerm) filters.push(`búsqueda: "${debouncedSearchTerm}"`);
@@ -238,28 +233,29 @@ export default function UserManagement() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        {USER_STATS.map(({ label, icon: Icon, color, valueKey }) => (
-          <StatCard
-            key={label}
-            label={label}
-            value={
-              valueKey === "total"
-                ? pagination.totalElements
-                : valueKey === "active"
-                ? activeCount
-                : inactiveCount
-            }
-            icon={<Icon className="w-8 h-8" />}
-            iconColor={color}
-            valueColor={
-              valueKey === "active"
-                ? "text-green-600"
-                : valueKey === "inactive"
-                ? "text-red-600"
-                : undefined
-            }
-          />
-        ))}
+        {USER_STATS.map(({ label, icon: Icon, color, valueKey }) => {
+          const metricValue =
+            valueKey === "total"
+              ? pagination.totalElements
+              : (statistics?.metrics?.[valueKey] as number) || 0;
+
+          return (
+            <StatCard
+              key={label}
+              label={label}
+              value={metricValue}
+              icon={<Icon className="w-8 h-8" />}
+              iconColor={color}
+              valueColor={
+                valueKey === "active"
+                  ? "text-green-600"
+                  : valueKey === "inactive"
+                  ? "text-red-600"
+                  : undefined
+              }
+            />
+          );
+        })}
       </div>
       <SearchAndFilters
         searchTerm={searchTerm}

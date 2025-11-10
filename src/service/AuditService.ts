@@ -1,12 +1,13 @@
+import type { PagedResponse } from "@/shared/interface/PaginatedResponse";
 import api from "./api";
-import type { ActionDto, ActionResult, EntityType, PagedAuditResponse } from "@/shared/types/auditTypes";
+import type { ActionDto, ActionResult, EntityType } from "@/shared/types/auditTypes";
 
 
 class AuditService {
   async getAllActions(filters?: {
     page?: number;
     size?: number;
-  }): Promise<PagedAuditResponse> {
+  }): Promise<PagedResponse<ActionDto>> {
     const params = new URLSearchParams();
     
     if (filters?.page !== undefined) params.append("page", filters.page.toString());
@@ -23,7 +24,7 @@ class AuditService {
       page?: number;
       size?: number;
     }
-  ): Promise<PagedAuditResponse> {
+  ): Promise<PagedResponse<ActionDto>> {
     const params = new URLSearchParams();
     
     if (filters?.page !== undefined) params.append("page", filters.page.toString());
@@ -36,29 +37,6 @@ class AuditService {
     return response.data;
   }
 
-  async countActionsByUser(
-    userId: number,
-    filters?: {
-      startDate?: string;
-      endDate?: string;
-    }
-  ): Promise<{
-    userId: number;
-    count: number;
-    startDate: string;
-    endDate: string;
-  }> {
-    const params = new URLSearchParams();
-    
-    if (filters?.startDate) params.append("startDate", filters.startDate);
-    if (filters?.endDate) params.append("endDate", filters.endDate);
-
-    const query = params.toString();
-    const response = await api.get(
-      `/api/v1/audit/user/${userId}/count${query ? `?${query}` : ""}`
-    );
-    return response.data;
-  }
 
   async getActionsByEntity(
     entityType: EntityType,
@@ -67,7 +45,7 @@ class AuditService {
       page?: number;
       size?: number;
     }
-  ): Promise<PagedAuditResponse> {
+  ): Promise<PagedResponse<ActionDto>> {
     const params = new URLSearchParams();
     
     if (filters?.page !== undefined) params.append("page", filters.page.toString());
@@ -86,7 +64,7 @@ class AuditService {
       page?: number;
       size?: number;
     }
-  ): Promise<PagedAuditResponse> {
+  ): Promise<PagedResponse<ActionDto>> {
     const params = new URLSearchParams();
     
     if (filters?.page !== undefined) params.append("page", filters.page.toString());
@@ -105,7 +83,7 @@ class AuditService {
       page?: number;
       size?: number;
     }
-  ): Promise<PagedAuditResponse> {
+  ): Promise<PagedResponse<ActionDto>> {
     const params = new URLSearchParams();
     
     if (filters?.page !== undefined) params.append("page", filters.page.toString());
@@ -125,7 +103,7 @@ class AuditService {
       page?: number;
       size?: number;
     }
-  ): Promise<PagedAuditResponse> {
+  ): Promise<PagedResponse<ActionDto>> {
     const params = new URLSearchParams();
     
     params.append("startDate", startDate);
@@ -135,70 +113,6 @@ class AuditService {
     if (filters?.size !== undefined) params.append("size", filters.size.toString());
 
     const response = await api.get(`/api/v1/audit/date-range?${params.toString()}`);
-    return response.data;
-  }
-
-  async getStatisticsByType(
-    startDate: string,
-    endDate: string
-  ): Promise<Record<string, number>> {
-    const params = new URLSearchParams();
-    params.append("startDate", startDate);
-    params.append("endDate", endDate);
-
-    const response = await api.get(
-      `/api/v1/audit/statistics/by-type?${params.toString()}`
-    );
-    return response.data;
-  }
-
-  async getStatisticsByResult(
-    startDate: string,
-    endDate: string
-  ): Promise<Record<ActionResult, number>> {
-    const params = new URLSearchParams();
-    params.append("startDate", startDate);
-    params.append("endDate", endDate);
-
-    const response = await api.get(
-      `/api/v1/audit/statistics/by-result?${params.toString()}`
-    );
-    return response.data;
-  }
-
-  async getRecentActivity(limit?: number): Promise<{
-    count: number;
-    limit: number;
-    timestamp: string;
-    actions: ActionDto[];
-  }> {
-    const params = new URLSearchParams();
-    if (limit) params.append("limit", limit.toString());
-
-    const query = params.toString();
-    const response = await api.get(
-      `/api/v1/audit/recent${query ? `?${query}` : ""}`
-    );
-    return response.data;
-  }
-
-  async getRecentActivityByUser(
-    userId: number,
-    limit?: number
-  ): Promise<{
-    userId: number;
-    count: number;
-    limit: number;
-    timestamp: string;
-    actions: ActionDto[];
-  }> {
-    const params = new URLSearchParams();
-    if (limit) params.append("limit", limit.toString());
-
-    const query = params.toString();
-    const response = await api.get(
-      `/api/v1/audit/user/${userId}/recent${query ? `?${query}` : ""}`
-    );
     return response.data;
   }
 }

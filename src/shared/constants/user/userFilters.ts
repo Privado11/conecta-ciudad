@@ -1,6 +1,5 @@
 import { UserCog, UserCheck, UserX } from "lucide-react";
-import type { UserRole, UserStatus } from "../types/userTYpes";
-
+import type { UserRole, UserStatus } from "../../types/userTYpes";
 
 export const ROLE_FILTERS: {
   label: string;

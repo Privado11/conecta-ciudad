@@ -1,7 +1,10 @@
 import { z } from "zod";
-import { USER_ROLES, ROLE_DESCRIPTIONS } from "@/shared/constants/userRoles";
+import {
+  USER_ROLES,
+  ROLE_DESCRIPTIONS,
+} from "@/shared/constants/user/userRoles";
 import type { DynamicFormConfig } from "@/shared/types/dynamicFormTypes";
-import { COMMON_VALIDATIONS } from "@/shared/constants/validationUtils";
+import { COMMON_VALIDATIONS } from "@/shared/constants/user/validationUtils";
 
 const roleOptions = Object.entries(USER_ROLES).map(([key, label]) => ({
   value: key,

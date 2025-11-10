@@ -3,7 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 import type { UserRole, UserStatus } from "@/shared/types/userTYpes";
-import { ROLE_FILTERS, STATUS_FILTERS } from "@/shared/constants/userFilters";
+import {
+  ROLE_FILTERS,
+  STATUS_FILTERS,
+} from "@/shared/constants/user/userFilters";
 
 interface SearchAndFiltersProps {
   searchTerm: string;

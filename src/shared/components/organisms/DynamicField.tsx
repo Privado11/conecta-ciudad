@@ -22,7 +22,7 @@ import type { FieldConfig } from "@/shared/types/dynamicFormTypes";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { useState } from "react";
-import { validateField } from "@/shared/constants/validationUtils";
+import { validateField } from "@/shared/constants/user/validationUtils";
 
 interface DynamicFieldProps {
   field: FieldConfig;

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Modal } from "../atoms/Modal";
+import { Modal } from "../../atoms/Modal";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/shared/types/userTYpes";
 import {
   ROLE_BADGE_CONFIG,
   ROLE_DESCRIPTIONS,
-} from "@/shared/constants/userRoles";
+} from "@/shared/constants/user/userRoles";
 import { Loader2 } from "lucide-react";
 
 interface ChangeRoleModalProps {
@@ -80,10 +80,19 @@ export function ChangeRoleModal({
         </div>
       </div>
       <div className="flex gap-3 justify-end">
-        <Button variant="outline" onClick={handleClose} className="cursor-pointer" disabled={loading}>
+        <Button
+          variant="outline"
+          onClick={handleClose}
+          className="cursor-pointer"
+          disabled={loading}
+        >
           Cancelar
         </Button>
-        <Button onClick={handleConfirm} disabled={!selectedRole || loading} className="cursor-pointer">
+        <Button
+          onClick={handleConfirm}
+          disabled={!selectedRole || loading}
+          className="cursor-pointer"
+        >
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

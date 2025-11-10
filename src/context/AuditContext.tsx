@@ -1,5 +1,6 @@
 import AuditService from "@/service/AuditService";
-import type { ActionDto, ActionResult, EntityType, PagedAuditResponse } from "@/shared/types/auditTypes";
+import type { PagedResponse, Statistics } from "@/shared/interface/PaginatedResponse";
+import type { ActionDto, ActionResult, EntityType } from "@/shared/types/auditTypes";
 import type { LoadingAuditState } from "@/shared/types/loadingTypes";
 import { createContext, useState } from "react";
 import type { ReactNode } from "react";
@@ -15,10 +16,7 @@ type AuditContextType = {
     totalElements: number;
     pageSize: number;
   };
-  statistics: {
-    byType?: Record<string, number>;
-    byResult?: Record<ActionResult, number>;
-  };
+  statistics: Statistics<ActionDto> | null;
 
   getAllActions: (filters?: {
     page?: number;
@@ -33,18 +31,6 @@ type AuditContextType = {
     }
   ) => Promise<void>;
 
-  countActionsByUser: (
-    userId: number,
-    filters?: {
-      startDate?: string;
-      endDate?: string;
-    }
-  ) => Promise<{
-    userId: number;
-    count: number;
-    startDate: string;
-    endDate: string;
-  } | null>;
 
   getActionsByEntity: (
     entityType: EntityType,
@@ -79,26 +65,8 @@ type AuditContextType = {
       size?: number;
     }
   ) => Promise<void>;
-
-  getStatisticsByType: (
-    startDate: string,
-    endDate: string
-  ) => Promise<void>;
-
-  getStatisticsByResult: (
-    startDate: string,
-    endDate: string
-  ) => Promise<void>;
-
-  getRecentActivity: (limit?: number) => Promise<void>;
-
-  getRecentActivityByUser: (
-    userId: number,
-    limit?: number
-  ) => Promise<void>;
-
   setSelectedAction: (action: ActionDto | null) => void;
-  clearStatistics: () => void;
+
 };
 
 export const AuditContext = createContext<AuditContextType | null>(null);
@@ -106,10 +74,7 @@ export const AuditContext = createContext<AuditContextType | null>(null);
 export const AuditProvider = ({ children }: { children: ReactNode }) => {
   const [actions, setActions] = useState<ActionDto[]>([]);
   const [selectedAction, setSelectedAction] = useState<ActionDto | null>(null);
-  const [statistics, setStatistics] = useState<{
-    byType?: Record<string, number>;
-    byResult?: Record<ActionResult, number>;
-  }>({});
+  const [statistics, setStatistics] = useState<Statistics<ActionDto> | null>(null);
   const [pagination, setPagination] = useState({
     currentPage: 0,
     totalPages: 0,
@@ -125,14 +90,15 @@ export const AuditProvider = ({ children }: { children: ReactNode }) => {
     setLoading((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handlePagedResponse = (data: PagedAuditResponse) => {
-    setActions(data.content);
+  const handlePagedResponse = (pagedData: PagedResponse<ActionDto>) => {
+    setActions(pagedData.page.content);
     setPagination({
-      currentPage: data.number,
-      totalPages: data.totalPages,
-      totalElements: data.totalElements,
-      pageSize: data.size,
+      currentPage: pagedData.page.number,
+      totalPages: pagedData.page.totalPages,
+      totalElements: pagedData.page.totalElements,
+      pageSize: pagedData.page.size,
     });
+    setStatistics(pagedData.statistics);
   };
 
   const getAllActions = async (filters?: {
@@ -178,21 +144,6 @@ export const AuditProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const countActionsByUser = async (
-    userId: number,
-    filters?: {
-      startDate?: string;
-      endDate?: string;
-    }
-  ) => {
-    try {
-      const data = await AuditService.countActionsByUser(userId, filters);
-      return data;
-    } catch (err: any) {
-      toast.error(err.message || "Error al contar acciones del usuario");
-      return null;
-    }
-  };
 
   const getActionsByEntity = async (
     entityType: EntityType,
@@ -295,105 +246,6 @@ export const AuditProvider = ({ children }: { children: ReactNode }) => {
       updateLoadingState("fetching", false);
     }
   };
-
-  const getStatisticsByType = async (
-    startDate: string,
-    endDate: string
-  ) => {
-    updateLoadingState("fetchingStatistics", true);
-    try {
-      const data = await AuditService.getStatisticsByType(startDate, endDate);
-      setStatistics((prev) => ({ ...prev, byType: data }));
-      toast.success("Estadísticas por tipo obtenidas exitosamente");
-    } catch (err: any) {
-      toast.error(err.message || "Error al obtener estadísticas por tipo", {
-        action: {
-          label: "Reintentar",
-          onClick: () => getStatisticsByType(startDate, endDate),
-        },
-      });
-    } finally {
-      updateLoadingState("fetchingStatistics", false);
-    }
-  };
-
-  const getStatisticsByResult = async (
-    startDate: string,
-    endDate: string
-  ) => {
-    updateLoadingState("fetchingStatistics", true);
-    try {
-      const data = await AuditService.getStatisticsByResult(startDate, endDate);
-      setStatistics((prev) => ({ ...prev, byResult: data }));
-      toast.success("Estadísticas por resultado obtenidas exitosamente");
-    } catch (err: any) {
-      toast.error(err.message || "Error al obtener estadísticas por resultado", {
-        action: {
-          label: "Reintentar",
-          onClick: () => getStatisticsByResult(startDate, endDate),
-        },
-      });
-    } finally {
-      updateLoadingState("fetchingStatistics", false);
-    }
-  };
-
-  const getRecentActivity = async (limit?: number) => {
-    updateLoadingState("fetching", true);
-    try {
-      const data = await AuditService.getRecentActivity(limit);
-      setActions(data.actions);
-      setPagination({
-        currentPage: 0,
-        totalPages: 1,
-        totalElements: data.count,
-        pageSize: data.count,
-      });
-    } catch (err: any) {
-      toast.error(err.message || "Error al obtener actividad reciente", {
-        action: {
-          label: "Reintentar",
-          onClick: () => getRecentActivity(limit),
-        },
-      });
-    } finally {
-      updateLoadingState("fetching", false);
-    }
-  };
-
-  const getRecentActivityByUser = async (
-    userId: number,
-    limit?: number
-  ) => {
-    updateLoadingState("fetching", true);
-    try {
-      const data = await AuditService.getRecentActivityByUser(userId, limit);
-      setActions(data.actions);
-      setPagination({
-        currentPage: 0,
-        totalPages: 1,
-        totalElements: data.count,
-        pageSize: data.count,
-      });
-    } catch (err: any) {
-      toast.error(
-        err.message || "Error al obtener actividad reciente del usuario",
-        {
-          action: {
-            label: "Reintentar",
-            onClick: () => getRecentActivityByUser(userId, limit),
-          },
-        }
-      );
-    } finally {
-      updateLoadingState("fetching", false);
-    }
-  };
-
-  const clearStatistics = () => {
-    setStatistics({});
-  };
-
   return (
     <AuditContext.Provider
       value={{
@@ -404,17 +256,11 @@ export const AuditProvider = ({ children }: { children: ReactNode }) => {
         statistics,
         getAllActions,
         getActionsByUser,
-        countActionsByUser,
         getActionsByEntity,
         getActionsByType,
         getActionsByResult,
         getActionsByDateRange,
-        getStatisticsByType,
-        getStatisticsByResult,
-        getRecentActivity,
-        getRecentActivityByUser,
         setSelectedAction,
-        clearStatistics,
       }}
     >
       {children}
