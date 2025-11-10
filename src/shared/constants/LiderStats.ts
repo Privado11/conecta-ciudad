@@ -10,6 +10,12 @@ export const LIDER_STATS: StatCardProps[] = [
     valueKey: "total",
   },
   {
+    label: "Pendientes",
+    icon: UserCheck,
+    color: "text-green-500",
+    valueKey: "pendiente",
+  },
+  {
     label: "En revision",
     icon: UserCheck,
     color: "text-green-500",
@@ -26,7 +32,13 @@ export const LIDER_STATS: StatCardProps[] = [
     icon: UserX,
     color: "text-yellow-500",
     valueKey: "publicado",
-  }
+  },
+  {
+    label: "Listo para publicar",
+    icon: UserX,
+    color: "text-purple-500",
+    valueKey: "listoParaPublicar",
+  },
 ];
 
 export const PROJECT_STATUS_FILTERS: {
@@ -38,5 +50,7 @@ export const PROJECT_STATUS_FILTERS: {
   { label: "En revision", value: "EN_REVISION", icon: UserCheck },
   { label: "Publicado", value: "PUBLICADO", icon: UserX },
   { label: "Devuelto", value: "DEVUELTO", icon: UserX },
+  { label: "Pendiente", value: "PENDIENTE", icon: UserX },
+  { label: "Listo para publicar", value: "LISTO_PARA_PUBLICAR", icon: UserCheck },
 ];
 

@@ -24,6 +24,8 @@ export default function Projects() {
         onSubmitCreate,
         filter,
         setFilter,
+        search,
+        setSearch,
         stats,
         handlePageChange,
         handlePageSizeChange,
@@ -32,6 +34,8 @@ export default function Projects() {
         pageSize,
         sortBy,
         sortDirection,
+        totalFiltered,
+        projectsFilter
     } = useProject();
     return (
         <div className="p-6 max-w-7xl mx-auto flex flex-col gap-6">
@@ -55,7 +59,7 @@ export default function Projects() {
                         label={label}
                         value={
                             valueKey === "total"
-                                ? projects.length
+                                ? stats.total
                                 : stats[valueKey as keyof typeof stats]
                         }
                         icon={<Icon className="w-8 h-8" />}
@@ -67,7 +71,11 @@ export default function Projects() {
                                     ? "text-red-600"
                                     : valueKey === "publicado"
                                         ? "text-yellow-600"
-                                        : undefined
+                                        : valueKey === "pendiente"
+                                            ? "text-blue-600"
+                                            : valueKey === "listoParaPublicar"
+                                                ? "text-purple-600"
+                                                : ""
                         }
                     />
                 ))}
@@ -96,8 +104,8 @@ export default function Projects() {
                                 <input
                                     type="text"
                                     placeholder="Buscar por nombre o ID..."
-                                    value={''}
-                                    onChange={(e) => { }}
+                                    value={search}
+                                    onChange={(e) => { setSearch(e.target.value); }}
                                     className="w-full pl-10 pr-4 py-2 border rounded-md bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring transition"
                                 />
                             </div>
@@ -123,7 +131,7 @@ export default function Projects() {
             {/** Table of the projects */}
             <section>
                 <ProjectTable
-                    projects={projects}
+                    projects={projectsFilter ? projectsFilter : projects}
                     loading={{ addingRole: false, creating: false, deleting: false, fetching: false, removingRole: false, togglingActive: false, updating: false }}
                     onEdit={(project) => {
                         setSelectProject(project);
@@ -131,10 +139,10 @@ export default function Projects() {
                     }}
                     onView={(project) => { }}
                     pagination={{
-                        currentPage:currentPage,
-                        pageSize:pageSize,
-                        totalElements:projects.length,
-                        totalPages: Math.ceil(projects.length / pageSize),
+                        currentPage: currentPage,
+                        pageSize: pageSize,
+                        totalElements: totalFiltered,
+                        totalPages: Math.ceil(totalFiltered / pageSize),
                     }}
                     sortBy={sortBy}
                     sortDirection={sortDirection}

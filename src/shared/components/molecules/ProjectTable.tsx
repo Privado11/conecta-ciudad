@@ -191,7 +191,7 @@ export function ProjectTable({
                                                         <DropdownMenuContent align="end">
                                                             <DropdownMenuItem
                                                                 onClick={() => onView(project)}
-                                                                className="cursor-pointer transition-colors data-highlighted:bg-blue-100 dark:data-highlighted:bg-blue-900/30"
+                                                                className="cursor-pointer hover:!text-green-600 transition-colors data-highlighted:bg-blue-100 dark:data-highlighted:bg-blue-900/30"
                                                             >
                                                                 <Eye className="w-4 h-4 mr-2" /> Ver detalles
                                                             </DropdownMenuItem>
@@ -199,7 +199,7 @@ export function ProjectTable({
                                                             <DropdownMenuItem
                                                                 onClick={() => onEdit(project)}
                                                                 disabled={loading.updating}
-                                                                className="cursor-pointer transition-colors data-highlighted:bg-green-100 dark:data-highlighted:bg-green-900/30"
+                                                                className="cursor-pointer hover:!text-blue-600 transition-colors data-highlighted:bg-green-100 dark:data-highlighted:bg-green-900/30"
                                                             >
                                                                 <Edit className="w-4 h-4 mr-2" /> Editar
                                                             </DropdownMenuItem>
@@ -207,7 +207,7 @@ export function ProjectTable({
                                                             <DropdownMenuItem
                                                                 onClick={() => onDelete(project)}
                                                                 disabled={loading.deleting}
-                                                                className="cursor-pointer text-destructive transition-colors data-highlighted:bg-red-100 dark:data-highlighted:bg-red-900/30"
+                                                                className="cursor-pointer hover:!text-red-600 text-destructive transition-colors data-highlighted:bg-red-100 dark:data-highlighted:bg-red-900/30"
                                                             >
                                                                 <Trash2 className="w-4 h-4 mr-2" /> Eliminar
                                                             </DropdownMenuItem>
