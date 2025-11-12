@@ -1,7 +1,7 @@
 import AuditManagement from "@/shared/components/molecules/audit/AuditManagement";
 
-function ListActions() {
+function SystemAuditPage() {
   return <AuditManagement />;
 }
 
-export default ListActions;
+export default SystemAuditPage;

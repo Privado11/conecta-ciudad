@@ -11,5 +11,6 @@ export type LoadingUserState = {
 export type LoadingAuditState = {
   fetching: boolean;
   fetchingStatistics: boolean;
+  fetchingDetails: boolean;
 };
 

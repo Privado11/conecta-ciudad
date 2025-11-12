@@ -5,8 +5,8 @@ import RegisterPage from "./views/auth/Register";
 import { Layout } from "./shared/layout/Layout";
 import Home from "./views/home/Home";
 import PublicRoute from "./route/PublicRoute";
-import ListUsers from "./views/users/ListUsers";
-import ListActions from "./views/audit/ListActions";
+import UserManagementPage from "./views/users/UserManagementPage";
+import SystemAuditPage from "./views/audit/SystemAuditPage";
 
 function AppUI() {
   return (
@@ -36,8 +36,8 @@ function AppUI() {
         }
       >
         <Route path="/dashboard" element={<Home />} />
-        <Route path="/admin/users" element={<ListUsers />} />
-        <Route path="/admin/audit" element={<ListActions />} />
+        <Route path="/admin/users" element={<UserManagementPage />} />
+        <Route path="/admin/audit" element={<SystemAuditPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/auth/login" replace />} />

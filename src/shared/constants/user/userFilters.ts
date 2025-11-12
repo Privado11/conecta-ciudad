@@ -1,10 +1,11 @@
 import { UserCog, UserCheck, UserX } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { UserRole, UserStatus } from "../../types/userTYpes";
 
 export const ROLE_FILTERS: {
   label: string;
   value: UserRole | "all";
-  icon?: React.ElementType;
+  icon?: LucideIcon;
 }[] = [
   { label: "Todos los roles", value: "all" },
   { label: "Admin", value: "ADMIN", icon: UserCog },
@@ -16,7 +17,7 @@ export const ROLE_FILTERS: {
 export const STATUS_FILTERS: {
   label: string;
   value: UserStatus | "all";
-  icon?: React.ElementType;
+  icon?: LucideIcon;
 }[] = [
   { label: "Todos", value: "all" },
   { label: "Activos", value: "active", icon: UserCheck },

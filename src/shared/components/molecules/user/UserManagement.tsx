@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
-import { StatCard } from "../../atoms/StatCard";
-import { SearchAndFilters } from "../../atoms/SearchAndFilters";
-import { UserTable } from "./UserTable";
 import { DeleteUserModal } from "./DeleteUserModal";
 import { ChangeRoleModal } from "./ChangeRoleModal";
 import type { UserRole, UserStatus } from "@/shared/types/userTYpes";
 import { useUser } from "@/hooks/useUser";
-import { ROLE_BADGE_CONFIG } from "@/shared/constants/user/userRoles";
 import { USER_STATS } from "@/shared/constants/user/userStats";
 import { DynamicFormModal } from "../DynamicFormModal";
 import { userFormConfig } from "@/config/forms/userForm.config";
 import ImportUsersModal from "./ImportUsersModal";
+import { createUserTableConfig } from "@/config/table/UserTableConfig";
+import { DynamicTable } from "../DynamicTable";
+import { UserSearchAndFilters } from "./UserSearchAndFilters";
+import { StatsGrid } from "../StatsGrid";
+import { useManagement } from "@/hooks/useManagement";
+import type { UserFilters } from "@/shared/interface/Filters";
+import { ROLE_BADGE_CONFIG } from "@/shared/constants/user/userRoles";
+import { STATUS_FILTERS } from "@/shared/constants/user/userFilters";
 
 export default function UserManagement() {
   const {
@@ -32,29 +36,33 @@ export default function UserManagement() {
     exportAllUsers,
     importUsers,
   } = useUser();
+
+  const {
+    filters,
+    currentPage,
+    pageSize,
+    sortBy,
+    sortDirection,
+    debouncedSearchTerm,
+    handleFilterChange,
+    handlePageChange,
+    handlePageSizeChange,
+    handleSortChange,
+  } = useManagement<UserFilters>({
+    initialFilters: {
+      searchTerm: "",
+      role: "all",
+      status: "all",
+    },
+    defaultSort: { sortBy: "name", sortDirection: "asc" },
+    searchField: "searchTerm",
+  });
+
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterRole, setFilterRole] = useState<UserRole | "all">("all");
-  const [filterStatus, setFilterStatus] = useState<UserStatus | "all">("all");
   const [modalType, setModalType] = useState<"edit" | "delete" | "role" | null>(
     null
   );
-  const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [sortBy, setSortBy] = useState("name");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-      setCurrentPage(0);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
 
   useEffect(() => {
     loadUsers();
@@ -64,12 +72,12 @@ export default function UserManagement() {
     sortBy,
     sortDirection,
     debouncedSearchTerm,
-    filterRole,
-    filterStatus,
+    filters.role,
+    filters.status,
   ]);
 
   const loadUsers = () => {
-    const filters: any = {
+    const apiFilters: any = {
       page: currentPage,
       size: pageSize,
       sortBy,
@@ -77,29 +85,27 @@ export default function UserManagement() {
     };
 
     if (debouncedSearchTerm.trim()) {
-      filters.name = debouncedSearchTerm;
+      apiFilters.name = debouncedSearchTerm;
     }
 
-    if (filterRole !== "all") {
-      filters.role = filterRole;
+    if (filters.role !== "all") {
+      apiFilters.role = filters.role;
     }
 
-    if (filterStatus !== "all") {
-      filters.active = filterStatus === "active";
+    if (filters.status !== "all") {
+      apiFilters.active = filters.status === "active";
     }
 
-    getUsers(filters);
+    getUsers(apiFilters);
   };
 
   const filteredUsers = users.filter((user) => {
     const matchesRole =
-      filterRole === "all" || user.roles?.includes(filterRole);
-
+      filters.role === "all" || user.roles?.includes(filters.role);
     const matchesStatus =
-      filterStatus === "all" ||
-      (filterStatus === "active" && user.active) ||
-      (filterStatus === "inactive" && !user.active);
-
+      filters.status === "all" ||
+      (filters.status === "active" && user.active) ||
+      (filters.status === "inactive" && !user.active);
     return matchesRole && matchesStatus;
   });
 
@@ -110,7 +116,6 @@ export default function UserManagement() {
       } else {
         await createUser(data);
       }
-
       setIsOpenModal(false);
       setSelectedUser(null);
       loadUsers();
@@ -143,80 +148,86 @@ export default function UserManagement() {
       setModalType(null);
       setSelectedUser(null);
       if (users.length === 1 && currentPage > 0) {
-        setCurrentPage(currentPage - 1);
+        handlePageChange(currentPage - 1);
       } else {
         loadUsers();
       }
     });
   };
 
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
-  };
-
-  const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
-    setCurrentPage(0);
-  };
-
-  const handleSortChange = (field: string) => {
-    if (sortBy === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(field);
-      setSortDirection("asc");
-    }
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-  };
-
-  const handleRoleFilterChange = (role: UserRole | "all") => {
-    setFilterRole(role);
-    setCurrentPage(0);
-  };
-
-  const handleStatusFilterChange = (status: UserStatus | "all") => {
-    setFilterStatus(status);
-    setCurrentPage(0);
-  };
-
   const handleExport = () => {
-    const filters: any = {};
+    const exportFilters: any = {};
 
     if (debouncedSearchTerm.trim()) {
-      filters.name = debouncedSearchTerm;
+      exportFilters.name = debouncedSearchTerm;
     }
 
-    if (filterRole !== "all") {
-      filters.role = filterRole;
+    if (filters.role !== "all") {
+      exportFilters.role = filters.role;
     }
 
-    if (filterStatus !== "all") {
-      filters.active = filterStatus === "active";
+    if (filters.status !== "all") {
+      exportFilters.active = filters.status === "active";
     }
 
-    if (Object.keys(filters).length > 0) {
-      exportUsers(filters);
+    if (Object.keys(exportFilters).length > 0) {
+      exportUsers(exportFilters);
     } else {
       exportAllUsers();
     }
   };
 
+  const filterHandlers = {
+    onSearchChange: (value: string) => handleFilterChange("searchTerm", value),
+    onRoleChange: (role: UserRole | "all") => handleFilterChange("role", role),
+    onStatusChange: (status: UserStatus | "all") =>
+      handleFilterChange("status", status),
+    onOpenModal: () => setIsOpenModal(true),
+    onExport: handleExport,
+    onImport: () => setIsImportModalOpen(true),
+  };
+
   const getActiveFiltersMessage = () => {
-    const filters = [];
-    if (debouncedSearchTerm) filters.push(`búsqueda: "${debouncedSearchTerm}"`);
-    if (filterRole !== "all") filters.push(`rol: ${filterRole}`);
-    if (filterStatus !== "all") {
-      filters.push(
-        `estado: ${filterStatus === "active" ? "activos" : "inactivos"}`
-      );
+    const filterMessages: string[] = [];
+    if (debouncedSearchTerm) {
+      filterMessages.push(`búsqueda: "${debouncedSearchTerm}"`);
     }
-    return filters.length > 0 ? filters.join(", ") : null;
+
+    if (filters.role !== "all") {
+      const roleLabel =
+        ROLE_BADGE_CONFIG[filters.role as keyof typeof ROLE_BADGE_CONFIG]
+          ?.label || filters.role;
+      filterMessages.push(`rol: ${roleLabel}`);
+    }
+
+    if (filters.status !== "all") {
+      const matchedStatus = STATUS_FILTERS.find(
+        (s) => s.value === filters.status
+      );
+      const statusLabel = matchedStatus ? matchedStatus.label : filters.status;
+      filterMessages.push(`estado: ${statusLabel.toLowerCase()}`);
+    }
+
+    return filterMessages.length > 0 ? filterMessages.join(", ") : null;
   };
 
   const activeFiltersMessage = getActiveFiltersMessage();
+
+  const userTableConfig = createUserTableConfig({
+    onEdit: (user) => {
+      setSelectedUser(user);
+      setIsOpenModal(true);
+    },
+    onChangeRole: (user) => {
+      setSelectedUser(user);
+      setModalType("role");
+    },
+    onToggleStatus: toggleUserStatus,
+    onDelete: (user) => {
+      setSelectedUser(user);
+      setModalType("delete");
+    },
+  });
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -232,59 +243,43 @@ export default function UserManagement() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        {USER_STATS.map(({ label, icon: Icon, color, valueKey }) => {
-          const metricValue =
-            valueKey === "total"
-              ? pagination.totalElements
-              : (statistics?.metrics?.[valueKey] as number) || 0;
+      <div className="flex flex-col gap-4">
+        <StatsGrid
+          stats={USER_STATS}
+          data={{
+            totalElements: pagination.totalElements,
+            metrics: statistics?.metrics,
+          }}
+          loading={loading.fetching && users.length === 0}
+          columns={3}
+        />
 
-          return (
-            <StatCard
-              key={label}
-              label={label}
-              value={metricValue}
-              icon={<Icon className="w-8 h-8" />}
-              iconColor={color}
-              valueColor={
-                valueKey === "active"
-                  ? "text-green-600"
-                  : valueKey === "inactive"
-                  ? "text-red-600"
-                  : undefined
-              }
-            />
-          );
-        })}
+        <UserSearchAndFilters filters={filters} handlers={filterHandlers} />
+
+        {activeFiltersMessage && (
+          <div className="mb-4 p-3 bg-muted/50 rounded-lg border border-border">
+            <p className="text-sm text-muted-foreground">
+              <span className="font-medium">Filtros activos:</span>{" "}
+              {activeFiltersMessage}
+              {" · "}
+              {loading.fetching ? (
+                <span className="text-muted-foreground italic">
+                  Cargando...
+                </span>
+              ) : (
+                <>
+                  <strong>{pagination.totalElements}</strong> resultado(s)
+                </>
+              )}
+            </p>
+          </div>
+        )}
       </div>
-      <SearchAndFilters
-        searchTerm={searchTerm}
-        onSearchChange={handleSearchChange}
-        filterRole={filterRole}
-        onRoleChange={handleRoleFilterChange}
-        filterStatus={filterStatus}
-        onStatusChange={handleStatusFilterChange}
-        onOpenModal={() => setIsOpenModal(true)}
-        onExport={handleExport}
-        onImport={() => setIsImportModalOpen(true)}
-      />
 
-      {activeFiltersMessage && (
-        <div className="mb-4 p-3 bg-muted/50 rounded-lg border border-border">
-          <p className="text-sm text-muted-foreground">
-            <span className="font-medium">Filtros activos:</span>{" "}
-            {activeFiltersMessage}
-            {" · "}
-            <strong>{pagination.totalElements}</strong> resultado(s)
-            encontrado(s)
-          </p>
-        </div>
-      )}
-
-      <UserTable
-        users={filteredUsers}
-        loading={loading}
-        roleBadgeConfig={ROLE_BADGE_CONFIG}
+      <DynamicTable
+        config={userTableConfig}
+        data={filteredUsers}
+        loading={loading.fetching}
         pagination={{
           currentPage: pagination.currentPage,
           totalPages: pagination.totalPages,
@@ -296,19 +291,6 @@ export default function UserManagement() {
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
         onSortChange={handleSortChange}
-        onEdit={(user) => {
-          setSelectedUser(user);
-          setIsOpenModal(true);
-        }}
-        onChangeRole={(user) => {
-          setSelectedUser(user);
-          setModalType("role");
-        }}
-        onToggleStatus={toggleUserStatus}
-        onDelete={(user) => {
-          setSelectedUser(user);
-          setModalType("delete");
-        }}
       />
 
       <DynamicFormModal

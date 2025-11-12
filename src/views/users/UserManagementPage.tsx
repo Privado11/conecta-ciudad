@@ -1,7 +1,7 @@
 import UserManagement from "@/shared/components/molecules/user/UserManagement";
 
-function ListUsers() {
+function UserManagementPage() {
   return <UserManagement />;
 }
 
-export default ListUsers;
+export default UserManagementPage;

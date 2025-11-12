@@ -1,11 +1,20 @@
-import type React from "react"
+import type React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { TrendingUp, TrendingDown } from "lucide-react";
 
 interface StatCardProps {
-  label: string
-  value: number | string
-  icon: React.ReactNode
-  valueColor?: string
-  iconColor?: string
+  label: string;
+  value: number | string;
+  icon: React.ReactNode;
+  valueColor?: string;
+  iconColor?: string;
+  trend?: {
+    value: number;
+    isPositive?: boolean;
+  };
+  description?: string;
+  loading?: boolean;
 }
 
 export function StatCard({
@@ -14,16 +23,78 @@ export function StatCard({
   icon,
   valueColor = "text-foreground",
   iconColor = "text-primary",
+  trend,
+  description,
+  loading = false,
 }: StatCardProps) {
+  const formatValue = (val: number | string) => {
+    if (typeof val === "number") {
+      return val.toLocaleString("es-CO");
+    }
+    return val;
+  };
+
+  if (loading) {
+    return (
+      <Card className="overflow-hidden">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2 flex-1">
+              <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+              <div className="h-8 w-20 bg-muted animate-pulse rounded" />
+            </div>
+            <div className="h-12 w-12 bg-muted animate-pulse rounded-lg" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <div className="bg-card border border-border rounded-lg p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className={`text-2xl font-bold ${valueColor}`}>{value}</p>
+    <Card className="overflow-hidden transition-all hover:shadow-md">
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between">
+          <div className="space-y-1 flex-1">
+            <p className="text-sm font-medium text-muted-foreground">
+              {label}
+            </p>
+            <div className="flex items-baseline gap-2">
+              <p className={cn("text-3xl font-bold tracking-tight", valueColor)}>
+                {formatValue(value)}
+              </p>
+              {trend && (
+                <div
+                  className={cn(
+                    "flex items-center gap-0.5 text-xs font-medium",
+                    trend.isPositive !== false
+                      ? "text-green-600"
+                      : "text-red-600"
+                  )}
+                >
+                  {trend.isPositive !== false ? (
+                    <TrendingUp className="h-3 w-3" />
+                  ) : (
+                    <TrendingDown className="h-3 w-3" />
+                  )}
+                  <span>{Math.abs(trend.value)}%</span>
+                </div>
+              )}
+            </div>
+            {description && (
+              <p className="text-xs text-muted-foreground">{description}</p>
+            )}
+          </div>
+
+          <div
+            className={cn(
+              "flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10",
+              iconColor
+            )}
+          >
+            {icon}
+          </div>
         </div>
-        <div className={`w-8 h-8 ${iconColor}`}>{icon}</div>
-      </div>
-    </div>
-  )
+      </CardContent>
+    </Card>
+  );
 }

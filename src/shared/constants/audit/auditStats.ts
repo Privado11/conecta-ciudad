@@ -1,28 +1,40 @@
-import { Activity, CheckCircle, XCircle, Clock } from "lucide-react";
+import type { StatConfig } from "@/shared/components/molecules/StatsGrid";
+import { Activity, CheckCircle2, XCircle, Clock } from "lucide-react";
 
-export const AUDIT_STATS = [
+export const AUDIT_STATS: StatConfig[] = [
   {
-    label: "Total Acciones",
+    key: "total",
+    label: "Total de Acciones",
     icon: Activity,
-    color: "text-blue-500",
+    iconColor: "text-blue-600",
+    valueColor: "text-blue-600",
     valueKey: "total",
+    description: "Todas las acciones registradas",
   },
   {
+    key: "successful",
     label: "Acciones Exitosas",
-    icon: CheckCircle,
-    color: "text-green-500",
-    valueKey: "success",
+    icon: CheckCircle2,
+    iconColor: "text-green-600",
+    valueColor: "text-green-600",
+    valueKey: "successful",
+    description: "Operaciones completadas",
   },
   {
+    key: "failed",
     label: "Acciones Fallidas",
     icon: XCircle,
-    color: "text-red-500",
+    iconColor: "text-red-600",
+    valueColor: "text-red-600",
     valueKey: "failed",
+    description: "Operaciones con errores",
   },
   {
-    label: "Acciones de Hoy",
+    key: "today",
+    label: "Acciones De Hoy",
     icon: Clock,
-    color: "text-blue-500",
+    iconColor: "text-black",
     valueKey: "today",
+    description: "Operaciones en las últ. 24 horas",
   },
 ];

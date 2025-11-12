@@ -1,13 +1,5 @@
 import { useEffect, useState } from "react";
-import { Shield, Users } from "lucide-react";
-import { StatCard } from "../../atoms/StatCard";
-import { SearchAndFilters } from "./SearchAndFilters";
-import type { UserRole, UserStatus } from "@/shared/types/userTYpes";
-import { useUser } from "@/hooks/useUser";
-import { ROLE_BADGE_CONFIG } from "@/shared/constants/user/userRoles";
-import { USER_STATS } from "@/shared/constants/user/userStats";
-import { DynamicFormModal } from "../DynamicFormModal";
-import { userFormConfig } from "@/config/forms/userForm.config";
+import { Shield } from "lucide-react";
 import { useAudit } from "@/hooks/useAudit";
 import type {
   ActionResult,
@@ -15,234 +7,244 @@ import type {
   EntityType,
 } from "@/shared/types/auditTypes";
 import { AUDIT_STATS } from "@/shared/constants/audit/auditStats";
-import { AuditTable } from "./AuditTable";
+import { DynamicTable } from "../DynamicTable";
+import { createAuditTableConfig } from "@/config/table/AuditTableConfig";
+import { AuditSearchAndFilters } from "./AuditSearchAndFilters";
+
+import { StatsGrid } from "../StatsGrid";
+import { useManagement } from "@/hooks/useManagement";
+import type { AuditFilters, TempDateFilters } from "@/shared/interface/Filters";
 import { ENTITY_BADGE_CONFIG } from "@/shared/constants/audit/auditEntity";
+import { ACTION_BY_ENTITY } from "@/shared/constants/audit/auditFilters";
+import { ActionDetailsModal } from "../ActionDetailsModal";
 
 export default function AuditManagement() {
   const {
     actions,
-    selectedAction,
+    actionDetails,
     loading,
     pagination,
     statistics,
-    getAllActions,
-    getActionsByUser,
-    getActionsByEntity,
-    getActionsByType,
-    getActionsByResult,
-    getActionsByDateRange,
+    searchActions,
+    selectedAction,
     setSelectedAction,
+    hasActiveFilters,
+    getActionDetails,
   } = useAudit();
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState<ActionType | "all">("all");
-  const [filterResult, setFilterResult] = useState<ActionResult | "all">("all");
-  const [filterEntity, setFilterEntity] = useState<EntityType | "all">("all");
+  const {
+    filters,
+    currentPage,
+    pageSize,
+    debouncedSearchTerm,
+    setFilters,
+    handleFilterChange,
+    handlePageChange,
+    handlePageSizeChange,
+  } = useManagement<AuditFilters>({
+    initialFilters: {
+      searchTerm: "",
+      actionType: "all",
+      result: "all",
+      entityType: "all",
+      startDate: undefined,
+      endDate: undefined,
+    },
+    searchField: "searchTerm",
+  });
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [sortBy, setSortBy] = useState("name");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-  const [isOpenModal, setIsOpenModal] = useState(false);
-
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [tempDateFilters, setTempDateFilters] = useState<TempDateFilters>({
+    startDate: undefined,
+    endDate: undefined,
+  });
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-      setCurrentPage(0);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
-
-  useEffect(() => {
-    loadUsers();
+    loadActions();
   }, [
     currentPage,
     pageSize,
-    sortBy,
-    sortDirection,
     debouncedSearchTerm,
-    filterType,
-    filterResult,
-    filterEntity,
+    filters.actionType,
+    filters.result,
+    filters.entityType,
+    filters.startDate,
+    filters.endDate,
   ]);
 
-  const loadUsers = () => {
-    const filters: any = {
+  const formatToLocalDateTime = (date: string | undefined) => {
+    if (!date) return undefined;
+    return `${date}T00:00:00`;
+  };
+
+  const loadActions = () => {
+    searchActions({
       page: currentPage,
       size: pageSize,
-      sortBy,
-      sortDirection,
-    };
-
-    if (debouncedSearchTerm.trim()) {
-      filters.name = debouncedSearchTerm;
-    }
-
-    if (filterType !== "all") {
-      filters.actionType = filterType;
-    }
-
-    if (filterResult !== "all") {
-      filters.result = filterResult;
-    }
-
-    getAllActions(filters);
+      searchTerm: debouncedSearchTerm.trim() || undefined,
+      actionType: filters.actionType !== "all" ? filters.actionType : undefined,
+      result: filters.result !== "all" ? filters.result : undefined,
+      entityType: filters.entityType !== "all" ? filters.entityType : undefined,
+      startDate: formatToLocalDateTime(filters.startDate),
+      endDate: filters.endDate ? `${filters.endDate}T23:59:59` : undefined,
+    });
   };
 
-  const filteredActions = actions.filter((action) => {
-    const matchesType =
-      filterType === "all" || action.actionType === filterType;
-
-    const matchesResult =
-      filterResult === "all" || action.result === filterResult;
-
-    const matchesEntity =
-      filterEntity === "all" || action.entityType === filterEntity;
-
-    return matchesType && matchesResult && matchesEntity;
-  });
-
-  const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
+  const filterHandlers = {
+    onSearchChange: (value: string) => handleFilterChange("searchTerm", value),
+    onActionTypeChange: (value: ActionType | "all") =>
+      handleFilterChange("actionType", value),
+    onActionResultChange: (value: ActionResult | "all") =>
+      handleFilterChange("result", value),
+    onEntityTypeChange: (value: EntityType | "all") =>
+      handleFilterChange("entityType", value),
+    onStartDateChange: (value: string | undefined) => {
+      setTempDateFilters((prev) => ({ ...prev, startDate: value }));
+    },
+    onEndDateChange: (value: string | undefined) => {
+      setTempDateFilters((prev) => ({ ...prev, endDate: value }));
+    },
+    onApplyDateFilter: () => {
+      setFilters((prev) => ({
+        ...prev,
+        startDate: tempDateFilters.startDate,
+        endDate: tempDateFilters.endDate,
+      }));
+      handlePageChange(0);
+    },
+    onClearDateFilters: () => {
+      setTempDateFilters({ startDate: undefined, endDate: undefined });
+      setFilters((prev) => ({
+        ...prev,
+        startDate: undefined,
+        endDate: undefined,
+      }));
+      handlePageChange(0);
+    },
   };
 
-  const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
-    setCurrentPage(0);
-  };
-
-  const handleSortChange = (field: string) => {
-    if (sortBy === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(field);
-      setSortDirection("asc");
-    }
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-  };
-
-  const handleTypeFilterChange = (actionType: ActionType | "all") => {
-    setFilterType(actionType);
-    setCurrentPage(0);
-  };
-
-  const handleResultFilterChange = (actionResult: ActionResult | "all") => {
-    setFilterResult(actionResult);
-    setCurrentPage(0);
-  };
-
-  const handleEntityFilterChange = (entityType: EntityType | "all") => {
-    setFilterEntity(entityType);
-    setCurrentPage(0);
+  const handleViewDetails = async (action: any) => {
+    setSelectedAction(action);
+    await getActionDetails(action.id);
   };
 
   const getActiveFiltersMessage = () => {
-    const filters = [];
-    if (debouncedSearchTerm) filters.push(`búsqueda: "${debouncedSearchTerm}"`);
-    if (filterType !== "all") filters.push(`tipo: ${filterType}`);
-    if (filterResult !== "all") {
-      filters.push(
-        `estado: ${filterResult === "SUCCESS" ? "exitosos" : "fallidos"}`
+    const filterMessages: string[] = [];
+    if (debouncedSearchTerm) {
+      filterMessages.push(`"${debouncedSearchTerm}"`);
+    }
+    if (filters.actionType !== "all") {
+      let actionLabel: string = filters.actionType;
+      const actionsList =
+        ACTION_BY_ENTITY[filters.entityType] || ACTION_BY_ENTITY["all"];
+      const matchedAction = actionsList.find(
+        (a) => a.value === filters.actionType
       );
+      if (matchedAction) {
+        actionLabel = matchedAction.label;
+      }
+
+      filterMessages.push(`tipo: ${actionLabel}`);
     }
-    if (filterEntity !== "all") {
-      filters.push(`entidad: ${filterEntity}`);
+
+    if (filters.result !== "all") {
+      const resultLabel =
+        filters.result === "SUCCESS"
+          ? "exitosas"
+          : filters.result === "FAILED"
+          ? "fallidas"
+          : filters.result;
+      filterMessages.push(`resultado: ${resultLabel}`);
     }
-    return filters.length > 0 ? filters.join(", ") : null;
+
+    if (filters.entityType !== "all") {
+      const entityLabel =
+        ENTITY_BADGE_CONFIG[
+          filters.entityType as keyof typeof ENTITY_BADGE_CONFIG
+        ]?.label || filters.entityType;
+      filterMessages.push(`entidad: ${entityLabel}`);
+    }
+
+    if (filters.startDate && filters.endDate) {
+      filterMessages.push(`${filters.startDate} - ${filters.endDate}`);
+    }
+    return filterMessages.length > 0 ? filterMessages.join(" · ") : null;
   };
 
   const activeFiltersMessage = getActiveFiltersMessage();
+  const auditTableConfig = createAuditTableConfig({
+    onViewDetails: handleViewDetails,
+  });
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Shield className="w-6 h-6 text-primary" />
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <Shield className="w-6 h-6 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold">Auditoría del Sistema</h1>
           </div>
-          <h1 className="text-3xl font-bold">Auditoría del Sistema</h1>
+          <p className="text-muted-foreground">
+            Monitorea todas las acciones y eventos del sistema en tiempo real
+          </p>
         </div>
-        <p className="text-muted-foreground">
-          Monitorea todas las acciones y eventos del sistema en tiempo real
-        </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-        {AUDIT_STATS.map(({ label, icon: Icon, color, valueKey }) => {
-          const metricValue =
-            valueKey === "total"
-              ? pagination.totalElements
-              : (statistics?.metrics?.[valueKey] as number) || 0;
+      <div className="flex flex-col gap-4">
+        <StatsGrid
+          stats={AUDIT_STATS}
+          data={{
+            totalElements: pagination.totalElements,
+            metrics: statistics?.metrics,
+          }}
+          loading={loading.fetching && actions.length === 0}
+          columns={4}
+        />
 
-          return (
-            <StatCard
-              key={label}
-              label={label}
-              value={metricValue}
-              icon={<Icon className="w-8 h-8" />}
-              iconColor={color}
-              valueColor={
-                valueKey === "active"
-                  ? "text-green-600"
-                  : valueKey === "inactive"
-                  ? "text-red-600"
-                  : undefined
-              }
-            />
-          );
-        })}
+        <AuditSearchAndFilters
+          filters={filters}
+          tempDateFilters={tempDateFilters}
+          handlers={filterHandlers}
+        />
       </div>
-      
-      <SearchAndFilters
-        searchTerm={searchTerm}
-        onSearchChange={handleSearchChange}
-        filterActionType={filterType}
-        onActionTypeChange={handleTypeFilterChange}
-        filterActionResult={filterResult}
-        onActionResultChange={handleResultFilterChange}
-        filterEntityType={filterEntity}
-        onEntityTypeChange={handleEntityFilterChange}
-      />
 
-      {activeFiltersMessage && (
+      {hasActiveFilters && activeFiltersMessage && (
         <div className="mb-4 p-3 bg-muted/50 rounded-lg border border-border">
           <p className="text-sm text-muted-foreground">
             <span className="font-medium">Filtros activos:</span>{" "}
             {activeFiltersMessage}
             {" · "}
-            <strong>{pagination.totalElements}</strong> resultado(s)
-            encontrado(s)
+            {loading.fetching ? (
+              <span className="text-muted-foreground italic">Cargando...</span>
+            ) : (
+              <>
+                <strong>{pagination.totalElements}</strong> resultado(s)
+              </>
+            )}
           </p>
         </div>
       )}
 
-      <AuditTable
-        actions={filteredActions}
+      <DynamicTable
+        config={auditTableConfig}
+        data={actions}
         loading={loading.fetching}
-        entityBadgeConfig={ENTITY_BADGE_CONFIG}
         pagination={{
           currentPage: pagination.currentPage,
           totalPages: pagination.totalPages,
           totalElements: pagination.totalElements,
           pageSize: pagination.pageSize,
         }}
-        sortBy={sortBy}
-        sortDirection={sortDirection}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
-        onSortChange={handleSortChange}
-        onViewDetails={(action) => {
-          setSelectedAction(action);
-          setIsOpenModal(true);
-        }}
-        
+      />
+
+      <ActionDetailsModal
+        action={actionDetails}
+        open={!!selectedAction}
+        onClose={() => setSelectedAction(null)}
+        loading={loading.fetchingDetails}
       />
     </div>
   );

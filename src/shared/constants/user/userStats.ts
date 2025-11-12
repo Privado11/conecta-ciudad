@@ -1,22 +1,32 @@
+import type { StatConfig } from "@/shared/components/molecules/StatsGrid";
 import { Users, UserCheck, UserX } from "lucide-react";
 
-export const USER_STATS = [
+
+export const USER_STATS: StatConfig[] = [
   {
-    label: "Total Usuarios",
+    key: "total",
+    label: "Total de Usuarios",
     icon: Users,
-    color: "text-blue-500",
+    iconColor: "text-blue-600",
     valueKey: "total",
+    description: "Usuarios registrados",
   },
   {
-    label: "Activos",
+    key: "active",
+    label: "Usuarios Activos",
     icon: UserCheck,
-    color: "text-green-500",
+    iconColor: "text-green-600",
+    valueColor: "text-green-600",
     valueKey: "active",
+    description: "Usuarios habilitados",
   },
   {
-    label: "Inactivos",
+    key: "inactive",
+    label: "Usuarios Inactivos",
     icon: UserX,
-    color: "text-red-500",
+    iconColor: "text-red-600",
+    valueColor: "text-red-600",
     valueKey: "inactive",
+    description: "Usuarios deshabilitados",
   },
 ];
