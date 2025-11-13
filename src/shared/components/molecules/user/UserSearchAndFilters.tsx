@@ -50,7 +50,7 @@ export function UserSearchAndFilters({
         variant="outline"
         onClick={handlers.onImport}
         title="Importar usuarios desde CSV"
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 cursor-pointer"
       >
         <Upload className="w-4 h-4" />
         <span className="hidden sm:inline">Importar CSV</span>
@@ -60,7 +60,7 @@ export function UserSearchAndFilters({
         variant="outline"
         onClick={handlers.onExport}
         title="Exportar usuarios a CSV"
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 cursor-pointer"
       >
         <Download className="w-4 h-4" />
         <span className="hidden sm:inline">Exportar CSV</span>
@@ -69,7 +69,7 @@ export function UserSearchAndFilters({
       <Button
         onClick={handlers.onOpenModal}
         title="Crear nuevo usuario"
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 cursor-pointer"
       >
         <Plus className="w-4 h-4" />
         <span>Nuevo Usuario</span>

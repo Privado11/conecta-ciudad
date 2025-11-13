@@ -7,6 +7,7 @@ import Home from "./views/home/Home";
 import PublicRoute from "./route/PublicRoute";
 import UserManagementPage from "./views/users/UserManagementPage";
 import SystemAuditPage from "./views/audit/SystemAuditPage";
+import RolePermissionPage from "./views/users/RolePermissionPage";
 
 function AppUI() {
   return (
@@ -37,6 +38,7 @@ function AppUI() {
       >
         <Route path="/dashboard" element={<Home />} />
         <Route path="/admin/users" element={<UserManagementPage />} />
+        <Route path="/admin/roles" element={<RolePermissionPage />} />
         <Route path="/admin/audit" element={<SystemAuditPage />} />
       </Route>
 

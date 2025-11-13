@@ -126,12 +126,25 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setStatistics(pagedData.statistics);
       }
     } catch (err: any) {
-      toast.error(err.message || "Error al obtener usuarios", {
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Error al obtener usuarios";
+      toast.error(errorMessage, {
         action: {
           label: "Reintentar",
           onClick: () => getUsers(filters),
         },
       });
+
+      setUsers([]);
+      setPagination({
+        currentPage: 0,
+        totalPages: 0,
+        totalElements: 0,
+        pageSize: 10,
+      });
+      setStatistics(null);
     } finally {
       updateLoadingState("fetching", false);
     }

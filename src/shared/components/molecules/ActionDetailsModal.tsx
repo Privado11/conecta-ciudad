@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import {
   Loader2,
   Info,
   Globe,
+  ChevronDown,
 } from "lucide-react";
 import type { ActionDetails } from "@/shared/types/auditTypes";
 
@@ -43,7 +45,7 @@ export const ActionDetailsModal: React.FC<ActionDetailsModalProps> = ({
     !!action?.metadata && Object.keys(action.metadata).length > 0;
   const hasChanges =
     !!action?.changes && Object.keys(action.changes).length > 0;
-  const modalSize = hasMetadata ? "max-w-3xl" : "max-w-xl";
+  const modalSize = hasMetadata || hasChanges ? "max-w-3xl" : "max-w-xl";
 
   const isGlobalAction =
     !action?.entityType ||
@@ -55,9 +57,16 @@ export const ActionDetailsModal: React.FC<ActionDetailsModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className={`${modalSize} rounded-2xl py-4`}>
+      <DialogContent 
+        className={`${modalSize} rounded-2xl py-4`}
+        aria-describedby="action-details-description"
+      >
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
+          <div 
+            className="flex flex-col items-center justify-center py-20 gap-3 text-center"
+            role="status"
+            aria-live="polite"
+          >
             <Loader2 className="w-8 h-8 text-primary animate-spin" />
             <p className="text-muted-foreground text-sm">
               Cargando detalles de la acción...
@@ -69,49 +78,69 @@ export const ActionDetailsModal: React.FC<ActionDetailsModalProps> = ({
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1 flex-1 min-w-0">
                   <DialogTitle className="text-lg font-semibold flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-primary shrink-0" />
-                    <span className="truncate">{action?.actionType}</span>
+                    <Shield className="w-5 h-5 text-primary shrink-0" aria-hidden="true" />
+                    <span className="truncate" title={action?.actionType}>
+                      {action?.actionType || "Acción sin tipo"}
+                    </span>
                   </DialogTitle>
                   <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 shrink-0" />
-                    <span className="text-xs">
+                    <Calendar className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <time className="text-xs">
                       {action?.actionAt
                         ? new Date(action.actionAt).toLocaleString("es-CO", {
                             dateStyle: "long",
                             timeStyle: "short",
                           })
-                        : "N/A"}
-                    </span>
+                        : "Fecha no disponible"}
+                    </time>
                   </p>
                 </div>
                 {action?.result && (
-                  <Badge variant={resultVariant} className="shrink-0">
+                  <Badge 
+                    variant={resultVariant} 
+                    className="shrink-0"
+                    aria-label={`Resultado: ${action.result}`}
+                  >
                     {action.result}
                   </Badge>
                 )}
               </div>
 
               {action?.description && (
-                <DialogDescription className="text-sm leading-relaxed">
+                <DialogDescription 
+                  id="action-details-description"
+                  className="text-sm leading-relaxed"
+                >
                   {action.description}
                 </DialogDescription>
               )}
             </DialogHeader>
 
-            <Separator />
+            <Separator className="my-2" />
 
             <ScrollArea className="max-h-[calc(90vh-200px)]">
-              <div className="px-6 py-4 space-y-4">
+              <div className="px-6 py-4 space-y-5">
                 {action?.user && (
                   <Section
                     icon={<User className="w-4 h-4" />}
-                    title="Usuario que realizó la acción"
+                    title="Responsable"
                   >
-                    <InfoRow label="Nombre" value={action.user.name} />
-                    <InfoRow label="Email" value={action.user.email} />
                     <InfoRow
                       label="ID"
                       value={action.user.id?.toString()}
+                      mono
+                      truncate
+                    />
+                    
+                    <InfoRow 
+                      label="Nombre" 
+                      value={action.user.name} 
+                      truncate
+                    />
+                    <InfoRow 
+                      label="Email" 
+                      value={action.user.email}
+                      truncate
                       mono
                     />
                   </Section>
@@ -125,35 +154,22 @@ export const ActionDetailsModal: React.FC<ActionDetailsModalProps> = ({
                     <>
                       <InfoRow label="Tipo" value={action.entityType} />
                       {isGlobalAction ? (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground italic">
-                          <Globe className="w-4 h-4 text-primary" />
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground italic py-1">
+                          <Globe className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
                           <span>
                             Esta acción es global y no tiene entidad asociada.
                           </span>
                         </div>
                       ) : (
-                        <div className="mt-2 border bg-muted/30 rounded-md p-3 text-xs font-mono space-y-2">
-                          {Object.entries(action.entityData ?? {}).map(
-                            ([k, v]) => (
-                              <div
-                                key={k}
-                                className="flex flex-col sm:flex-row sm:gap-2"
-                              >
-                                <span className="font-semibold min-w-[100px] text-foreground">
-                                  {k}:
-                                </span>
-                                <span className="text-muted-foreground wrap-break-word whitespace-pre-wrap break-all leading-relaxed w-full overflow-hidden">
-                                  {String(v ?? "N/A")}
-                                </span>
-                              </div>
-                            )
-                          )}
-                        </div>
+                        <DataBlock 
+                          data={action.entityData ?? {}} 
+                          emptyMessage="Sin datos de entidad"
+                        />
                       )}
                     </>
                   ) : (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground italic">
-                      <Info className="w-4 h-4 text-primary" />
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground italic py-1">
+                      <Info className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
                       <span>
                         Esta acción no afecta a una entidad específica.
                       </span>
@@ -166,21 +182,11 @@ export const ActionDetailsModal: React.FC<ActionDetailsModalProps> = ({
                     icon={<GitCompare className="w-4 h-4" />}
                     title="Cambios Registrados"
                   >
-                    <div className="rounded-md border bg-muted/30 p-3 text-xs font-mono space-y-1">
-                      {Object.entries(action!.changes!).map(([key, value]) => (
-                        <div
-                          key={key}
-                          className="flex flex-col sm:flex-row sm:gap-2"
-                        >
-                          <span className="font-semibold min-w-[120px]">
-                            {key}:
-                          </span>
-                          <span className="wrap-break-word whitespace-pre-wrap break-all">
-                            {String(value)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                    <DataBlock 
+                      data={action!.changes!} 
+                      emptyMessage="Sin cambios registrados"
+                      variant="changes"
+                    />
                   </Section>
                 )}
 
@@ -189,26 +195,17 @@ export const ActionDetailsModal: React.FC<ActionDetailsModalProps> = ({
                     icon={<FileJson className="w-4 h-4" />}
                     title="Metadatos Adicionales"
                   >
-                    <div className="rounded-lg border bg-muted/30 overflow-hidden">
-                      <ScrollArea className="max-h-64">
-                        <div className="text-xs font-mono p-3 bg-background/50 leading-relaxed whitespace-pre-wrap wrap-break-word break-all text-foreground overflow-hidden">
-                          {Object.entries(action.metadata ?? {}).map(
-                            ([k, v]) => (
-                              <div
-                                key={k}
-                                className="flex flex-col sm:flex-row sm:gap-2 mb-2"
-                              >
-                                <span className="font-semibold min-w-[100px]">
-                                  {k}:
-                                </span>
-                                <span className="text-muted-foreground wrap-break-word whitespace-pre-wrap break-all leading-relaxed">
-                                  {String(v ?? "N/A")}
-                                </span>
-                              </div>
-                            )
-                          )}
-                        </div>
+                    <div className="rounded-lg border bg-muted/30 overflow-hidden relative">
+                      <ScrollArea className="max-h-72">
+                        <DataBlock 
+                          data={action.metadata ?? {}} 
+                          emptyMessage="Sin metadatos"
+                          variant="metadata"
+                        />
                       </ScrollArea>
+                      <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-muted/30 to-transparent pointer-events-none flex items-end justify-center pb-1">
+                        <ChevronDown className="w-4 h-4 text-muted-foreground/50 animate-pulse" aria-hidden="true" />
+                      </div>
                     </div>
                   </Section>
                 )}
@@ -221,7 +218,7 @@ export const ActionDetailsModal: React.FC<ActionDetailsModalProps> = ({
   );
 };
 
-// 📦 Componentes auxiliares
+
 const Section = ({
   icon,
   title,
@@ -233,7 +230,7 @@ const Section = ({
 }) => (
   <section className="space-y-2.5">
     <h3 className="font-semibold text-sm flex items-center gap-2 text-foreground">
-      <span className="text-primary">{icon}</span>
+      <span className="text-primary" aria-hidden="true">{icon}</span>
       {title}
     </h3>
     <div className="rounded-lg border bg-muted/30 p-3.5 space-y-2.5 text-sm">
@@ -246,21 +243,86 @@ const InfoRow = ({
   label,
   value,
   mono = false,
+  truncate = false,
 }: {
   label: string;
   value?: string | null;
   mono?: boolean;
-}) => (
-  <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2">
-    <span className="text-muted-foreground min-w-[100px] shrink-0 text-sm">
-      {label}:
-    </span>
-    <span
-      className={`flex-1 ${
-        mono ? "font-mono text-xs" : "text-sm"
-      } wrap-break-word whitespace-pre-wrap break-all leading-relaxed`}
-    >
-      {value || "N/A"}
-    </span>
-  </div>
-);
+  truncate?: boolean;
+}) => {
+  const displayValue = value || "N/A";
+  const isTooLong = displayValue.length > 50;
+  
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-start gap-1.5 sm:gap-2">
+      <span className="text-muted-foreground min-w-[100px] shrink-0 text-sm font-medium">
+        {label}:
+      </span>
+      <span
+        className={`flex-1 ${mono ? "font-mono text-xs" : "text-sm"} ${
+          truncate && isTooLong ? "truncate" : "break-words"
+        } leading-relaxed`}
+        title={truncate && isTooLong ? displayValue : undefined}
+      >
+        {displayValue}
+      </span>
+    </div>
+  );
+};
+
+const DataBlock = ({
+  data,
+  emptyMessage = "Sin datos",
+  variant = "default",
+}: {
+  data: Record<string, any>;
+  emptyMessage?: string;
+  variant?: "default" | "changes" | "metadata";
+}) => {
+  const entries = Object.entries(data);
+  
+  if (entries.length === 0) {
+    return (
+      <div className="text-sm text-muted-foreground italic py-2 text-center">
+        {emptyMessage}
+      </div>
+    );
+  }
+
+  const bgClass = variant === "metadata" ? "bg-background/50" : "bg-muted/30";
+
+  return (
+    <div className={`rounded-md border ${bgClass} p-3 text-xs font-mono space-y-2 overflow-hidden`}>
+      {entries.map(([key, value]) => {
+        const stringValue = value === null || value === undefined 
+          ? "N/A" 
+          : typeof value === "object"
+          ? JSON.stringify(value, null, 2)
+          : String(value);
+        
+        const isLongValue = stringValue.length > 100;
+
+        return (
+          <div
+            key={key}
+            className="flex flex-col sm:flex-row sm:gap-2 pb-2 border-b border-border/50 last:border-0 last:pb-0"
+          >
+            <span className="font-semibold min-w-[120px] text-foreground shrink-0 mb-1 sm:mb-0">
+              {key}:
+            </span>
+            <span 
+              className={`text-muted-foreground break-words whitespace-pre-wrap leading-relaxed flex-1 ${
+                isLongValue ? "max-h-32 overflow-y-auto text-[11px]" : ""
+              }`}
+              title={isLongValue ? stringValue : undefined}
+            >
+              {stringValue}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+export default ActionDetailsModal;
