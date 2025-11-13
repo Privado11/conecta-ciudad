@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { usePermission } from "@/hooks/usePermission";
 import { PERMISSION_GROUPS } from "@/shared/constants/permission/permissions";
-import { ShieldCheck } from "lucide-react";
+import { Loader2, ShieldCheck } from "lucide-react";
 import type { PermissionCode, Role } from "@/shared/types/PermissionTypes";
 import { RoleSelector } from "@/shared/components/atoms/RoleSelector";
 import { PermissionTabs } from "@/shared/components/atoms/PermissionTabs";
@@ -136,7 +136,14 @@ export default function RolePermissionPage() {
         onCancel={handleCancelChanges}
       />
 
-      {selectedRole && (
+      {loading.fetchingPermissions && (
+        <div className="flex flex-col items-center justify-center py-20 text-muted-foreground animate-in fade-in-50">
+          <Loader2 className="h-10 w-10 animate-spin text-primary mb-3" />
+          <p className="text-sm animate-pulse">Cargando información…</p>
+        </div>
+      )}
+
+      {selectedRole && !loading.fetchingPermissions && (
         <Card>
           <CardContent className="p-6">
             <PermissionTabs

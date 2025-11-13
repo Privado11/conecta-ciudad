@@ -16,7 +16,7 @@ import { useManagement } from "@/hooks/useManagement";
 import type { AuditFilters, TempDateFilters } from "@/shared/interface/Filters";
 import { ENTITY_BADGE_CONFIG } from "@/shared/constants/audit/auditEntity";
 import { ACTION_BY_ENTITY } from "@/shared/constants/audit/auditFilters";
-import { ActionDetailsModal } from "../ActionDetailsModal";
+import { ActionDetailsModal } from "./ActionDetailsModal";
 
 export default function AuditManagement() {
   const {
