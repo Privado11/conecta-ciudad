@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
-import { DeleteUserModal } from "./DeleteUserModal";
 import { ChangeRoleModal } from "./ChangeRoleModal";
 import type { UserRole, UserStatus } from "@/shared/types/userTYpes";
 import { useUser } from "@/hooks/useUser";
@@ -16,6 +15,7 @@ import { useManagement } from "@/hooks/useManagement";
 import type { UserFilters } from "@/shared/interface/Filters";
 import { ROLE_BADGE_CONFIG } from "@/shared/constants/user/userRoles";
 import { STATUS_FILTERS } from "@/shared/constants/user/userFilters";
+import { ConfirmModal } from "../../atoms/ConfirmModal";
 
 export default function UserManagement() {
   const {
@@ -312,15 +312,27 @@ export default function UserManagement() {
         onImport={importUsers}
       />
 
-      <DeleteUserModal
+      <ConfirmModal
         isOpen={modalType === "delete"}
-        userName={selectedUser?.name}
         onClose={() => {
           setModalType(null);
           setSelectedUser(null);
         }}
         onConfirm={handleDelete}
         loading={loading.deleting}
+        title="Confirmar eliminación"
+        description={
+          <>
+            <p className="mb-2">
+              ¿Estás seguro de que deseas eliminar a{" "}
+              <strong>{selectedUser?.name}</strong>?
+            </p>
+            <p className="text-muted-foreground">Esta acción no se puede deshacer.</p>
+          </>
+        }
+        confirmText="Eliminar"
+        loadingText="Eliminando"
+        variant="destructive"
       />
 
       <ChangeRoleModal

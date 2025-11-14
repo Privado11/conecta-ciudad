@@ -32,12 +32,16 @@ class UserService {
 
     if (filters?.name) params.append("name", filters.name);
     if (filters?.role) params.append("role", filters.role);
-    if (filters?.active !== undefined) params.append("active", filters.active.toString());
-    
-    if (filters?.page !== undefined) params.append("page", filters.page.toString());
-    if (filters?.size !== undefined) params.append("size", filters.size.toString());
+    if (filters?.active !== undefined)
+      params.append("active", filters.active.toString());
+
+    if (filters?.page !== undefined)
+      params.append("page", filters.page.toString());
+    if (filters?.size !== undefined)
+      params.append("size", filters.size.toString());
     if (filters?.sortBy) params.append("sortBy", filters.sortBy);
-    if (filters?.sortDirection) params.append("sortDirection", filters.sortDirection);
+    if (filters?.sortDirection)
+      params.append("sortDirection", filters.sortDirection);
 
     const query = params.toString();
     const response = await api.get(`/api/v1/users${query ? `?${query}` : ""}`);
@@ -94,11 +98,13 @@ class UserService {
     nationalId?: string;
   }): Promise<{ available: boolean; message: string }> {
     const query = new URLSearchParams();
-  
+
     if (params.email) query.append("email", params.email);
     if (params.nationalId) query.append("nationalId", params.nationalId);
-  
-    const response = await api.get(`/api/v1/users/validate?${query.toString()}`);
+
+    const response = await api.get(
+      `/api/v1/users/validate?${query.toString()}`
+    );
     return response.data;
   }
 
@@ -115,16 +121,22 @@ class UserService {
 
     if (filters?.name) params.append("name", filters.name);
     if (filters?.role) params.append("role", filters.role);
-    if (filters?.active !== undefined) params.append("active", filters.active.toString());
-    if (filters?.page !== undefined) params.append("page", filters.page.toString());
+    if (filters?.active !== undefined)
+      params.append("active", filters.active.toString());
+    if (filters?.page !== undefined)
+      params.append("page", filters.page.toString());
     if (filters?.size) params.append("size", filters.size.toString());
     if (filters?.sortBy) params.append("sortBy", filters.sortBy);
-    if (filters?.sortDirection) params.append("sortDirection", filters.sortDirection);
+    if (filters?.sortDirection)
+      params.append("sortDirection", filters.sortDirection);
 
     const query = params.toString();
-    const response = await api.get(`/api/v1/users/export${query ? `?${query}` : ""}`, {
-      responseType: "blob",
-    });
+    const response = await api.get(
+      `/api/v1/users/export${query ? `?${query}` : ""}`,
+      {
+        responseType: "blob",
+      }
+    );
 
     return response.data;
   }
@@ -148,7 +160,24 @@ class UserService {
 
     return response.data;
   }
-  
+
+  async changePassword(
+    id: number,
+    data: {
+      oldPassword: string;
+      newPassword: string;
+    }
+  ): Promise<string> {
+    const response = await api.patch(
+      `/api/v1/users/${id}/change-password`,
+      data
+    );
+    return response.data;
+  }
+
+  getCurrentUser(): User {
+    return JSON.parse(localStorage.getItem("user")!);
+  }
 }
 
 export default new UserService();

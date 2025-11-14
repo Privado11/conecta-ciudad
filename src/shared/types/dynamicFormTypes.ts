@@ -69,11 +69,11 @@ export interface DynamicFormConfig {
   schema?: z.ZodObject<any>;
 }
 
-export interface DynamicFormProps<T = Record<string, any>> {
+export interface DynamicFormProps<T = { [key: string]: any }> {
   config: DynamicFormConfig;
-  initialData?: T | null;
+  initialData?: Partial<T> | null;
   onValidate?: (data: T) => Promise<{ available: boolean; message: string }>;
-  onSubmit: (data: T) => Promise<void>;
+  onSubmit: (data: T) => Promise<void> | void;
   onCancel?: () => void;
   loading?: boolean;
   className?: string;

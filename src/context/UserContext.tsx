@@ -63,6 +63,8 @@ type UserContextType = {
   }) => Promise<void>;
   exportAllUsers: () => Promise<void>;
   importUsers: (file: File) => Promise<BulkUserImportResult>;
+  getCurrentUser: () => User;
+  changePassword: (id: number, data: { oldPassword: string; newPassword: string }) => Promise<string>;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -209,6 +211,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           user.id === id ? { ...user, ...updatedUser } : user
         )
       );
+      if (selectedUser?.id === id) {
+        setSelectedUser(updatedUser);
+      }
       toast.success(
         "El usuario " + updatedUser.name + " actualizado exitosamente"
       );
@@ -446,10 +451,45 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const changePassword = async (
+    id: number,
+    data: { oldPassword: string; newPassword: string }
+  ): Promise<string> => {
+    updateLoadingState("updating", true);
+    try {
+      const response = await UserService.changePassword(id, data);
+  
+      toast.success("Contraseña actualizada exitosamente");
+      return response;
+    } catch (err: any) {
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Error al cambiar contraseña";
+  
+      toast.error(message, {
+        action: {
+          label: "Reintentar",
+          onClick: () => changePassword(id, data),
+        },
+      });
+  
+      throw err;
+    } finally {
+      updateLoadingState("updating", false);
+    }
+  };
+  
+
+  const getCurrentUser = () => {
+    return UserService.getCurrentUser();
+  };
+
   return (
     <UserContext.Provider
       value={{
         users,
+        getCurrentUser,
         selectedUser,
         loading,
         pagination,
@@ -467,6 +507,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         exportUsers,
         exportAllUsers,
         importUsers,
+        changePassword,
       }}
     >
       {children}

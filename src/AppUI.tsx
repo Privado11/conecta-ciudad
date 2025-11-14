@@ -8,6 +8,8 @@ import PublicRoute from "./route/PublicRoute";
 import UserManagementPage from "./views/users/UserManagementPage";
 import SystemAuditPage from "./views/audit/SystemAuditPage";
 import RolePermissionPage from "./views/users/RolePermissionPage";
+import ProfilePage from "./views/profile/ProfilePage";
+import SettingsPage from "./views/setting/SettingPage";
 
 function AppUI() {
   return (
@@ -40,6 +42,8 @@ function AppUI() {
         <Route path="/admin/users" element={<UserManagementPage />} />
         <Route path="/admin/roles" element={<RolePermissionPage />} />
         <Route path="/admin/audit" element={<SystemAuditPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/setting" element={<SettingsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/auth/login" replace />} />

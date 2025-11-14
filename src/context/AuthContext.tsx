@@ -3,8 +3,6 @@ import type { User } from "@/shared/types/userTYpes";
 import { createContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 
-
-
 type AuthContextType = {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;

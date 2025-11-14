@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ export function DynamicForm<T = any>({
   loading = false,
   className = "",
 }: DynamicFormProps<T>) {
+  const [hasChanges, setHasChanges] = useState(false);
   const isEditMode = !!initialData;
 
   const getDefaultValues = () => {
@@ -57,11 +58,14 @@ export function DynamicForm<T = any>({
     return defaults;
   };
 
+  const isEqual = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b);
+
   const form = useForm({
     resolver: config.schema ? zodResolver(config.schema) : undefined,
     defaultValues: getDefaultValues(),
     mode: "onBlur",
     reValidateMode: "onChange",
+    shouldUnregister: false,
   });
 
   useEffect(() => {
@@ -163,9 +167,36 @@ export function DynamicForm<T = any>({
 
   const formData = form.watch();
 
-  const hasErrors = Object.keys(form.formState.errors).length > 0;
-  const isSubmitDisabled = loading || hasErrors || !form.formState.isValid;
+  useEffect(() => {
+    if (!initialData) {
+      setHasChanges(true);
+      return;
+    }
 
+    const cleanedInitial: Record<string, any> = { ...initialData };
+
+    config.sections.forEach((section) => {
+      section.fields.forEach((field) => {
+        if (
+          field.type === "radio" &&
+          Array.isArray(cleanedInitial[field.name])
+        ) {
+          cleanedInitial[field.name] = cleanedInitial[field.name][0];
+        }
+      });
+    });
+
+    const changed = !isEqual(cleanedInitial, formData);
+    setHasChanges(changed);
+  }, [formData, initialData]);
+
+  const hasErrors = Object.keys(form.formState.errors).length > 0;
+
+  console.log(hasErrors, loading, form.formState.isValid, hasChanges);
+  const isSubmitDisabled =
+    loading || hasErrors || !form.formState.isValid || !hasChanges;
+
+  console.log("isSubmitDisabled", isSubmitDisabled);
   return (
     <Form {...form}>
       <form

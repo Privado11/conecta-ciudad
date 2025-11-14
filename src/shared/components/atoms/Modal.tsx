@@ -7,7 +7,7 @@ interface ModalProps {
   title?: string;
   description?: string;
   children: React.ReactNode;
-  width?: "sm" | "md" | "lg" | "xl"; // para controlar el ancho
+  width?: "sm" | "md" | "lg" | "xl"; 
 }
 
 export function Modal({

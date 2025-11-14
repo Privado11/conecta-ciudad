@@ -1,5 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, User, ChevronDown, Bell, Search, Menu } from "lucide-react";
+import {
+  LogOut,
+  User,
+  ChevronDown,
+  Bell,
+  Search,
+  Menu,
+  Settings,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
@@ -33,10 +41,14 @@ export const Header = ({ actionButton, toggleSidebar }: HeaderProps) => {
     navigate("/profile");
   };
 
+  const handleSettings = () => {
+    navigate("/setting");
+  };
+
   return (
     <header className="flex bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 h-16 items-center justify-between px-4 sticky top-0 z-40 shadow-sm">
       <div className="flex items-center gap-3">
-        <button 
+        <button
           onClick={toggleSidebar}
           className="md:hidden p-2 -ml-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
         >
@@ -108,6 +120,14 @@ export const Header = ({ actionButton, toggleSidebar }: HeaderProps) => {
                 <User className="w-4 h-4 mr-2" />
                 <span>Mi Perfil</span>
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleSettings}
+                className="cursor-pointer focus:bg-slate-100 dark:focus:bg-slate-800 focus:text-slate-900 dark:focus:text-slate-100"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                <span>Configuración</span>
+              </DropdownMenuItem>
+
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleLogout}
