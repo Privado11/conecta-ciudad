@@ -4,6 +4,7 @@ import { MenuProvider } from "./MenuContext";
 import { UserProvider } from "./UserContext";
 import { AuditProvider } from "./AuditContext";
 import { PermissionProvider } from "./PermissionContext";
+import { ProjectProvider } from "./ProjectContext";
 
 interface AppProviderProps {
   children: ReactNode;
@@ -15,7 +16,9 @@ export function AppProvider({ children }: AppProviderProps) {
       <MenuProvider>
         <UserProvider>
           <AuditProvider>
-            <PermissionProvider>{children}</PermissionProvider>
+            <PermissionProvider>
+              <ProjectProvider>{children}</ProjectProvider>
+            </PermissionProvider>
           </AuditProvider>
         </UserProvider>
       </MenuProvider>

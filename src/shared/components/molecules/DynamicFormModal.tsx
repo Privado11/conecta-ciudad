@@ -5,6 +5,7 @@ import {
   excludeFields,
   excludeSections,
 } from "@/config/forms/filterFormConfig";
+import { useEffect } from "react";
 
 interface DynamicFormModalProps<T = any> {
   isOpen: boolean;
@@ -53,6 +54,7 @@ export function DynamicFormModal<T = any>({
           }),
         }
       : baseFilteredConfig;
+
 
   if (!isOpen) return null;
 

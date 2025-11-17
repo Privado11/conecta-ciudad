@@ -16,7 +16,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useMenu } from "@/hooks/useMenu";
+import { useUser } from "@/hooks/useUser";
+import { USER_ROLES } from "@/shared/constants/user/userRoles";
 
 interface HeaderProps {
   actionButton?: {
@@ -29,8 +30,10 @@ interface HeaderProps {
 export const Header = ({ actionButton, toggleSidebar }: HeaderProps) => {
   const navigate = useNavigate();
 
-  const { user } = useMenu();
+  const { userProfile } = useUser();
   const { logout } = useAuth();
+
+  const user = userProfile;
 
   const handleLogout = () => {
     logout();
@@ -90,14 +93,14 @@ export const Header = ({ actionButton, toggleSidebar }: HeaderProps) => {
                 <div className="flex items-center gap-2">
                   <div className="text-right hidden md:block">
                     <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      {user.fullName}
+                      {user.name}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {user.role}
+                      {USER_ROLES[user.roles?.[0] as keyof typeof USER_ROLES]}
                     </p>
                   </div>
                   <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-semibold text-sm shadow-lg">
-                    {user.fullName?.charAt(0) || "?"}
+                    {user.name?.charAt(0) || "?"}
                   </div>
                 </div>
                 <ChevronDown className="w-4 h-4 text-slate-400" />
@@ -106,10 +109,10 @@ export const Header = ({ actionButton, toggleSidebar }: HeaderProps) => {
             <DropdownMenuContent align="end" className="w-56">
               <div className="px-3 py-2">
                 <p className="font-semibold text-slate-900 dark:text-slate-100">
-                  {user.fullName}
+                  {user.name}
                 </p>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {user.username}
+                  {user.email}
                 </p>
               </div>
               <DropdownMenuSeparator />

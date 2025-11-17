@@ -57,7 +57,7 @@ export function ChangeRoleModal({
                 key={role}
                 onClick={() => setSelectedRole(role)}
                 className={cn(
-                  "w-full p-3 border rounded-lg text-left hover:bg-accent transition-colors",
+                  "w-full p-3 border rounded-lg text-left hover:bg-accent transition-colors cursor-pointer",
                   isCurrentRole && "border-muted bg-muted/30",
                   isSelected &&
                     "border-primary bg-primary/10 ring-2 ring-primary/20"

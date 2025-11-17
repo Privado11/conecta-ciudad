@@ -4,33 +4,19 @@ import { useUser } from "@/hooks/useUser";
 import { useNavigate } from "react-router-dom";
 import HeaderProfile from "@/shared/components/molecules/profile/HeaderProfile";
 import InfoProfile from "@/shared/components/molecules/profile/InfoProfile";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DynamicFormModal } from "@/shared/components/molecules/DynamicFormModal";
 import { userFormConfig } from "@/config/forms/userForm.config";
 
 function ProfilePage() {
-  const {
-    selectedUser,
-    getUserById,
-    getCurrentUser,
-    loading,
-    validateUniqueFields,
-    updateUser,
-  } = useUser();
+  const { userProfile, loading, validateUniqueFields, updateUser } = useUser();
   const navigate = useNavigate();
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  const currentUser = getCurrentUser();
-
-  useEffect(() => {
-    if (currentUser?.id) {
-      getUserById(currentUser.id);
-    }
-  }, []);
-
   const handleSubmit = async (data: any) => {
-    await updateUser(currentUser.id, data);
+    if (!userProfile) return;
+    await updateUser(userProfile.id, data);
     setIsOpenModal(false);
   };
 
@@ -38,8 +24,28 @@ function ProfilePage() {
     navigate(-1);
   };
 
-  if (!selectedUser) {
-    return <div className="p-6">Loading profile...</div>;
+  if (loading.fetching && !userProfile) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando perfil...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-200px)]">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">No se pudo cargar el perfil</p>
+          <Button onClick={handleGoBack} variant="outline">
+            Volver
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -60,12 +66,12 @@ function ProfilePage() {
 
         <Card className="w-full mx-auto">
           <HeaderProfile
-            user={selectedUser}
+            user={userProfile}
             onEdit={() => setIsOpenModal(true)}
           />
 
           <CardContent>
-            <InfoProfile user={selectedUser} />
+            <InfoProfile user={userProfile} />
           </CardContent>
         </Card>
       </div>
@@ -76,7 +82,7 @@ function ProfilePage() {
           setIsOpenModal(false);
         }}
         config={userFormConfig}
-        initialData={selectedUser}
+        initialData={userProfile}
         onValidate={validateUniqueFields}
         onSubmit={handleSubmit}
         loading={loading.updating}

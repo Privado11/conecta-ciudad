@@ -6,6 +6,8 @@ export type LoadingUserState = {
   togglingActive: boolean;
   addingRole: boolean;
   removingRole: boolean;
+  fetchingCurators: boolean;
+  assigningCurator: boolean;
 };
 
 export type LoadingAuditState = {

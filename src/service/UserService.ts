@@ -1,4 +1,4 @@
-import type { User, UserRole } from "@/shared/types/userTYpes";
+import type { CuratorDto, CuratorInfoDto, User, UserRole } from "@/shared/types/userTYpes";
 import api from "./api";
 
 import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
@@ -175,9 +175,24 @@ class UserService {
     return response.data;
   }
 
-  getCurrentUser(): User {
-    return JSON.parse(localStorage.getItem("user")!);
+  async getCurrentUser(): Promise<User> {
+    const userString = localStorage.getItem("user");
+    if (!userString) {
+      throw new Error("No user found in localStorage");
+    }
+
+    const user = JSON.parse(userString);
+    const currentUser = await this.getUserById(user.id);
+
+    return currentUser;
   }
+
+  async getCuratorsWithStats(projectId: number): Promise<CuratorInfoDto> {
+    const response = await api.get(`/api/v1/users/curators/${projectId}`);
+    return response.data;
+  }
+  
+  
 }
 
 export default new UserService();

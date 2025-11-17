@@ -12,6 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -27,8 +34,13 @@ interface DynamicFilterProps<T extends Record<string, any>> {
   filterGroups: FilterGroup<any>[];
   headerActions?: ReactNode;
   titleIcon?: LucideIcon;
+
+
+  dateType?: string;
   startDate?: string;
   endDate?: string;
+  dateTypeOptions?: Array<{ value: string; label: string }>;
+  onDateTypeChange?: (value: string) => void;
   onStartDateChange?: (value: string | undefined) => void;
   onEndDateChange?: (value: string | undefined) => void;
   onApplyDateFilter?: () => void;
@@ -43,8 +55,11 @@ export function DynamicFilter<T extends Record<string, any>>({
   filterGroups,
   headerActions,
   titleIcon: TitleIcon,
+  dateType,
   startDate,
   endDate,
+  dateTypeOptions,
+  onDateTypeChange,
   onStartDateChange,
   onEndDateChange,
   onApplyDateFilter,
@@ -157,7 +172,7 @@ export function DynamicFilter<T extends Record<string, any>>({
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-medium flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      Rango de fechas
+                      Filtro por fecha
                     </Label>
                     {(startDate || endDate) && (
                       <Button
@@ -170,13 +185,37 @@ export function DynamicFilter<T extends Record<string, any>>({
                       </Button>
                     )}
                   </div>
+
+                  {dateTypeOptions && onDateTypeChange && (
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="dateType"
+                        className="text-xs text-muted-foreground"
+                      >
+                        Tipo de fecha
+                      </Label>
+                      <Select value={dateType} onValueChange={onDateTypeChange}>
+                        <SelectTrigger id="dateType">
+                          <SelectValue placeholder="Seleccionar tipo de fecha" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dateTypeOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label
                         htmlFor="startDate"
                         className="text-xs text-muted-foreground"
                       >
-                        Fecha inicio
+                        Fecha desde
                       </Label>
                       <Input
                         id="startDate"
@@ -193,7 +232,7 @@ export function DynamicFilter<T extends Record<string, any>>({
                         htmlFor="endDate"
                         className="text-xs text-muted-foreground"
                       >
-                        Fecha fin
+                        Fecha hasta
                       </Label>
                       <Input
                         id="endDate"
@@ -212,7 +251,7 @@ export function DynamicFilter<T extends Record<string, any>>({
                       size="sm"
                       className="w-full cursor-pointer mt-3"
                     >
-                      Aplicar filtro de fechas
+                      Aplicar filtro de fecha
                     </Button>
                   )}
                 </div>
