@@ -11,6 +11,12 @@ import RolePermissionPage from "./views/users/RolePermissionPage";
 import ProfilePage from "./views/profile/ProfilePage";
 import SettingsPage from "./views/setting/SettingPage";
 
+//   PÁGINAS DEL GRUPO 1
+import PublicProjects from "./pages/PublicProjects";
+import VotingResults from "./pages/VotingResults";
+import CommunicationsHistory from "./pages/CommunicationsHistory";
+import NotificationsCenter from "./pages/NotificationsCenter";
+
 function AppUI() {
   return (
     <Routes>
@@ -44,6 +50,13 @@ function AppUI() {
         <Route path="/admin/audit" element={<SystemAuditPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/setting" element={<SettingsPage />} />
+        
+        {/* RUTAS DEL GRUPO 1 - Comunicación, Transparencia y Resultados */}
+        <Route path="/projects/public" element={<PublicProjects />} />
+        <Route path="/results" element={<VotingResults />} />
+        <Route path="/results/:id" element={<VotingResults />} />
+        <Route path="/communications/history" element={<CommunicationsHistory />} />
+        <Route path="/notifications" element={<NotificationsCenter />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/auth/login" replace />} />
@@ -52,3 +65,4 @@ function AppUI() {
 }
 
 export default AppUI;
+``
