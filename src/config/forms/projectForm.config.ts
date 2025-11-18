@@ -46,7 +46,7 @@ export const projectFormConfig: DynamicFormConfig = {
             .union([
               z
                 .string()
-                .regex(/^\d+$/, "El presupuesto debe ser un número válido")
+                .regex(/^[0-9]{10}$/, "El presupuesto debe ser un número válido")
                 .transform((val) => Number(val)),
               z.number(),
             ])

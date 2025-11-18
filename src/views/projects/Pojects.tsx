@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { projectFormConfig } from "@/config/forms/projectForm.config";
-import { userFormConfig } from "@/config/forms/userForm.config";
 import useProject from "@/hooks/useProject";
 import { Modal } from "@/shared/components/atoms/Modal";
-import { SearchAndFilters } from "@/shared/components/atoms/SearchAndFilters";
 import { StatCard } from "@/shared/components/atoms/StatCard";
 import { DynamicFormModal } from "@/shared/components/molecules/DynamicFormModal";
 import { ProjectTable } from "@/shared/components/molecules/ProjectTable";

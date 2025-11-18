@@ -82,6 +82,9 @@ export default function useProject() {
 
   const onSubmitCreate = async (data: ProjectCreateDTO) => {
     setLoading(true);
+    if(/^[0-9]{10}$/.test(data.budgets) ){
+      throw new Error("El presupuesto debe ser un número válido");
+    }
     const dataCreate: ProjectCreateDTO = {
       name: data.name,
       objectives: data.objectives,
