@@ -4,6 +4,7 @@ import { StatCard } from "../atoms/StatCard";
 export interface SubStat {
   label: string;
   value: string;
+  suffix?: string; 
 }
 
 export interface StatConfig {
@@ -66,6 +67,7 @@ export function StatsGrid({
         const subStatsData = stat.subStats?.map((subStat) => ({
           label: subStat.label,
           value: (data.metrics?.[subStat.value] as number) || 0,
+          suffix: subStat.suffix, 
         }));
 
         return (

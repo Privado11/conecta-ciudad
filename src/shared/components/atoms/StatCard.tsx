@@ -6,6 +6,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 interface SubStatData {
   label: string;
   value: number;
+  suffix?: string; 
 }
 
 interface StatCardProps {
@@ -100,6 +101,7 @@ export function StatCard({
                     </span>
                     <span className="font-semibold text-foreground">
                       {formatValue(subStat.value)}
+                      {subStat.suffix || ""} 
                     </span>
                   </div>
                 ))}

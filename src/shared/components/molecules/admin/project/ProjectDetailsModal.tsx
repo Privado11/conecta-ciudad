@@ -2,12 +2,12 @@ import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import type { ProjectDto } from "@/shared/types/projectTypes";
-import { ProjectHeader } from "../../atoms/project/ProjectHeader";
-import { GeneralInfoSection } from "../../atoms/project/GeneralInfoSection";
-import { TimelineSection } from "../../atoms/project/TimelineSection";
-import { CreatorSection } from "../../atoms/project/CreatorSection";
-import { ReviewsSection } from "../../atoms/project/ReviewsSection";
-import { ProjectDetailsFooter } from "../../atoms/project/ProjectDetailsFooter";
+import { ProjectHeader } from "../../../atoms/admin/ProjectHeader";
+import { GeneralInfoSection } from "../../../atoms/admin/GeneralInfoSection";
+import { TimelineSection } from "../../../atoms/admin/TimelineSection";
+import { CreatorSection } from "../../../atoms/admin/CreatorSection";
+import { ReviewsSection } from "../../../atoms/admin/ReviewsSection";
+import { ProjectDetailsFooter } from "../../../atoms/admin/ProjectDetailsFooter";
 
 interface ProjectDetailsModalProps {
   isOpen: boolean;

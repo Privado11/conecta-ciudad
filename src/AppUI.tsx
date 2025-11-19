@@ -11,6 +11,8 @@ import RolePermissionPage from "./views/admin/users/RolePermissionPage";
 import ProfilePage from "./views/admin/profile/ProfilePage";
 import SettingsPage from "./views/setting/SettingPage";
 import ProjectManagementPage from "./views/project/ProjectManagementPage";
+import ProjectPendingReviewManagementPage from "./views/curator/ProjectPendingReviewManagementPage";
+import ReviewHistoryManagementPage from "./views/curator/ReviewHistoryManagementPage";
 
 function AppUI() {
   return (
@@ -46,7 +48,10 @@ function AppUI() {
         <Route path="/admin/audit" element={<SystemAuditPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/setting" element={<SettingsPage />} />
+        <Route path="/curator/review/pending" element={<ProjectPendingReviewManagementPage />} />
+        <Route path="/curator/review/history" element={<ReviewHistoryManagementPage />} />
       </Route>
+      
 
       <Route path="*" element={<Navigate to="/auth/login" replace />} />
     </Routes>

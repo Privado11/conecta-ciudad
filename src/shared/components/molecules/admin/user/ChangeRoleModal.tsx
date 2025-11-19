@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Modal } from "../../atoms/Modal";
+import { Modal } from "@/shared/components/atoms/Modal";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/shared/types/userTYpes";
 import {

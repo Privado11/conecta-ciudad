@@ -6,7 +6,7 @@ import {
   ROLE_FILTERS,
   STATUS_FILTERS,
 } from "@/shared/constants/user/userFilters";
-import { DynamicFilter } from "../DynamicFilter";
+import { DynamicFilter } from "../../DynamicFilter";
 import type { UserFilters } from "@/shared/interface/Filters";
 
 interface FilterHandlers {

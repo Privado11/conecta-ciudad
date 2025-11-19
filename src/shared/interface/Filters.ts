@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import type { ActionResult, ActionType, EntityType } from "../types/auditTypes";
 import type { UserRole, UserStatus } from "../types/userTYpes";
 import type { ProjectStatus } from "../types/projectTypes";
+import type { ProjectPriority } from "../types/curatorTypes";
 
 export interface FilterOption<T> {
   label: string;
@@ -54,4 +55,19 @@ export interface ProjectFilters {
 
   createdFrom?: string;
   createdTo?: string;
+}
+
+export interface CuratorFilters {
+  searchTerm: string;
+  status: ProjectPriority | "all";
+}
+
+export interface ReviewHistoryFilters {
+  searchTerm: string;
+  outcome: "all" | "APROBADO" | "DEVUELTO" | "RECHAZADO";
+  status: ProjectStatus | "all";
+  wasOverdue?: boolean;
+  isResubmission?: boolean;
+  reviewedFrom?: string;
+  reviewedTo?: string;
 }

@@ -1,5 +1,5 @@
 import { FolderKanban } from "lucide-react";
-import { DynamicFilter } from "../DynamicFilter";
+import { DynamicFilter } from "../../DynamicFilter";
 import type {
   ProjectFilters,
   TempDateFilters,

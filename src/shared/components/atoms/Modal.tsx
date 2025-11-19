@@ -13,7 +13,7 @@ interface ModalProps {
   title?: string;
   description?: string;
   children: React.ReactNode;
-  width?: "sm" | "md" | "lg" | "xl"; 
+  width?: "sm" | "md" | "lg" | "xl";
 }
 
 export function Modal({
@@ -33,12 +33,17 @@ export function Modal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={widthClasses[width]}>
-        <DialogHeader>
+      <DialogContent
+        className={`${widthClasses[width]} max-h-[80vh] flex flex-col`}
+      >
+        <DialogHeader className="shrink-0">
           {title && <DialogTitle>{title}</DialogTitle>}
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <div className="space-y-4">{children}</div>
+
+        <div className="overflow-y-auto pr-1 mt-4 space-y-4">
+          {children}
+        </div>
       </DialogContent>
     </Dialog>
   );

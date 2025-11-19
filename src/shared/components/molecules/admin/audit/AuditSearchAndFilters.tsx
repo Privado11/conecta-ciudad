@@ -10,7 +10,7 @@ import {
   ACTION_RESULT_FILTERS,
   ACTION_BY_ENTITY,
 } from "@/shared/constants/audit/auditFilters";
-import { DynamicFilter } from "../DynamicFilter";
+import { DynamicFilter } from "../../DynamicFilter";
 import type { AuditFilters, TempDateFilters } from "@/shared/interface/Filters";
 
 interface FilterHandlers {

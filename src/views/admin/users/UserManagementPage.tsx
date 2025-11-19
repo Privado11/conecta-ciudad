@@ -1,4 +1,5 @@
-import UserManagement from "@/shared/components/molecules/user/UserManagement";
+import UserManagement from "@/shared/components/molecules/admin/user/UserManagement";
+
 
 function UserManagementPage() {
   return <UserManagement />;

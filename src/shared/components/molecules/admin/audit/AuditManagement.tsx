@@ -7,11 +7,11 @@ import type {
   EntityType,
 } from "@/shared/types/auditTypes";
 import { AUDIT_STATS } from "@/shared/constants/audit/auditStats";
-import { DynamicTable } from "../DynamicTable";
+import { DynamicTable } from "../../DynamicTable";
 import { createAuditTableConfig } from "@/config/table/AuditTableConfig";
 import { AuditSearchAndFilters } from "./AuditSearchAndFilters";
 
-import { StatsGrid } from "../StatsGrid";
+import { StatsGrid } from "../../StatsGrid";
 import { useManagement } from "@/hooks/useManagement";
 import type { AuditFilters, TempDateFilters } from "@/shared/interface/Filters";
 import { ENTITY_BADGE_CONFIG } from "@/shared/constants/audit/auditEntity";

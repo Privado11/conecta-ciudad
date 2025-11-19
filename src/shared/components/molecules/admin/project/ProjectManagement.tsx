@@ -1,51 +1,46 @@
 import { useEffect, useState } from "react";
 import { FolderOpen } from "lucide-react";
-import { DynamicTable } from "../DynamicTable";
-import { StatsGrid } from "../StatsGrid";
+import { DynamicTable } from "../../DynamicTable";
+import { StatsGrid } from "../../StatsGrid";
 import { useManagement } from "@/hooks/useManagement";
 
 import { createProjectTableConfig } from "@/config/table/ProjectTableConfig";
-
-import { useProject } from "@/hooks/useProject";
 
 import type {
   ProjectFilters,
   TempDateFilters,
 } from "@/shared/interface/Filters";
 
-import { ConfirmModal } from "../../atoms/ConfirmModal";
+import { ConfirmModal } from "../../../atoms/ConfirmModal";
 import type { ProjectStatus } from "@/shared/types/projectTypes";
 import { PROJECT_STATUS_BADGE_CONFIG } from "@/shared/constants/project/projectStatus";
 import { PROJECT_STATS } from "@/shared/constants/project/projectStats";
 import { ProjectSearchAndFilters } from "./ProjectSerachAndFilters";
-import { DynamicFormModal } from "../DynamicFormModal";
-import { projectFormConfig } from "@/config/forms/projectForm.config";
 import { ProjectDetailsModal } from "./ProjectDetailsModal";
 import { AssignCuratorModal } from "./AssignCuratorModal";
-import { useUser } from "@/hooks/useUser";
+import { useUsersAdmin } from "@/hooks/admin/useUsersAdmin";
+import { useProjectsAdmin } from "@/hooks/admin/useProjectsAdmin";
 
 export default function ProjectManagement() {
   const {
     projects,
     selectedProject,
-    loading,
+    loadingProjects,
     pagination,
-    statistics,
+    statisticsProjects,
     searchProjects,
     getStatistics,
-    getProjectById,
-    updateProject,
     deleteProject,
     assignCurator,
     setSelectedProject,
-  } = useProject();
+  } = useProjectsAdmin();
   const {
     curatorsActive,
     currentCurator,
     getCuratorsWithStats,
     clearCurators,
     loading: userLoading,
-  } = useUser();
+  } = useUsersAdmin();
   const [tempDateFilters, setTempDateFilters] = useState<TempDateFilters>({
     dateType: "projectStart",
     startDate: undefined,
@@ -308,15 +303,6 @@ export default function ProjectManagement() {
     },
   });
 
-  const handleSubmit = async (data: any) => {
-    if (selectedProject) {
-      await updateProject(selectedProject.id, data);
-    }
-    setModalType(null);
-    setSelectedProject(null);
-    loadProjects();
-  };
-
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-8 flex items-start justify-between">
@@ -337,10 +323,10 @@ export default function ProjectManagement() {
         <StatsGrid
           stats={PROJECT_STATS}
           data={{
-            totalElements: statistics?.total,
-            metrics: statistics?.metrics,
+            totalElements: statisticsProjects?.total,
+            metrics: statisticsProjects?.metrics,
           }}
-          loading={loading.fetching && projects.length === 0}
+          loading={loadingProjects.fetching && projects.length === 0}
           columns={4}
         />
 
@@ -356,7 +342,7 @@ export default function ProjectManagement() {
           <p className="text-sm text-muted-foreground">
             <span className="font-medium">Filtros activos:</span>{" "}
             {activeFiltersMessage} ·{" "}
-            {loading.fetching ? (
+            {loadingProjects.fetching ? (
               <span className="italic">Cargando...</span>
             ) : (
               <>
@@ -370,7 +356,7 @@ export default function ProjectManagement() {
       <DynamicTable
         config={projectTableConfig}
         data={projects}
-        loading={loading.fetching}
+        loading={loadingProjects.fetching}
         pagination={{
           currentPage,
           totalPages: pagination.totalPages,
@@ -395,18 +381,6 @@ export default function ProjectManagement() {
         }
       />
 
-      <DynamicFormModal
-        isOpen={modalType === "edit"}
-        onClose={() => {
-          setModalType(null);
-          setSelectedProject(null);
-        }}
-        config={projectFormConfig}
-        initialData={selectedProject}
-        onSubmit={handleSubmit}
-        loading={loading.updating}
-      />
-
       <ProjectDetailsModal
         isOpen={modalType === "view"}
         onClose={() => setModalType(null)}
@@ -429,7 +403,7 @@ export default function ProjectManagement() {
         curators={curatorsActive}
         onAssign={handleAssignCurator}
         loadingFetchingCurators={userLoading.fetchingCurators}
-        loadingAssigningCurator={loading.assigningCurator}
+        loadingAssigningCurator={loadingProjects.assigningCurator}
       />
     </div>
   );

@@ -2,22 +2,26 @@ import { useEffect, useState } from "react";
 import { Users } from "lucide-react";
 import { ChangeRoleModal } from "./ChangeRoleModal";
 import type { UserRole, UserStatus } from "@/shared/types/userTYpes";
-import { useUser } from "@/hooks/useUser";
+
 import { USER_STATS } from "@/shared/constants/user/userStats";
-import { DynamicFormModal } from "../DynamicFormModal";
+import { DynamicFormModal } from "../../DynamicFormModal";
 import { userFormConfig } from "@/config/forms/userForm.config";
 import ImportUsersModal from "./ImportUsersModal";
 import { createUserTableConfig } from "@/config/table/UserTableConfig";
-import { DynamicTable } from "../DynamicTable";
+import { DynamicTable } from "../../DynamicTable";
 import { UserSearchAndFilters } from "./UserSearchAndFilters";
-import { StatsGrid } from "../StatsGrid";
+import { StatsGrid } from "../../StatsGrid";
 import { useManagement } from "@/hooks/useManagement";
 import type { UserFilters } from "@/shared/interface/Filters";
 import { ROLE_BADGE_CONFIG } from "@/shared/constants/user/userRoles";
 import { STATUS_FILTERS } from "@/shared/constants/user/userFilters";
-import { ConfirmModal } from "../../atoms/ConfirmModal";
+import { ConfirmModal } from "../../../atoms/ConfirmModal";
+import { useUsersAdmin } from "@/hooks/admin/useUsersAdmin";
+import { useUser } from "@/hooks/useUser";
+
 
 export default function UserManagement() {
+  const { validateUniqueFields } = useUser();
   const {
     users,
     getUsers,
@@ -31,11 +35,10 @@ export default function UserManagement() {
     addRole,
     toggleActive,
     setSelectedUser,
-    validateUniqueFields,
     exportUsers,
     exportAllUsers,
     importUsers,
-  } = useUser();
+  } = useUsersAdmin();
 
   const {
     filters,
@@ -327,7 +330,9 @@ export default function UserManagement() {
               ¿Estás seguro de que deseas eliminar a{" "}
               <strong>{selectedUser?.name}</strong>?
             </p>
-            <p className="text-muted-foreground">Esta acción no se puede deshacer.</p>
+            <p className="text-muted-foreground">
+              Esta acción no se puede deshacer.
+            </p>
           </>
         }
         confirmText="Eliminar"

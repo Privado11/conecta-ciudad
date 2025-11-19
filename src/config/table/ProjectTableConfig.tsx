@@ -1,4 +1,4 @@
-import { Eye, Edit, Trash2, UserPlus } from "lucide-react";
+import { Eye, Trash2, UserPlus } from "lucide-react";
 import type { DynamicTableConfig } from "@/shared/types/dynamicTableTypes";
 import type { ProjectDto } from "@/shared/types/projectTypes";
 import { PROJECT_STATUS_BADGE_CONFIG } from "@/shared/constants/project/projectStatus";
@@ -144,14 +144,6 @@ export const createProjectTableConfig = (
       onClick: actions.onViewDetails,
       className:
         "transition-colors data-[highlighted]:bg-blue-100 data-[highlighted]:text-blue-700 dark:data-[highlighted]:bg-blue-900/30 dark:data-[highlighted]:text-blue-400",
-    },
-    {
-      label: "Editar",
-      icon: <Edit className="w-4 h-4 mr-2" />,
-      onClick: actions.onEdit,
-      hidden: (project) => !projectPermissions.canEdit(project.status),
-      className:
-        "transition-colors data-[highlighted]:bg-green-100 data-[highlighted]:text-green-700 dark:data-[highlighted]:bg-green-900/30 dark:data-[highlighted]:text-green-400",
     },
     {
       label: (project) => {
