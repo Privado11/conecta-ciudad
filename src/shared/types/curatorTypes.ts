@@ -3,6 +3,7 @@ import type { ProjectStatus } from "./projectTypes";
 export interface PendingReviewDto {
   projectId: number;
   projectName: string;
+  description: string;
   objectives: string;
   beneficiaryPopulations: string;
   budget: number;
@@ -53,6 +54,7 @@ export interface PendingReviewQueueDto {
 export interface ReviewHistoryDto {
   projectId: number;
   projectName: string;
+  description: string;
   objectives: string;
   beneficiaryPopulations: string;
   budget: number;
@@ -85,7 +87,6 @@ export interface HistoryStatistics {
   metrics: {
     approved: number;
     returned: number;
-    rejected: number;
     resubmissions: number;
     averageDaysToComplete: number;
     completedOnTime: number;
@@ -113,7 +114,7 @@ export interface PagedResponse<T> {
 export interface ReviewHistoryFilters {
   searchTerm?: string;
   status?: ProjectStatus;
-  outcome?: "APROBADO" | "DEVUELTO" | "RECHAZADO" | "all";
+  outcome?: "APROBADO" | "DEVUELTO" | "all";
   wasOverdue?: boolean;
   isResubmission?: boolean;
   reviewedFrom?: string;
@@ -131,4 +132,48 @@ export interface LoadingCuratorState {
   fetchingHistory: boolean; 
   addingObservations: boolean;
   approvingProject: boolean;
+}
+
+export interface CuratorDashboardStats {
+  assignedProjects: number;
+  pendingReview: number;
+  inReview: number;
+  completedThisMonth: number;
+  averageReviewTime: number;
+  overdueProjects: number;
+  approvalRate: number;
+  onTimeRate: number;
+}
+
+export interface CuratorProjectStatusData {
+  status: string;
+  count: number;
+  color: string;
+}
+
+export interface CuratorReviewTrendData {
+  month: string;
+  reviewed: number;
+  approved: number;
+  returned: number;
+}
+
+export interface UrgentProjectData {
+  projectId: number;
+  projectName: string;
+  creatorName: string;
+  assignedAt: string;
+  dueAt: string;
+  daysUntilDue: number;
+  isOverdue: boolean;
+  priorityLevel: string;
+  daysInReview: number;
+}
+
+export interface CuratorRecentActivity {
+  id: number;
+  projectName: string;
+  action: string;
+  timestamp: string;
+  outcome: string;
 }

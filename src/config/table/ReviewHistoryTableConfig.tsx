@@ -50,7 +50,9 @@ export const createReviewHistoryTableConfig = (
       sortable: false,
       render: (review) => {
         const outcome =
-          review.projectStatus === "READY_TO_PUBLISH"
+          review.projectStatus === "READY_TO_PUBLISH" ||
+          review.projectStatus === "OPEN_FOR_VOTING" ||
+          review.projectStatus === "VOTING_CLOSED"
             ? "APROBADO"
             : review.projectStatus === "RETURNED_WITH_OBSERVATIONS"
             ? "DEVUELTO"

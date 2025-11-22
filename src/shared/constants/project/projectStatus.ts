@@ -42,6 +42,11 @@ export const PROJECT_STATUS_BADGE_CONFIG: Record<
     variant: "destructive",
   },
 
+  OPEN_FOR_VOTING: {
+    label: "Abierto para votación",
+    variant: "default",
+  },
+
   VOTING_CLOSED: {
     label: "Votación cerrada",
     variant: "secondary",

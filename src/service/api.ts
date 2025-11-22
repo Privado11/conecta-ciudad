@@ -4,58 +4,71 @@ import axios from "axios";
 import { toast } from "sonner";
 
 const API_URL = import.meta.env.VITE_API_URL_DEV;
+const VOTING_API_URL = import.meta.env.VITE_VOTING_API_URL;
+
+const createInterceptors = (instance: ReturnType<typeof axios.create>) => {
+  instance.interceptors.request.use(
+    (config) => {
+      const token = localStorage.getItem("token");
+      const isAuthRoute =
+        config.url?.includes("/auth/login") ||
+        config.url?.includes("/auth/register");
+
+      if (token && !isAuthRoute) {
+        if (isTokenExpired(token)) {
+          console.warn("Token expirado, redirigiendo al login...");
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          toast.error("Sesión expirada. Por favor, inicia sesión de nuevo.");
+          window.location.href = "/auth/login";
+          return Promise.reject(new axios.Cancel("Token expirado"));
+        }
+
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      const message = handleApiError(error);
+
+      if (error.response?.status === 401) {
+        const msg = error.response?.data?.message?.toLowerCase() ?? "";
+        if (msg.includes("token") || msg.includes("expired")) {
+          console.warn("Token inválido o expirado, cerrando sesión...");
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          toast.error("Sesión expirada. Por favor, inicia sesión de nuevo.");
+          window.location.href = "/auth/login";
+        } else {
+          console.warn("No autorizado para este recurso (401).");
+        }
+      }
+
+      console.error("API Error:", message);
+
+      return Promise.reject(new Error(message));
+    }
+  );
+};
 
 const api = axios.create({
   baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    const isAuthRoute =
-      config.url?.includes("/auth/login") ||
-      config.url?.includes("/auth/register");
+createInterceptors(api);
 
-    if (token && !isAuthRoute) {
-      if (isTokenExpired(token)) {
-        console.warn("Token expirado, redirigiendo al login...");
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        toast.error("Sesión expirada. Por favor, inicia sesión de nuevo.");
-        window.location.href = "/auth/login";
-        return Promise.reject(new axios.Cancel("Token expirado"));
-      }
+const votingApi = axios.create({
+  baseURL: VOTING_API_URL,
+  headers: { "Content-Type": "application/json" },
+});
 
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+createInterceptors(votingApi);
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const message = handleApiError(error);
-
-    if (error.response?.status === 401) {
-      const msg = error.response?.data?.message?.toLowerCase() ?? "";
-      if (msg.includes("token") || msg.includes("expired")) {
-        console.warn("Token inválido o expirado, cerrando sesión...");
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        toast.error("Sesión expirada. Por favor, inicia sesión de nuevo.");
-        window.location.href = "/auth/login";
-      } else {
-        console.warn("No autorizado para este recurso (401).");
-      }
-    }
-
-    console.error("API Error:", message);
-
-    return Promise.reject(new Error(message));
-  }
-);
-
+export { votingApi };
 export default api;

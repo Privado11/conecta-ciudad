@@ -8,6 +8,7 @@ import { ProjectProvider } from "./ProjectContext";
 import { AdminUsersProvider } from "./AdminUsersContext";
 import { AdminProjectsProvider } from "./AdminProjectsContext";
 import { CuratorProvider } from "./CuratorContext";
+import { DashboardProvider } from "./DashboardContext";
 
 interface AppProviderProps {
   children: ReactNode;
@@ -23,7 +24,11 @@ export function AppProvider({ children }: AppProviderProps) {
               <AuditProvider>
                 <CuratorProvider>
                   <PermissionProvider>
-                    <ProjectProvider>{children}</ProjectProvider>
+                    <ProjectProvider>
+                      <DashboardProvider>
+                        {children}
+                      </DashboardProvider>
+                    </ProjectProvider>
                   </PermissionProvider>
                 </CuratorProvider>
               </AuditProvider>

@@ -13,7 +13,7 @@ export interface FilterOption<T> {
 export interface FilterGroup<T> {
   label: string;
   filterKey: string;
-  options: FilterOption<T>[];
+  options?: FilterOption<T>[];
   activeValue: T;
   onChange: (value: T) => void;
 }

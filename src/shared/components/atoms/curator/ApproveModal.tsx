@@ -84,7 +84,20 @@ export function ApproveModal({
               <h3 className="font-semibold text-lg mb-2">
                 {project.projectName}
               </h3>
+
+              <p className="text-sm text-muted-foreground mb-3 leading-relaxed line-clamp-3">
+                <strong className="font-medium text-neutral-800">
+                  Descripción:{" "}
+                </strong>
+                {project.description
+                  ? project.description
+                  : "Sin descripción registrada."}
+              </p>
+
               <p className="text-sm text-muted-foreground mb-4">
+                <strong className="font-medium text-neutral-800">
+                  Objetivos:{" "}
+                </strong>
                 {project.objectives}
               </p>
 

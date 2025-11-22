@@ -2,7 +2,9 @@ import ProjectService from "@/service/ProjectService";
 import type {
   LoadingProjectState,
   ProjectDto,
+  ProjectReadyDto,
   ProjectSaveDto,
+  ProjectVotingDto,
 } from "@/shared/types/projectTypes";
 import { createContext, useState, useCallback } from "react";
 import type { ReactNode } from "react";
@@ -10,6 +12,8 @@ import { toast } from "sonner";
 
 type ProjectContextType = {
   selectedProject: ProjectDto | null;
+  readyProjects: ProjectReadyDto[];
+  votingProjects: ProjectVotingDto[];
   loading: LoadingProjectState;
   getProjectById: (id: number) => Promise<ProjectDto | null>;
   // createProject: (projectData: ProjectSaveDto) => Promise<ProjectDto | null>;
@@ -19,17 +23,12 @@ type ProjectContextType = {
   ) => Promise<ProjectDto | null>;
   // deleteProject: (id: number) => Promise<boolean>;
 
-  addObservations: (
-    projectId: number,
-    notes: string
-  ) => Promise<ProjectDto | null>;
-  approveProject: (
-    projectId: number,
-    data: { votingStartAt: string; votingEndAt: string }
-  ) => Promise<ProjectDto | null>;
-  getMyCuratedProjects: (status?: string) => Promise<ProjectDto[]>;
   getReadyToPublish: () => Promise<ProjectDto[]>;
+  fetchReadyToPublishNotOpen: () => Promise<void>;
+  fetchOpenForVoting: () => Promise<void>;
+
   submitProject: (projectId: number) => Promise<ProjectDto | null>;
+  voteOnProject: (projectId: number, decision: boolean) => Promise<boolean>;
 
   setSelectedProject: (project: ProjectDto | null) => void;
 };
@@ -37,6 +36,8 @@ type ProjectContextType = {
 export const ProjectContext = createContext<ProjectContextType | null>(null);
 
 export const ProjectProvider = ({ children }: { children: ReactNode }) => {
+  const [readyProjects, setReadyProjects] = useState<ProjectReadyDto[]>([]);
+  const [votingProjects, setVotingProjects] = useState<ProjectVotingDto[]>([]);
   const [selectedProject, setSelectedProject] = useState<ProjectDto | null>(
     null
   );
@@ -48,6 +49,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     deleting: false,
     fetchingDetails: false,
     assigningCurator: false,
+    voting: false,
   });
 
   const updateLoadingState = useCallback(
@@ -175,81 +177,6 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
   //   [updateLoadingState, handleError, selectedProject]
   // );
 
-  const addObservations = useCallback(
-    async (projectId: number, notes: string): Promise<ProjectDto | null> => {
-      updateLoadingState("updating", true);
-
-      try {
-        const updatedProject = await ProjectService.addObservations(
-          projectId,
-          notes
-        );
-        toast.success("Observaciones agregadas exitosamente");
-
-        // setProjects((prev) =>
-        //   prev.map((p) => (p.id === projectId ? updatedProject : p))
-        // );
-
-        if (selectedProject?.id === projectId) {
-          setSelectedProject(updatedProject);
-        }
-
-        return updatedProject;
-      } catch (error: any) {
-        handleError(error, "Error al agregar observaciones");
-        return null;
-      } finally {
-        updateLoadingState("updating", false);
-      }
-    },
-    [updateLoadingState, handleError, selectedProject]
-  );
-
-  const approveProject = useCallback(
-    async (
-      projectId: number,
-      data: { votingStartAt: string; votingEndAt: string }
-    ): Promise<ProjectDto | null> => {
-      updateLoadingState("updating", true);
-
-      try {
-        const updatedProject = await ProjectService.approveProject(
-          projectId,
-          data
-        );
-        toast.success("Proyecto aprobado exitosamente");
-
-        // setProjects((prev) =>
-        //   prev.map((p) => (p.id === projectId ? updatedProject : p))
-        // );
-
-        if (selectedProject?.id === projectId) {
-          setSelectedProject(updatedProject);
-        }
-
-        return updatedProject;
-      } catch (error: any) {
-        handleError(error, "Error al aprobar proyecto");
-        return null;
-      } finally {
-        updateLoadingState("updating", false);
-      }
-    },
-    [updateLoadingState, handleError, selectedProject]
-  );
-
-  const getMyCuratedProjects = useCallback(
-    async (status?: string): Promise<ProjectDto[]> => {
-      try {
-        return await ProjectService.getMyCuratedProjects(status as any);
-      } catch (error: any) {
-        handleError(error, "Error al obtener proyectos curatorados");
-        return [];
-      }
-    },
-    [handleError]
-  );
-
   const getReadyToPublish = useCallback(async (): Promise<ProjectDto[]> => {
     try {
       return await ProjectService.getReadyToPublishProjects();
@@ -258,6 +185,33 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
       return [];
     }
   }, [handleError]);
+
+  const fetchReadyToPublishNotOpen = useCallback(async (): Promise<void> => {
+    updateLoadingState("fetching", true);
+    try {
+      const projects = await ProjectService.getReadyToPublishNotOpen();
+      setReadyProjects(projects);
+    } catch (error: any) {
+      handleError(
+        error,
+        "Error al obtener proyectos listos no abiertos a votación"
+      );
+    } finally {
+      updateLoadingState("fetching", false);
+    }
+  }, [handleError, updateLoadingState]);
+
+  const fetchOpenForVoting = useCallback(async (): Promise<void> => {
+    updateLoadingState("fetching", true);
+    try {
+      const projects = await ProjectService.getOpenForVoting();
+      setVotingProjects(projects);
+    } catch (error: any) {
+      handleError(error, "Error al obtener proyectos abiertos a votación");
+    } finally {
+      updateLoadingState("fetching", false);
+    }
+  }, [handleError, updateLoadingState]);
 
   const submitProject = useCallback(
     async (projectId: number): Promise<ProjectDto | null> => {
@@ -278,22 +232,44 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     [handleError, updateLoadingState]
   );
 
+  const voteOnProject = useCallback(
+    async (projectId: number, decision: boolean): Promise<boolean> => {
+      updateLoadingState("voting", true);
+
+      try {
+        await ProjectService.voteOnProject(projectId, decision);
+        toast.success(
+          decision
+            ? "Voto a favor registrado exitosamente"
+            : "Voto en contra registrado exitosamente"
+        );
+        await fetchOpenForVoting();
+
+        return true;
+      } catch (error: any) {
+        handleError(error, "Error al registrar voto");
+        return false;
+      } finally {
+        updateLoadingState("voting", false);
+      }
+    },
+    [handleError, updateLoadingState, fetchOpenForVoting]
+  );
+
   return (
     <ProjectContext.Provider
       value={{
+        readyProjects,
+        votingProjects,
         selectedProject,
         loading,
-
         getProjectById,
-
         updateProject,
-
-        addObservations,
-        approveProject,
-
-        getMyCuratedProjects,
         getReadyToPublish,
+        fetchReadyToPublishNotOpen,
+        fetchOpenForVoting,
         submitProject,
+        voteOnProject,
         setSelectedProject,
       }}
     >

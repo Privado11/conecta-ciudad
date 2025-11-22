@@ -18,6 +18,16 @@ export function GeneralInfoSection({ project }: GeneralInfoSectionProps) {
         </h3>
       </div>
       <div className="space-y-3">
+        <Card className="border-l-4 border-l-slate-700 dark:border-l-slate-400 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+          <CardContent className="pt-5">
+            <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">
+              Descripción del Proyecto
+            </label>
+            <p className="mt-2 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+              {project.description || "Sin descripción registrada."}
+            </p>
+          </CardContent>
+        </Card>
         <Card className="border-l-4 border-l-slate-600 dark:border-l-slate-400 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
           <CardContent className="pt-5">
             <label className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">

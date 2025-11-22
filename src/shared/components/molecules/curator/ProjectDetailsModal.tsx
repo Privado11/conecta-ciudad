@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,13 +12,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import {
+  Collapsible,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   User,
   Calendar,
   DollarSign,
   MessageSquare,
   Eye,
   Users,
-  BadgeCheckIcon,
+  BadgeCheck,
+  ChevronDown,
+  FileText,
 } from "lucide-react";
 import type { PendingReviewDto } from "@/shared/types/curatorTypes";
 import { getBadgeColor } from "@/shared/constants/curator/priorityColors";
@@ -37,6 +44,8 @@ export function ProjectDetailsModal({
   onOpenObservations,
   onOpenApprove,
 }: ProjectDetailsModalProps) {
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+
   if (!project) return null;
 
   return (
@@ -59,6 +68,54 @@ export function ProjectDetailsModal({
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
+          {project.description && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Descripción del Proyecto
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Collapsible
+                  open={isDescriptionOpen}
+                  onOpenChange={setIsDescriptionOpen}
+                >
+                  <div className="space-y-2">
+                    <p
+                      className={`text-sm text-muted-foreground ${
+                        !isDescriptionOpen ? "line-clamp-3" : ""
+                      }`}
+                    >
+                      {project.description}
+                    </p>
+                    {project.description.length > 150 && (
+                      <CollapsibleTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full hover:bg-transparent hover:text-current  hover:underline cursor-pointer"
+                      >
+                        {isDescriptionOpen ? (
+                          <>
+                            Ver menos
+                            <ChevronDown className="w-4 h-4 ml-2 rotate-180 transition-transform" />
+                          </>
+                          ) : (
+                            <>
+                              Ver más
+                              <ChevronDown className="w-4 h-4 ml-2 transition-transform" />
+                            </>
+                          )}
+                        </Button>
+                      </CollapsibleTrigger>
+                    )}
+                  </div>
+                </Collapsible>
+              </CardContent>
+            </Card>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
@@ -196,7 +253,7 @@ export function ProjectDetailsModal({
             onClick={onOpenApprove}
             className="w-full sm:w-auto cursor-pointer"
           >
-            <BadgeCheckIcon className="w-4 h-4 mr-2 " />
+            <BadgeCheck className="w-4 h-4 mr-2 " />
             Aprobar Proyecto
           </Button>
         </DialogFooter>

@@ -13,6 +13,8 @@ import SettingsPage from "./views/setting/SettingPage";
 import ProjectManagementPage from "./views/project/ProjectManagementPage";
 import ProjectPendingReviewManagementPage from "./views/curator/ProjectPendingReviewManagementPage";
 import ReviewHistoryManagementPage from "./views/curator/ReviewHistoryManagementPage";
+import ReadyProjectsView from "./views/citizen/ReadyProjectsView";
+import VotingProjectsView from "./views/citizen/VotingProjectsView";
 
 function AppUI() {
   return (
@@ -50,7 +52,10 @@ function AppUI() {
         <Route path="/setting" element={<SettingsPage />} />
         <Route path="/curator/review/pending" element={<ProjectPendingReviewManagementPage />} />
         <Route path="/curator/review/history" element={<ReviewHistoryManagementPage />} />
+        <Route path="/citizen/projects/upcoming" element={<ReadyProjectsView />} />
+        <Route path="/citizen/projects/voting" element={<VotingProjectsView />} />
       </Route>
+
       
 
       <Route path="*" element={<Navigate to="/auth/login" replace />} />

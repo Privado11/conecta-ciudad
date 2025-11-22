@@ -42,9 +42,25 @@ export function ProjectCard({ project, onReview }: ProjectCardProps) {
               )}
             </div>
 
-            <p className="text-sm text-muted-foreground">
-              {project.objectives}
-            </p>
+            <div className="text-sm text-muted-foreground space-y-3">
+              {project.description && (
+                <p className="line-clamp-3">
+                  <strong className="font-medium text-foreground">
+                    Descripción:{" "}
+                  </strong>
+                  {project.description}
+                </p>
+              )}
+
+              {project.objectives && (
+                <p className="line-clamp-3">
+                  <strong className="font-medium text-foreground">
+                    Objetivos:{" "}
+                  </strong>
+                  {project.objectives}
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col items-end gap-2">
@@ -108,7 +124,10 @@ export function ProjectCard({ project, onReview }: ProjectCardProps) {
           )}
         </div>
 
-        <Button onClick={() => onReview(project)} className="gap-2 cursor-pointer">
+        <Button
+          onClick={() => onReview(project)}
+          className="gap-2 cursor-pointer"
+        >
           <Eye className="w-4 h-4" />
           Revisar
         </Button>

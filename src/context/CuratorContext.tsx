@@ -7,6 +7,11 @@ import type {
   PendingReviewQueueDto,
   ReviewHistoryDto,
   ReviewHistoryFilters,
+  CuratorDashboardStats,
+  CuratorProjectStatusData,
+  CuratorReviewTrendData,
+  UrgentProjectData,
+  CuratorRecentActivity,
 } from "@/shared/types/curatorTypes";
 import { createContext, useState, useCallback } from "react";
 import type { ReactNode } from "react";
@@ -17,7 +22,15 @@ type CuratorContextType = {
   selectedReview: PendingReviewDto | null;
   curatedProjects: ProjectDto[];
   reviewHistory: PagedResponse<ReviewHistoryDto> | null;
-  loading: LoadingCuratorState;
+  
+
+  dashboardStats: CuratorDashboardStats | null;
+  projectStatusData: CuratorProjectStatusData[];
+  reviewTrendData: CuratorReviewTrendData[];
+  urgentProjects: UrgentProjectData[];
+  recentActivities: CuratorRecentActivity[];
+  
+  loading: LoadingCuratorState & { fetchingDashboard: boolean };
 
   getPendingReviewQueue: () => Promise<PendingReviewQueueDto | null>;
   getPendingReviewDetails: (projectId: number) => Promise<PendingReviewDto | null>;
@@ -25,6 +38,9 @@ type CuratorContextType = {
   getReviewHistory: (
     filters?: ReviewHistoryFilters
   ) => Promise<PagedResponse<ReviewHistoryDto> | null>;
+  
+
+  fetchDashboardData: () => Promise<void>;
   
   addObservations: (projectId: number, notes: string) => Promise<ProjectDto | null>;
   approveProject: (
@@ -46,17 +62,25 @@ export const CuratorProvider = ({ children }: { children: ReactNode }) => {
   const [reviewHistory, setReviewHistory] =
     useState<PagedResponse<ReviewHistoryDto> | null>(null);
 
-  const [loading, setLoading] = useState<LoadingCuratorState>({
+
+  const [dashboardStats, setDashboardStats] = useState<CuratorDashboardStats | null>(null);
+  const [projectStatusData, setProjectStatusData] = useState<CuratorProjectStatusData[]>([]);
+  const [reviewTrendData, setReviewTrendData] = useState<CuratorReviewTrendData[]>([]);
+  const [urgentProjects, setUrgentProjects] = useState<UrgentProjectData[]>([]);
+  const [recentActivities, setRecentActivities] = useState<CuratorRecentActivity[]>([]);
+
+  const [loading, setLoading] = useState<LoadingCuratorState & { fetchingDashboard: boolean }>({
     fetchingQueue: false,
     fetchingDetails: false,
     fetchingProjects: false,
     fetchingHistory: false,
     addingObservations: false,
     approvingProject: false,
+    fetchingDashboard: false,
   });
 
   const updateLoadingState = useCallback(
-    (key: keyof LoadingCuratorState, value: boolean) => {
+    (key: keyof (LoadingCuratorState & { fetchingDashboard: boolean }), value: boolean) => {
       setLoading((prev) => ({ ...prev, [key]: value }));
     },
     []
@@ -152,6 +176,28 @@ export const CuratorProvider = ({ children }: { children: ReactNode }) => {
     [updateLoadingState, handleError]
   );
 
+  const fetchDashboardData = useCallback(async () => {
+    updateLoadingState("fetchingDashboard", true);
+    try {
+      const [stats, statusData, trend, urgent, recent] = await Promise.all([
+        CuratorService.getDashboardStats(),
+        CuratorService.getProjectStatusDistribution(),
+        CuratorService.getReviewTrend(),
+        CuratorService.getUrgentProjects(5),
+        CuratorService.getRecentActivities(8),
+      ]);
+
+      setDashboardStats(stats);
+      setProjectStatusData(statusData);
+      setReviewTrendData(trend);
+      setUrgentProjects(urgent);
+      setRecentActivities(recent);
+    } catch (error: any) {
+      handleError(error, "Error al cargar datos del dashboard");
+    } finally {
+      updateLoadingState("fetchingDashboard", false);
+    }
+  }, [updateLoadingState, handleError]);
 
   const addObservations = useCallback(
     async (projectId: number, notes: string): Promise<ProjectDto | null> => {
@@ -240,12 +286,20 @@ export const CuratorProvider = ({ children }: { children: ReactNode }) => {
         selectedReview,
         curatedProjects,
         reviewHistory,
+        
+        dashboardStats,
+        projectStatusData,
+        reviewTrendData,
+        urgentProjects,
+        recentActivities,
+        
         loading,
 
         getPendingReviewQueue,
         getPendingReviewDetails,
         getMyCuratedProjects,
         getReviewHistory,
+        fetchDashboardData,
         
         addObservations,
         approveProject,

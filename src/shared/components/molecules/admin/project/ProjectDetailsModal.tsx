@@ -13,7 +13,6 @@ interface ProjectDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   project: ProjectDto | null;
-  onEdit?: (project: ProjectDto) => void;
   onAssignCurator?: (project: ProjectDto) => void;
 }
 
@@ -21,7 +20,6 @@ export function ProjectDetailsModal({
   isOpen,
   onClose,
   project,
-  onEdit,
   onAssignCurator,
 }: ProjectDetailsModalProps) {
   if (!project) return null;
@@ -67,7 +65,6 @@ export function ProjectDetailsModal({
           <ProjectDetailsFooter
             project={project}
             latestReview={latestReview}
-            onEdit={onEdit}
             onAssignCurator={onAssignCurator}
             onClose={onClose}
           />

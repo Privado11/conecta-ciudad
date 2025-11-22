@@ -39,7 +39,7 @@ export const PROJECT_STATUS_FILTERS: {
 
   { label: "Publicado", value: "PUBLISHED", icon: LaptopMinimalCheck },
 
-  { label: "Rechazado", value: "REJECTED", icon: XCircle },
+  { label: "Votación abierta", value: "OPEN_FOR_VOTING", icon: CheckCircle2 },
 
-  { label: "Votación cerrada", value: "VOTING_CLOSED", icon: CheckCircle2 },
+  { label: "Votación cerrada", value: "VOTING_CLOSED", icon: XCircle },
 ];

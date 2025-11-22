@@ -3,6 +3,7 @@ import type { User } from "./userTYpes";
 export interface ProjectDto {
   id: number;
   name: string;
+  description: string;
   objectives: string;
   beneficiaryPopulations: string;
   budget: number;
@@ -35,17 +36,17 @@ export type ProjectStatus =
   | "READY_TO_PUBLISH"
   | "PUBLISHED"
   | "REJECTED"
+  | "OPEN_FOR_VOTING"
   | "VOTING_CLOSED";
 
-  export interface ProjectSaveDto {
-    name: string;
-    objectives: string;
-    beneficiaryPopulations: string;
-    budget: number;
-    startAt: string | null;
-    endAt: string | null;
-  }
-  
+export interface ProjectSaveDto {
+  name: string;
+  objectives: string;
+  beneficiaryPopulations: string;
+  budget: number;
+  startAt: string | null;
+  endAt: string | null;
+}
 
 export interface ReviewNotesDto {
   notes: string;
@@ -58,4 +59,67 @@ export interface LoadingProjectState {
   deleting: boolean;
   fetchingDetails: boolean;
   assigningCurator: boolean;
+  voting: boolean;
 }
+
+export type ProjectReadyDto = {
+  id: number;
+  name: string;
+  description: string;
+  objectives: string;
+  beneficiaryPopulations: string;
+  budget: number;
+  startAt: string;
+  endAt: string;
+  votingStartAt: string | null;
+  votingEndAt: string | null;
+  createdAt: string;
+  status: string;
+  creator: User;
+  version: number;
+  votingSchedule: VotingScheduleInfo;
+};
+
+export type VotingScheduleInfo = {
+  hasScheduledVoting: boolean;
+  daysUntilVotingStarts: number | null;
+  plannedVotingDurationDays: number | null;
+  scheduleStatus: string;
+};
+
+export type ProjectVotingDto = {
+  id: number;
+  name: string;
+  description: string;
+  objectives: string;
+  beneficiaryPopulations: string;
+  budget: number;
+  startAt: string;
+  endAt: string;
+  votingStartAt: string;
+  votingEndAt: string;
+  createdAt: string;
+  status: string;
+  creator: User;
+  version: number;
+  votingInfo: VotingActiveInfo;
+  userVotingStatus: userVotingStatus;
+};
+
+export type VotingActiveInfo = {
+  isOpen: boolean;
+  isExpiringSoon: boolean;
+  daysRemaining: number;
+  hoursRemaining: number;
+  totalVotingDays: number;
+  progressPercentage: number;
+  urgencyLevel: "CRITICAL" | "HIGH" | "NORMAL";
+  statusMessage: string;
+};
+
+export type userVotingStatus = {
+  hasVoted: boolean;
+  voteDecision: boolean;
+  votedAt: string;
+  message: string;
+};

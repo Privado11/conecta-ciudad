@@ -4,6 +4,11 @@ import type {
   PendingReviewQueueDto,
   ReviewHistoryDto,
   ReviewHistoryFilters,
+  CuratorDashboardStats,
+  CuratorProjectStatusData,
+  CuratorReviewTrendData,
+  UrgentProjectData,
+  CuratorRecentActivity,
 } from "@/shared/types/curatorTypes";
 import api from "./api";
 import type { ProjectDto, ProjectStatus } from "@/shared/types/projectTypes";
@@ -77,6 +82,35 @@ class CuratorService {
     const response = await api.get(
       `/api/v1/curator/reviews/history?${params.toString()}`
     );
+    return response.data;
+  }
+
+  async getDashboardStats(): Promise<CuratorDashboardStats> {
+    const response = await api.get("/api/v1/curator/dashboard/stats");
+    return response.data;
+  }
+
+  async getProjectStatusDistribution(): Promise<CuratorProjectStatusData[]> {
+    const response = await api.get("/api/v1/curator/dashboard/project-status");
+    return response.data;
+  }
+
+  async getReviewTrend(): Promise<CuratorReviewTrendData[]> {
+    const response = await api.get("/api/v1/curator/dashboard/review-trend");
+    return response.data;
+  }
+
+  async getUrgentProjects(limit: number = 5): Promise<UrgentProjectData[]> {
+    const response = await api.get("/api/v1/curator/dashboard/urgent-projects", {
+      params: { limit },
+    });
+    return response.data;
+  }
+
+  async getRecentActivities(limit: number = 8): Promise<CuratorRecentActivity[]> {
+    const response = await api.get("/api/v1/curator/dashboard/recent-activities", {
+      params: { limit },
+    });
     return response.data;
   }
 }

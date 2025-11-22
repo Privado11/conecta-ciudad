@@ -46,8 +46,6 @@ export function ObservationsModal({
 
   if (!project) return null;
 
-
-
   const handleSubmit = () => {
     if (observations.trim()) {
       onSubmit(project.projectId, observations);
@@ -80,7 +78,25 @@ export function ObservationsModal({
               {project.projectName}
             </h3>
 
-            <p className="text-sm text-neutral-600">{project.objectives}</p>
+            <p className="text-sm text-neutral-600 leading-relaxed min-h-18">
+              <strong className="font-medium text-neutral-800">
+                Descripción:{" "}
+              </strong>
+              {project.description
+                ? project.description.length > 200
+                  ? project.description.slice(0, 200) + "..."
+                  : project.description
+                : "Sin descripción registrada."}
+            </p>
+
+            <p className="text-sm text-neutral-600 leading-relaxed min-h-18">
+              <strong className="font-medium text-neutral-800">
+                Objetivos:{" "}
+              </strong>
+              {project.objectives.length > 200
+                ? project.objectives.slice(0, 200) + "..."
+                : project.objectives}
+            </p>
 
             <div className="grid grid-cols-2 gap-4 text-sm mt-3">
               <div className="flex items-center gap-2">

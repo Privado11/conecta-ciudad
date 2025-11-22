@@ -80,7 +80,6 @@ export default function ReviewHistoryManagement() {
     getReviewHistory({
       searchTerm: debouncedSearchTerm.trim() || undefined,
       status: filters.status !== "all" ? (filters.status as any) : undefined,
-      outcome: filters.outcome !== "all" ? filters.outcome : undefined,
       wasOverdue: filters.wasOverdue,
       isResubmission: filters.isResubmission,
       reviewedFrom: formatToISODateTime(filters.reviewedFrom),
