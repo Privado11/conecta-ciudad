@@ -121,6 +121,8 @@ function Register() {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
+    setErrors(prev => ({ ...prev, general: "" }));
+
     if (name === "password" || name === "confirmPassword") {
       const password = name === "password" ? value : formData.password;
       const confirmPassword = name === "confirmPassword" ? value : formData.confirmPassword;

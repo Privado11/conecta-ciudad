@@ -1,6 +1,10 @@
 import { DynamicForm } from "./DynamicForm";
-import type { DynamicFormConfig } from "@/shared/types/dynamicForm.types";
+import type { DynamicFormConfig } from "@/shared/types/dynamicFormTypes";
 import { Modal } from "../atoms/Modal";
+import {
+  excludeFields,
+  excludeSections,
+} from "@/config/forms/filterFormConfig";
 
 interface DynamicFormModalProps<T = any> {
   isOpen: boolean;
@@ -10,6 +14,7 @@ interface DynamicFormModalProps<T = any> {
   onValidate?: (data: T) => Promise<{ available: boolean; message: string }>;
   onSubmit: (data: T) => Promise<void>;
   loading?: boolean;
+  isAdmin?: boolean;
 }
 
 export function DynamicFormModal<T = any>({
@@ -20,6 +25,7 @@ export function DynamicFormModal<T = any>({
   onValidate,
   onSubmit,
   loading = false,
+  isAdmin = true,
 }: DynamicFormModalProps<T>) {
   const isEditMode = !!initialData;
   const modalTitle = `${isEditMode ? "Editar" : "Nuevo"} ${config.title}`;
@@ -27,6 +33,26 @@ export function DynamicFormModal<T = any>({
   const dynamicSubmitLabel = isEditMode
     ? `Actualizar ${config.title}`
     : `Guardar ${config.title}`;
+
+  const baseFilteredConfig = isAdmin
+    ? config
+    : excludeFields(
+        excludeSections(config, ["Roles y Permisos", "Seguridad"]),
+        ["active", "roles", "password", "confirmPassword"]
+      );
+
+  const filteredConfig =
+    !isAdmin && baseFilteredConfig.schema
+      ? {
+          ...baseFilteredConfig,
+          schema: baseFilteredConfig.schema.pick({
+            name: true,
+            email: true,
+            nationalId: true,
+            phone: true,
+          }),
+        }
+      : baseFilteredConfig;
 
 
   if (!isOpen) return null;
@@ -42,7 +68,7 @@ export function DynamicFormModal<T = any>({
       <div className="px-6">
         <DynamicForm
           config={{
-            ...config,
+            ...filteredConfig,
             submitLabel: dynamicSubmitLabel,
           }}
           initialData={initialData}

@@ -6,10 +6,9 @@ import { useMenu } from "@/hooks/useMenu";
 import type { MenuItem } from "@/shared/types/menuTypes";
 
 interface SidebarProps {
-    isOpen: boolean;
-    onClose: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
-
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
@@ -54,7 +53,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           {hasChildren ? (
             <button
               onClick={() => toggleExpanded(item.label)}
-              className={`w-full flex items-center py-2.5 text-sm font-medium rounded-xl transition-colors duration-200 group relative ${
+              className={`w-full flex items-center py-2.5 text-sm font-medium rounded-xl transition-colors duration-200 group relative cursor-pointer ${
                 isExpanded
                   ? "bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400"
                   : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
@@ -63,7 +62,13 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               <div className="w-12 flex items-center justify-center shrink-0">
                 <IconComponent className="w-5 h-5" />
               </div>
-              <div className={`flex items-center justify-between flex-1 pr-3 overflow-hidden transition-all duration-300 ${isHovered || isOpen ? 'opacity-100 max-w-full' : 'opacity-0 max-w-0'}`}>
+              <div
+                className={`flex items-center justify-between flex-1 pr-3 overflow-hidden transition-all duration-300 ${
+                  isHovered || isOpen
+                    ? "opacity-100 max-w-full"
+                    : "opacity-0 max-w-0"
+                }`}
+              >
                 <span className="truncate whitespace-nowrap">{item.label}</span>
                 <ChevronDown
                   className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
@@ -84,7 +89,13 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               <div className="w-12 flex items-center justify-center shrink-0">
                 <IconComponent className="w-5 h-5" />
               </div>
-              <span className={`truncate whitespace-nowrap transition-all duration-300 ${isHovered || isOpen ? 'opacity-100 max-w-full' : 'opacity-0 max-w-0'}`}>
+              <span
+                className={`truncate whitespace-nowrap transition-all duration-300 ${
+                  isHovered || isOpen
+                    ? "opacity-100 max-w-full"
+                    : "opacity-0 max-w-0"
+                }`}
+              >
                 {item.label}
               </span>
             </Link>
@@ -116,13 +127,15 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         onMouseLeave={() => setIsHovered(false)}
         className={`
           ${isHovered ? "md:w-64" : "md:w-12"}
-          ${isOpen ? "translate-x-0 w-64" : "-translate-x-full md:translate-x-0"}
+          ${
+            isOpen ? "translate-x-0 w-64" : "-translate-x-full md:translate-x-0"
+          }
           fixed md:relative left-0 top-16 md:top-0 z-40
           bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 
           h-[calc(100vh-4rem)] flex flex-col transition-all duration-300 ease-in-out shadow-xl overflow-hidden
         `}
       >
-       <nav className="flex-1 py-4 space-y-4 overflow-y-auto scrollbar-hide">
+        <nav className="flex-1 py-4 space-y-4 overflow-y-auto scrollbar-hide">
           {loading ? (
             <div className="flex items-center justify-center py-8">
               <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
@@ -148,7 +161,11 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 <div className="w-12 flex items-center justify-center shrink-0">
                   <Settings className="w-5 h-5" />
                 </div>
-                <span className={`truncate whitespace-nowrap transition-all duration-300 ${isHovered || isOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                <span
+                  className={`truncate whitespace-nowrap transition-all duration-300 ${
+                    isHovered || isOpen ? "opacity-100" : "opacity-0 w-0"
+                  }`}
+                >
                   Configuración
                 </span>
               </Link>
@@ -159,7 +176,11 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 <div className="w-12 flex items-center justify-center shrink-0">
                   <User className="w-5 h-5" />
                 </div>
-                <span className={`truncate whitespace-nowrap transition-all duration-300 ${isHovered || isOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                <span
+                  className={`truncate whitespace-nowrap transition-all duration-300 ${
+                    isHovered || isOpen ? "opacity-100" : "opacity-0 w-0"
+                  }`}
+                >
                   Mi Perfil
                 </span>
               </Link>
@@ -167,12 +188,13 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           )}
         </div>
       </aside>
-      
-    
+
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-30 md:hidden"
-          onClick={() => {onClose()}}
+          onClick={() => {
+            onClose();
+          }}
         />
       )}
     </>

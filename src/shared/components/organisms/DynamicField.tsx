@@ -18,8 +18,11 @@ import {
   FormDescription,
   FormMessage,
 } from "@/components/ui/form";
-import type { FieldConfig } from "@/shared/types/dynamicForm.types";
+import type { FieldConfig } from "@/shared/types/dynamicFormTypes";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+import { useState } from "react";
+import { validateField } from "@/shared/constants/user/validationUtils";
 
 interface DynamicFieldProps {
   field: FieldConfig;
@@ -28,6 +31,8 @@ interface DynamicFieldProps {
 }
 
 export function DynamicField({ field, control, formData }: DynamicFieldProps) {
+  const [customError, setCustomError] = useState<string | undefined>();
+
   const isHidden =
     typeof field.hidden === "function" ? field.hidden(formData) : field.hidden;
 
@@ -37,6 +42,19 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
     typeof field.disabled === "function"
       ? field.disabled(formData)
       : field.disabled;
+
+  const handleCustomValidation = (
+    value: any,
+    onChange: (...event: any[]) => void
+  ) => {
+    onChange(value);
+
+    if (field.customValidations) {
+      const error = validateField(value, field.customValidations);
+      setCustomError(error);
+    }
+  };
+
   const renderFieldControl = (fieldProps: any) => {
     switch (field.type) {
       case "text":
@@ -48,7 +66,11 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
             type={field.type}
             placeholder={field.placeholder}
             disabled={isDisabled}
+            maxLength={field.maxLength}
             {...fieldProps}
+            onChange={(e) =>
+              handleCustomValidation(e.target.value, fieldProps.onChange)
+            }
           />
         );
 
@@ -59,12 +81,24 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
             placeholder={field.placeholder}
             disabled={isDisabled}
             {...fieldProps}
-            onChange={(e) => fieldProps.onChange(Number(e.target.value))}
+            onChange={(e) => {
+              const numValue = Number(e.target.value);
+              handleCustomValidation(numValue, fieldProps.onChange);
+            }}
           />
         );
 
       case "date":
-        return <Input type="date" disabled={isDisabled} {...fieldProps} />;
+        return (
+          <Input
+            type="date"
+            disabled={isDisabled}
+            {...fieldProps}
+            onChange={(e) =>
+              handleCustomValidation(e.target.value, fieldProps.onChange)
+            }
+          />
+        );
 
       case "textarea":
         return (
@@ -72,14 +106,20 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
             placeholder={field.placeholder}
             disabled={isDisabled}
             rows={4}
+            maxLength={field.maxLength}
             {...fieldProps}
+            onChange={(e) =>
+              handleCustomValidation(e.target.value, fieldProps.onChange)
+            }
           />
         );
 
       case "select":
         return (
           <Select
-            onValueChange={fieldProps.onChange}
+            onValueChange={(value) =>
+              handleCustomValidation(value, fieldProps.onChange)
+            }
             defaultValue={fieldProps.value}
             disabled={isDisabled}
           >
@@ -212,7 +252,7 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
     <FormField
       control={control}
       name={field.name}
-      render={({ field: fieldProps }) => (
+      render={({ field: fieldProps, fieldState }) => (
         <FormItem
           className={`relative ${field.cols === 2 ? "md:col-span-2" : ""}`}
         >
@@ -227,6 +267,11 @@ export function DynamicField({ field, control, formData }: DynamicFieldProps) {
 
           <div className="min-h-3 mt-1">
             <FormMessage />
+            {customError && !fieldState.error && (
+              <p className="text-sm font-medium text-destructive">
+                {customError}
+              </p>
+            )}
           </div>
         </FormItem>
       )}

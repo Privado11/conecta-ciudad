@@ -3,8 +3,6 @@ import type { User } from "@/shared/types/userTYpes";
 import { createContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 
-
-
 type AuthContextType = {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
@@ -18,6 +16,7 @@ type AuthContextType = {
   logout: () => void;
   isAuthenticated: () => boolean;
   loading: boolean;
+  refreshUser: () => void;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -31,6 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const loggedUser = await AuthService.login(email, password);
       setUser(loggedUser);
+      window.dispatchEvent(new CustomEvent('userLoggedIn'));
     } finally {
       setLoading(false);
     }
@@ -54,10 +54,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     AuthService.logout();
     setUser(null);
+    window.dispatchEvent(new CustomEvent('userLoggedOut'));
   };
 
   const isAuthenticated = (): boolean => {
     return AuthService.isAuthenticated();
+  };
+
+  const refreshUser = () => {
+    const storedUser = AuthService.getCurrentUser();
+    setUser(storedUser);
   };
 
   useEffect(() => {
@@ -67,7 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, isAuthenticated, loading }}
+      value={{ user, login, register, logout, isAuthenticated, loading, refreshUser }}
     >
       {children}
     </AuthContext.Provider>

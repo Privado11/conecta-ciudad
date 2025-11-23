@@ -1,4 +1,4 @@
-export type LoadingState = {
+export type LoadingUserState = {
   fetching: boolean;
   creating: boolean;
   updating: boolean;
@@ -6,4 +6,13 @@ export type LoadingState = {
   togglingActive: boolean;
   addingRole: boolean;
   removingRole: boolean;
+  fetchingCurators: boolean;
+  assigningCurator: boolean;
 };
+
+export type LoadingAuditState = {
+  fetching: boolean;
+  fetchingStatistics: boolean;
+  fetchingDetails: boolean;
+};
+

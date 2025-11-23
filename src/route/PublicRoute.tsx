@@ -10,7 +10,6 @@ function PublicRoute({ children }: PublicRouteProps) {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
-
   if (isAuthenticated()) {
     return <Navigate to="/dashboard" replace state={{ from: location }} />;
   }

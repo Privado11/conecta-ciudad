@@ -5,9 +5,17 @@ import RegisterPage from "./views/auth/Register";
 import { Layout } from "./shared/layout/Layout";
 import Home from "./views/home/Home";
 import PublicRoute from "./route/PublicRoute";
-import ListUsers from "./views/auth/ListUsers";
-import Projects from "./views/projects/Pojects";
-
+import UserManagementPage from "./views/admin/users/UserManagementPage";
+import SystemAuditPage from "./views/admin/audit/SystemAuditPage";
+import RolePermissionPage from "./views/admin/users/RolePermissionPage";
+import ProfilePage from "./views/admin/profile/ProfilePage";
+import SettingsPage from "./views/setting/SettingPage";
+import ProjectManagementPage from "./views/project/ProjectManagementPage";
+import ProjectPendingReviewManagementPage from "./views/curator/ProjectPendingReviewManagementPage";
+import ReviewHistoryManagementPage from "./views/curator/ReviewHistoryManagementPage";
+import ReadyProjectsView from "./views/citizen/ReadyProjectsView";
+import VotingProjectsView from "./views/citizen/VotingProjectsView";
+import VotingManagementPage from "./views/admin/voting/VotingManagementPage";
 
 function AppUI() {
   return (
@@ -37,14 +45,34 @@ function AppUI() {
         }
       >
         <Route path="/dashboard" element={<Home />} />
-        <Route path="/admin/users" element={<ListUsers />} />
-        <Route path="/projects/my-projects" element={<Projects />} />
+        <Route path="/admin/users" element={<UserManagementPage />} />
+        <Route path="/admin/roles" element={<RolePermissionPage />} />
+        <Route path="/admin/projects" element={<ProjectManagementPage />} />
+        <Route path="/admin/voting" element={<VotingManagementPage />} />
+        <Route path="/admin/audit" element={<SystemAuditPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/setting" element={<SettingsPage />} />
+        <Route
+          path="/curator/review/pending"
+          element={<ProjectPendingReviewManagementPage />}
+        />
+        <Route
+          path="/curator/review/history"
+          element={<ReviewHistoryManagementPage />}
+        />
+        <Route
+          path="/citizen/projects/upcoming"
+          element={<ReadyProjectsView />}
+        />
+        <Route
+          path="/citizen/projects/voting"
+          element={<VotingProjectsView />}
+        />
       </Route>
 
       <Route path="*" element={<Navigate to="/auth/login" replace />} />
     </Routes>
   );
 }
-
 
 export default AppUI;
