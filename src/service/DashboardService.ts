@@ -21,6 +21,7 @@ export interface ProjectTrendData {
 }
 
 export interface VotingActivityData {
+  id: number;
   projectName: string;
   votes: number;
   endDate: string;

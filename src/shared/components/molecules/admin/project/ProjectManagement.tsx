@@ -385,10 +385,6 @@ export default function ProjectManagement() {
         isOpen={modalType === "view"}
         onClose={() => setModalType(null)}
         project={selectedProject}
-        onEdit={(p) => {
-          setSelectedProject(p);
-          setModalType("edit");
-        }}
         onAssignCurator={(p) => {
           setSelectedProject(p);
           setModalType("assignCurator");

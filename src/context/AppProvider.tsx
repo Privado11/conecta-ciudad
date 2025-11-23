@@ -5,6 +5,7 @@ import { UserProvider } from "./UserContext";
 import { AuditProvider } from "./AuditContext";
 import { PermissionProvider } from "./PermissionContext";
 import { ProjectProvider } from "./ProjectContext";
+import { VotingProvider } from "./VotingContext";
 import { AdminUsersProvider } from "./AdminUsersContext";
 import { AdminProjectsProvider } from "./AdminProjectsContext";
 import { CuratorProvider } from "./CuratorContext";
@@ -20,19 +21,19 @@ export function AppProvider({ children }: AppProviderProps) {
       <MenuProvider>
         <UserProvider>
           <AdminUsersProvider>
-            <AdminProjectsProvider>
-              <AuditProvider>
-                <CuratorProvider>
-                  <PermissionProvider>
+            <DashboardProvider>
+              <CuratorProvider>
+                <AdminProjectsProvider>
+                  <VotingProvider>
                     <ProjectProvider>
-                      <DashboardProvider>
-                        {children}
-                      </DashboardProvider>
+                      <AuditProvider>
+                        <PermissionProvider>{children}</PermissionProvider>
+                      </AuditProvider>
                     </ProjectProvider>
-                  </PermissionProvider>
-                </CuratorProvider>
-              </AuditProvider>
-            </AdminProjectsProvider>
+                  </VotingProvider>
+                </AdminProjectsProvider>
+              </CuratorProvider>
+            </DashboardProvider>
           </AdminUsersProvider>
         </UserProvider>
       </MenuProvider>

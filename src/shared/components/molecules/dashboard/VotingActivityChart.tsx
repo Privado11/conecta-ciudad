@@ -7,6 +7,8 @@ import { formatDate } from '@/utils/formatDate';
 export function VotingActivityChart() {
   const { votingActivityData } = useDashboard();
 
+  console.log("DATA DASHBOARD:", votingActivityData);
+
   const getDaysRemaining = (endDate: string) => {
     const end = new Date(endDate);
     const today = new Date();
@@ -19,16 +21,19 @@ export function VotingActivityChart() {
 
   const data = votingActivityData.slice(0, 6).map(item => {
     const daysRemaining = getDaysRemaining(item.endDate);
+    const truncatedName = item.projectName.length > 20 
+      ? item.projectName.substring(0, 20) + '...' 
+      : item.projectName;
+    
     return {
-      name: item.projectName.length > 30 
-        ? item.projectName.substring(0, 30) + '...' 
-        : item.projectName,
+      id: item.id,
+      name: `${truncatedName} (${item.id})`,
       votes: item.votes,
       fullName: item.projectName,
       endDate: formatDate(item.endDate),
       daysRemaining,
       color:
-        daysRemaining <= 1 ? '#ef4444' : 
+        daysRemaining <= 2 ? '#ef4444' : 
         daysRemaining <= 7 ? '#f97316' : 
         '#8b5cf6'                       
     };
@@ -75,7 +80,7 @@ export function VotingActivityChart() {
           <div className="flex gap-4 text-xs">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-full bg-red-500"></div>
-              <span className="text-muted-foreground">≤ 3 días</span>
+              <span className="text-muted-foreground">≤ 2 días</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-full bg-orange-500"></div>
@@ -115,6 +120,7 @@ export function VotingActivityChart() {
                   const data = payload[0].payload;
                   return (
                     <div className="bg-background border-2 rounded-lg p-3 shadow-xl">
+                      <p className="text-xs text-muted-foreground">ID: {data.id}</p>
                       <p className="font-semibold text-sm mb-2">{data.fullName}</p>
                       <div className="space-y-1 text-sm">
                         <p className="flex items-center gap-2">
@@ -153,7 +159,7 @@ export function VotingActivityChart() {
         <div className="mt-6 p-4 bg-muted/30 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             
-            {/* TOTAL VOTOS */}
+
             <div className="flex items-start gap-3">
               <TrendingUp className="w-5 h-5 text-purple-500 mt-0.5" />
               <div>
@@ -164,7 +170,7 @@ export function VotingActivityChart() {
               </div>
             </div>
 
-            {/* PRÓXIMO CIERRE */}
+    
             <div className="flex items-start gap-3">
               <Calendar className="w-5 h-5 text-blue-500 mt-0.5" />
               <div>
@@ -175,13 +181,13 @@ export function VotingActivityChart() {
               </div>
             </div>
 
-            {/* URGENTES */}
+   
             <div className="flex items-start gap-3">
-              <Clock className="w-5 h-5 text-orange-500 mt-0.5" />
+              <Clock className="w-5 h-5 text-red-500 mt-0.5" />
               <div>
                 <p className="font-medium">Urgentes</p>
-                <p className="text-2xl font-bold text-orange-600">
-                  {data.filter(item => item.daysRemaining <= 3).length}
+                <p className="text-2xl font-bold text-red-600">
+                  {data.filter(item => item.daysRemaining <= 2).length}
                 </p>
               </div>
             </div>

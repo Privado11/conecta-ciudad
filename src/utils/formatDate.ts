@@ -7,3 +7,7 @@ export const formatDate = (dateString: string) => {
     year: "numeric",
   });
 };
+
+export const formatCurrency = (amount: number): string => {
+  return `$${amount.toLocaleString("es-ES")}`;
+};

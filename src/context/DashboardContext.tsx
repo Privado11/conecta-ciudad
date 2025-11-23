@@ -7,7 +7,7 @@ import type {
   RecentActivity,
   UserRoleDistribution,
 } from "@/service/DashboardService";
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 
 type DashboardContextType = {
@@ -22,22 +22,34 @@ type DashboardContextType = {
   refreshDashboard: () => Promise<void>;
 };
 
-export const DashboardContext = createContext<DashboardContextType | null>(null);
+export const DashboardContext = createContext<DashboardContextType | null>(
+  null
+);
 
 export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [projectStatusData, setProjectStatusData] = useState<ProjectStatusData[]>([]);
-  const [projectTrendData, setProjectTrendData] = useState<ProjectTrendData[]>([]);
-  const [votingActivityData, setVotingActivityData] = useState<VotingActivityData[]>([]);
-  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
-  const [userRoleDistribution, setUserRoleDistribution] = useState<UserRoleDistribution[]>([]);
+  const [projectStatusData, setProjectStatusData] = useState<
+    ProjectStatusData[]
+  >([]);
+  const [projectTrendData, setProjectTrendData] = useState<ProjectTrendData[]>(
+    []
+  );
+  const [votingActivityData, setVotingActivityData] = useState<
+    VotingActivityData[]
+  >([]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>(
+    []
+  );
+  const [userRoleDistribution, setUserRoleDistribution] = useState<
+    UserRoleDistribution[]
+  >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const [
         statsData,
@@ -67,11 +79,45 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const refreshDashboard = async () => {
     await fetchDashboardData();
   };
+
+  const resetDashboardState = useCallback(() => {
+    setStats(null);
+    setProjectStatusData([]);
+    setProjectTrendData([]);
+    setVotingActivityData([]);
+    setRecentActivities([]);
+    setUserRoleDistribution([]);
+    setLoading(false);
+    setError(null);
+  }, []);
+
+  useEffect(() => {
+    const handleUserLoggedIn = async () => {
+      await fetchDashboardData();
+    };
+
+    const handleUserLoggedOut = () => {
+      resetDashboardState();
+    };
+
+    const user = localStorage.getItem("user");
+    if (user) {
+      handleUserLoggedIn();
+    }
+
+    window.addEventListener("userLoggedIn", handleUserLoggedIn);
+    window.addEventListener("userLoggedOut", handleUserLoggedOut);
+
+    return () => {
+      window.removeEventListener("userLoggedIn", handleUserLoggedIn);
+      window.removeEventListener("userLoggedOut", handleUserLoggedOut);
+    };
+  }, [fetchDashboardData, resetDashboardState]);
 
   return (
     <DashboardContext.Provider

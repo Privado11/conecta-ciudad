@@ -1,20 +1,14 @@
-
-import { ProjectStatusChart } from '@/shared/components/molecules/dashboard/ProjectStatusChart';
-import { ProjectTrendChart } from '@/shared/components/molecules/dashboard/ProjectTrendChart';
-import { VotingActivityChart } from '@/shared/components/molecules/dashboard/VotingActivityChart';
-import { RecentActivityTable } from '@/shared/components/molecules/dashboard/RecentActivityTable';
-import { QuickActions } from '@/shared/components/molecules/dashboard/QuickActions';
-import { useDashboard } from '@/hooks/useDashboard';
-import { Users, FolderKanban, Vote, TrendingUp, UserPlus } from 'lucide-react';
-import { StatCard } from '../../atoms/dashboard/StatCard';
-import { useEffect } from 'react';
+import { ProjectStatusChart } from "@/shared/components/molecules/dashboard/ProjectStatusChart";
+import { ProjectTrendChart } from "@/shared/components/molecules/dashboard/ProjectTrendChart";
+import { VotingActivityChart } from "@/shared/components/molecules/dashboard/VotingActivityChart";
+import { RecentActivityTable } from "@/shared/components/molecules/dashboard/RecentActivityTable";
+import { QuickActions } from "@/shared/components/molecules/dashboard/QuickActions";
+import { useDashboard } from "@/hooks/useDashboard";
+import { Users, FolderKanban, Vote, TrendingUp, UserPlus } from "lucide-react";
+import { StatCard } from "../../atoms/dashboard/StatCard";
 
 export function AdminDashboard() {
-  const { stats, loading, error, refreshDashboard } = useDashboard();
-
-  useEffect(() => {
-  refreshDashboard(); 
-}, []);
+  const { stats, loading, error } = useDashboard();
 
   if (loading) {
     return (
@@ -32,7 +26,9 @@ export function AdminDashboard() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <p className="text-destructive text-lg">{error}</p>
-          <p className="text-muted-foreground mt-2">Por favor, intenta recargar la página</p>
+          <p className="text-muted-foreground mt-2">
+            Por favor, intenta recargar la página
+          </p>
         </div>
       </div>
     );
@@ -45,9 +41,12 @@ export function AdminDashboard() {
   return (
     <div className="space-y-6 p-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard de Administrador</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Dashboard de Administrador
+        </h1>
         <p className="text-muted-foreground">
-          Bienvenido a Conecta Ciudad. Aquí tienes un resumen de la actividad del sistema.
+          Bienvenido a Conecta Ciudad. Aquí tienes un resumen de la actividad
+          del sistema.
         </p>
       </div>
 
@@ -87,11 +86,9 @@ export function AdminDashboard() {
         <ProjectTrendChart />
       </div>
 
-
       <VotingActivityChart />
 
       <QuickActions />
-
 
       <RecentActivityTable />
     </div>
