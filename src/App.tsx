@@ -1,15 +1,26 @@
 import "./App.css";
 import { BrowserRouter } from "react-router-dom";
 import AppUI from "./AppUI";
-import { AppProvider } from "./context/AppProvider";
+import { AuthProvider } from "./context/AuthContext";
+import { MenuProvider } from "./context/MenuContext";
+import { UserProvider } from "./context/UserContext";
+import { ContextApp } from "./shared/provider/store/ContextApp";
 
 function App() {
   return (
-    <BrowserRouter>
-      <AppProvider>
-        <AppUI />
-      </AppProvider>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <AuthProvider>
+          <MenuProvider>
+            <UserProvider>
+              <ContextApp>
+                <AppUI />
+              </ContextApp>
+            </UserProvider>
+          </MenuProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </>
   );
 }
 
