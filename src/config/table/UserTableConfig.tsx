@@ -69,7 +69,7 @@ export const createUserTableConfig = (
       label: "Última Actividad",
       type: "date",
       sortable: true,
-      format: (value, user) => {
+      format: (value, _user) => {
         if (!value) return "Sin actividad";
         return new Date(value).toLocaleDateString("es-ES", {
           year: "numeric",

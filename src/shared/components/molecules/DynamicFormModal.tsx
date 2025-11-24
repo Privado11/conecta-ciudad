@@ -54,6 +54,7 @@ export function DynamicFormModal<T = any>({
         }
       : baseFilteredConfig;
 
+
   if (!isOpen) return null;
 
   return (

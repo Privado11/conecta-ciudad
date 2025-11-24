@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Lock, User, ArrowLeft, AlertTriangle, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,26 +13,15 @@ import AppearanceSettings from "@/shared/components/molecules/setting/Appearance
 function SettingsPage() {
   const { logout } = useAuth();
   const {
-    selectedUser,
-    getCurrentUser,
-    getUserById,
+    userProfile, 
     updateUser,
     deleteUser,
     changePassword,
     loading,
     validateUniqueFields,
   } = useUser();
-
+  
   const [currentTab, setCurrentTab] = useState("profile");
-
-  const currentUser = getCurrentUser();
-
-  useEffect(() => {
-    if (currentUser?.id) {
-      getUserById(currentUser.id);
-    }
-  }, []);
-
   const navigate = useNavigate();
 
   const handleTabChange = (value: string) => {
@@ -40,65 +29,49 @@ function SettingsPage() {
   };
 
   const handleUpdateProfile = async (data: any) => {
-    if (!selectedUser) return;
-    await updateUser(selectedUser.id, data);
+    if (!userProfile) return;
+    await updateUser(userProfile.id, data);
   };
 
   const handleUpdatePassword = async (data: any) => {
-    if (!selectedUser) return;
-    await changePassword(selectedUser.id, data);
+    if (!userProfile) return;
+    await changePassword(userProfile.id, data);
   };
 
   const handleDeleteAccount = async () => {
-    if (!selectedUser) return;
-    await deleteUser(selectedUser.id);
+    if (!userProfile) return;
+    await deleteUser(userProfile.id);
+    setTimeout(() => {
+      logout();
+    }, 1500);
   };
 
   const handleGoBack = () => navigate(-1);
   const handleLogout = () => logout();
 
-  const tabsConfig = [
-    {
-      key: "profile",
-      label: "Perfil",
-      icon: User,
-      content: selectedUser && (
-        <ProfileSettings
-          user={selectedUser}
-          updateProfile={handleUpdateProfile}
-        />
-      ),
-    },
-    {
-      key: "password",
-      label: "Contraseña",
-      icon: Lock,
-      content: (
-        <PasswordSettings
-          updatePassword={handleUpdatePassword}
-          loading={loading.updating}
-        />
-      ),
-    },
-    {
-      key: "appearance",
-      label: "Apariencia",
-      icon: Palette,
-      content: <AppearanceSettings />,
-    },
-    {
-      key: "account",
-      label: "Cuenta",
-      icon: AlertTriangle,
-      content: (
-        <AccountSettings
-          handleLogout={handleLogout}
-          loading={loading.updating}
-          handleDeleteAccount={handleDeleteAccount}
-        />
-      ),
-    },
-  ];
+  if (loading.fetching && !userProfile) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando configuración...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">No se pudo cargar la configuración</p>
+          <Button onClick={handleGoBack} variant="outline">
+            Volver
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -114,7 +87,7 @@ function SettingsPage() {
               <span className="text-sm font-medium">Volver</span>
             </Button>
           </div>
-
+          
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900">Configuración</h1>
             <p className="text-gray-600 mt-2">
@@ -128,25 +101,43 @@ function SettingsPage() {
             className="space-y-6"
           >
             <TabsList className="grid w-full grid-cols-4 bg-white">
-              {tabsConfig.map(({ key, label, icon: Icon }) => (
-                <TabsTrigger
-                  key={key}
-                  value={key}
-                  className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900"
-                >
-                  <Icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{label}</span>
-                </TabsTrigger>
-              ))}
+              <TabsTrigger
+                value="profile"
+                className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900"
+              >
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">Perfil</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="password"
+                className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900"
+              >
+                <Lock className="h-4 w-4" />
+                <span className="hidden sm:inline">Contraseña</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="appearance"
+                className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900"
+              >
+                <Palette className="h-4 w-4" />
+                <span className="hidden sm:inline">Apariencia</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="account"
+                className="flex items-center gap-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 cursor-pointer hover:bg-gray-100 hover:text-gray-900"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                <span className="hidden sm:inline">Cuenta</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile">
-              {selectedUser && (
-                <ProfileSettings
-                  user={selectedUser}
-                  updateProfile={handleUpdateProfile}
-                />
-              )}
+              <ProfileSettings
+                user={userProfile}
+                updateProfile={handleUpdateProfile}
+                onValidate={validateUniqueFields}
+                loading={loading.updating}
+              />
             </TabsContent>
 
             <TabsContent value="password">
@@ -163,7 +154,7 @@ function SettingsPage() {
             <TabsContent value="account">
               <AccountSettings
                 handleLogout={handleLogout}
-                loading={loading.updating}
+                loading={loading.deleting}
                 handleDeleteAccount={handleDeleteAccount}
               />
             </TabsContent>
@@ -241,14 +232,12 @@ function SettingsPage() {
 
             <div className="mt-6">
               <TabsContent value="profile" className="mt-0">
-                {selectedUser && (
-                  <ProfileSettings
-                    user={selectedUser}
-                    updateProfile={handleUpdateProfile}
-                    onValidate={validateUniqueFields}
-                    loading={loading.updating}
-                  />
-                )}
+                <ProfileSettings
+                  user={userProfile}
+                  updateProfile={handleUpdateProfile}
+                  onValidate={validateUniqueFields}
+                  loading={loading.updating}
+                />
               </TabsContent>
 
               <TabsContent value="password" className="mt-0">
@@ -265,7 +254,7 @@ function SettingsPage() {
               <TabsContent value="account" className="mt-0">
                 <AccountSettings
                   handleLogout={handleLogout}
-                  loading={loading.updating}
+                  loading={loading.deleting}
                   handleDeleteAccount={handleDeleteAccount}
                 />
               </TabsContent>

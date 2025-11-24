@@ -3,12 +3,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
+interface SubStatData {
+  label: string;
+  value: number;
+  suffix?: string; 
+}
+
 interface StatCardProps {
   label: string;
   value: number | string;
   icon: React.ReactNode;
   valueColor?: string;
   iconColor?: string;
+  subStats?: SubStatData[];
   trend?: {
     value: number;
     isPositive?: boolean;
@@ -23,6 +30,7 @@ export function StatCard({
   icon,
   valueColor = "text-foreground",
   iconColor = "text-primary",
+  subStats,
   trend,
   description,
   loading = false,
@@ -80,14 +88,36 @@ export function StatCard({
                 </div>
               )}
             </div>
+
+            {subStats && subStats.length > 0 && (
+              <div className="mt-3 space-y-1.5 border-t border-border/50 pt-3">
+                {subStats.map((subStat, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between text-xs"
+                  >
+                    <span className="text-muted-foreground">
+                      {subStat.label}
+                    </span>
+                    <span className="font-semibold text-foreground">
+                      {formatValue(subStat.value)}
+                      {subStat.suffix || ""} 
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                {description}
+              </p>
             )}
           </div>
 
           <div
             className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10",
+              "flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 shrink-0",
               iconColor
             )}
           >

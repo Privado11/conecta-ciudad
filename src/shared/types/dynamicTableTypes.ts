@@ -34,7 +34,7 @@ export interface ColumnConfig<T = any> {
 }
 
 export interface ActionConfig<T = any> {
-  label: string;
+  label: string | ((row: T) => string);
   icon?: ReactNode | ((row: T) => ReactNode);
   onClick: (row: T) => void;
   render?: (row: T) => ReactNode;

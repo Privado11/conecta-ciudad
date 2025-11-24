@@ -12,6 +12,16 @@ export type User = {
 
 export type UserRole = "ADMIN" | "LIDER_COMUNITARIO" | "CURATOR" | "CIUDADANO";
 
+export type UserStatus = "active" | "inactive";
 
-export type UserStatus = "active" | "inactive"
+export type CuratorDto = {
+  curator: User;
+  activeProjects: number;
+  completedProjects: number;
+  totalProjects: number;
+};
 
+export interface CuratorInfoDto {
+  currentCurator: CuratorDto | null;
+  activeCurators: CuratorDto[];
+}

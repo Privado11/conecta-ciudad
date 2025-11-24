@@ -3,8 +3,6 @@ import {
   LogOut,
   User,
   ChevronDown,
-  Bell,
-  Search,
   Menu,
   Settings,
 } from "lucide-react";
@@ -16,7 +14,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useMenu } from "@/hooks/useMenu";
+import { useUser } from "@/hooks/useUser";
+import { USER_ROLES } from "@/shared/constants/user/userRoles";
 
 interface HeaderProps {
   actionButton?: {
@@ -29,8 +28,10 @@ interface HeaderProps {
 export const Header = ({ actionButton, toggleSidebar }: HeaderProps) => {
   const navigate = useNavigate();
 
-  const { user } = useMenu();
+  const { userProfile } = useUser();
   const { logout } = useAuth();
+
+  const user = userProfile;
 
   const handleLogout = () => {
     logout();
@@ -65,16 +66,7 @@ export const Header = ({ actionButton, toggleSidebar }: HeaderProps) => {
       </div>
 
       <div className="flex items-center gap-3">
-        <button className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-          <Search className="w-5 h-5" />
-        </button>
-
-        <button className="relative p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-950" />
-        </button>
-
-        {actionButton && (
+          {actionButton && (
           <button
             onClick={actionButton.onClick}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-200"
@@ -90,14 +82,14 @@ export const Header = ({ actionButton, toggleSidebar }: HeaderProps) => {
                 <div className="flex items-center gap-2">
                   <div className="text-right hidden md:block">
                     <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      {user.fullName}
+                      {user.name}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {user.role}
+                      {USER_ROLES[user.roles?.[0] as keyof typeof USER_ROLES]}
                     </p>
                   </div>
                   <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-semibold text-sm shadow-lg">
-                    {user.fullName?.charAt(0) || "?"}
+                    {user.name?.charAt(0) || "?"}
                   </div>
                 </div>
                 <ChevronDown className="w-4 h-4 text-slate-400" />
@@ -106,10 +98,10 @@ export const Header = ({ actionButton, toggleSidebar }: HeaderProps) => {
             <DropdownMenuContent align="end" className="w-56">
               <div className="px-3 py-2">
                 <p className="font-semibold text-slate-900 dark:text-slate-100">
-                  {user.fullName}
+                  {user.name}
                 </p>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {user.username}
+                  {user.email}
                 </p>
               </div>
               <DropdownMenuSeparator />

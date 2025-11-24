@@ -26,6 +26,7 @@ export interface PaginatedResponse<T> {
 export interface Statistics<T> {
   total: number;
   metrics: Record<string, number | string | boolean | null>;
+  items?: T[];
 }
 
 

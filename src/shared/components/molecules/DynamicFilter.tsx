@@ -12,6 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -19,7 +26,7 @@ import {
 import { useState, type ReactNode } from "react";
 import type { FilterGroup } from "@/shared/interface/Filters";
 
-interface DynamicFilterProps<T extends Record<string, any>> {
+interface DynamicFilterProps {
   title: string;
   searchTerm: string;
   onSearchChange: (value: string) => void;
@@ -27,15 +34,19 @@ interface DynamicFilterProps<T extends Record<string, any>> {
   filterGroups: FilterGroup<any>[];
   headerActions?: ReactNode;
   titleIcon?: LucideIcon;
+
+  dateType?: string;
   startDate?: string;
   endDate?: string;
+  dateTypeOptions?: Array<{ value: string; label: string }>;
+  onDateTypeChange?: (value: string) => void;
   onStartDateChange?: (value: string | undefined) => void;
   onEndDateChange?: (value: string | undefined) => void;
   onApplyDateFilter?: () => void;
   onClearDateFilters?: () => void;
 }
 
-export function DynamicFilter<T extends Record<string, any>>({
+export function DynamicFilter({
   title,
   searchTerm,
   onSearchChange,
@@ -43,18 +54,22 @@ export function DynamicFilter<T extends Record<string, any>>({
   filterGroups,
   headerActions,
   titleIcon: TitleIcon,
+  dateType,
   startDate,
   endDate,
+  dateTypeOptions,
+  onDateTypeChange,
   onStartDateChange,
   onEndDateChange,
   onApplyDateFilter,
   onClearDateFilters,
-}: DynamicFilterProps<T>) {
+}: DynamicFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const activeFiltersCount =
-    filterGroups.filter((group) => group.activeValue !== "all").length +
-    (startDate || endDate ? 1 : 0);
+    filterGroups.filter(
+      (group) => group.activeValue !== "all" && group.activeValue !== ""
+    ).length + (startDate || endDate ? 1 : 0);
 
   const clearAllFilters = () => {
     filterGroups.forEach((group) => {
@@ -69,6 +84,10 @@ export function DynamicFilter<T extends Record<string, any>>({
   };
 
   const hasActiveFilters = activeFiltersCount > 0 || searchTerm.length > 0;
+
+  const hasAdvancedFilters =
+    filterGroups.some((group) => group.options && group.options.length > 0) ||
+    (onStartDateChange && onEndDateChange);
 
   return (
     <Card className="mb-6 border-border shadow-sm">
@@ -134,132 +153,166 @@ export function DynamicFilter<T extends Record<string, any>>({
 
         <Separator />
 
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-between !p-0 hover:bg-transparent hover:text-foreground cursor-pointer"
-            >
-              <span className="text-sm font-medium">Filtros avanzados</span>
-              <ChevronDown
-                className={`transition-transform ${
-                  isOpen ? "rotate-180" : "rotate-0"
-                }`}
-              />
-            </Button>
-          </CollapsibleTrigger>
+        {hasAdvancedFilters && (
+          <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-between !p-0 hover:bg-transparent hover:text-foreground cursor-pointer"
+              >
+                <span className="text-sm font-medium">Filtros avanzados</span>
+                <ChevronDown
+                  className={`transition-transform ${
+                    isOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                />
+              </Button>
+            </CollapsibleTrigger>
 
-          <CollapsibleContent className="space-y-6 pt-4">
-            {onStartDateChange && onEndDateChange && (
-              <>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      Rango de fechas
-                    </Label>
-                    {(startDate || endDate) && (
+            <CollapsibleContent className="space-y-6 pt-4">
+              {onStartDateChange && onEndDateChange && (
+                <>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        Filtro por fecha
+                      </Label>
+                      {(startDate || endDate) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearDateFilters}
+                          className="h-auto p-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+                        >
+                          Limpiar
+                        </Button>
+                      )}
+                    </div>
+
+                    {dateTypeOptions && onDateTypeChange && (
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="dateType"
+                          className="text-xs text-muted-foreground"
+                        >
+                          Tipo de fecha
+                        </Label>
+                        <Select
+                          value={dateType}
+                          onValueChange={onDateTypeChange}
+                        >
+                          <SelectTrigger id="dateType">
+                            <SelectValue placeholder="Seleccionar tipo de fecha" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {dateTypeOptions.map((option) => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="startDate"
+                          className="text-xs text-muted-foreground"
+                        >
+                          Fecha desde
+                        </Label>
+                        <Input
+                          id="startDate"
+                          type="date"
+                          value={startDate || ""}
+                          onChange={(e) =>
+                            onStartDateChange(e.target.value || undefined)
+                          }
+                          max={endDate || undefined}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="endDate"
+                          className="text-xs text-muted-foreground"
+                        >
+                          Fecha hasta
+                        </Label>
+                        <Input
+                          id="endDate"
+                          type="date"
+                          value={endDate || ""}
+                          onChange={(e) =>
+                            onEndDateChange(e.target.value || undefined)
+                          }
+                          min={startDate || undefined}
+                        />
+                      </div>
+                    </div>
+                    {startDate && endDate && (
                       <Button
-                        variant="ghost"
+                        onClick={onApplyDateFilter}
                         size="sm"
-                        onClick={clearDateFilters}
-                        className="h-auto p-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+                        className="w-full cursor-pointer mt-3"
                       >
-                        Limpiar
+                        Aplicar filtro de fecha
                       </Button>
                     )}
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="startDate"
-                        className="text-xs text-muted-foreground"
-                      >
-                        Fecha inicio
+                  <Separator />
+                </>
+              )}
+
+              {filterGroups.map((group, index) => (
+                <div key={group.filterKey}>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-medium">
+                        {group.label}
                       </Label>
-                      <Input
-                        id="startDate"
-                        type="date"
-                        value={startDate || ""}
-                        onChange={(e) =>
-                          onStartDateChange(e.target.value || undefined)
-                        }
-                        max={endDate || undefined}
-                      />
+                      {group.activeValue !== "all" && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => group.onChange("all" as any)}
+                          className="h-auto p-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer "
+                        >
+                          Limpiar
+                        </Button>
+                      )}
                     </div>
-                    <div className="space-y-2">
-                      <Label
-                        htmlFor="endDate"
-                        className="text-xs text-muted-foreground"
-                      >
-                        Fecha fin
-                      </Label>
-                      <Input
-                        id="endDate"
-                        type="date"
-                        value={endDate || ""}
-                        onChange={(e) =>
-                          onEndDateChange(e.target.value || undefined)
-                        }
-                        min={startDate || undefined}
-                      />
+                    <div className="flex flex-wrap gap-2">
+                      {group.options?.map(({ label, value, icon: Icon }) => (
+                        <Button
+                          key={String(value)}
+                          variant={
+                            group.activeValue === value ? "default" : "outline"
+                          }
+                          size="sm"
+                          onClick={() => group.onChange(value)}
+                          className="gap-2 transition-all cursor-pointer"
+                        >
+                          {Icon && <Icon className="w-3.5 h-3.5" />}
+                          <span>{label}</span>
+                        </Button>
+                      ))}
                     </div>
                   </div>
-                  {startDate && endDate && (
-                    <Button
-                      onClick={onApplyDateFilter}
-                      size="sm"
-                      className="w-full cursor-pointer mt-3"
-                    >
-                      Aplicar filtro de fechas
-                    </Button>
+                  {index < filterGroups.length - 1 && (
+                    <Separator className="mt-6" />
                   )}
                 </div>
-                <Separator />
-              </>
-            )}
-
-            {filterGroups.map((group, index) => (
-              <div key={group.filterKey}>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-sm font-medium">{group.label}</Label>
-                    {group.activeValue !== "all" && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => group.onChange("all" as any)}
-                        className="h-auto p-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer "
-                      >
-                        Limpiar
-                      </Button>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {group.options.map(({ label, value, icon: Icon }) => (
-                      <Button
-                        key={String(value)}
-                        variant={
-                          group.activeValue === value ? "default" : "outline"
-                        }
-                        size="sm"
-                        onClick={() => group.onChange(value)}
-                        className="gap-2 transition-all cursor-pointer"
-                      >
-                        {Icon && <Icon className="w-3.5 h-3.5" />}
-                        <span>{label}</span>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                {index < filterGroups.length - 1 && (
-                  <Separator className="mt-6" />
-                )}
-              </div>
-            ))}
-          </CollapsibleContent>
-        </Collapsible>
+              ))}
+            </CollapsibleContent>
+          </Collapsible>
+        )}
       </CardContent>
     </Card>
   );

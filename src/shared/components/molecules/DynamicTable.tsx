@@ -102,23 +102,26 @@ export function DynamicTable<T = any>({
     }
   };
 
-  const visibleActions = config.actions?.filter(
-    (action) => !action.hidden || !action.hidden
-  );
+  const visibleActions = config.actions;
 
   const renderActions = (row: T) => {
     if (!visibleActions || visibleActions.length === 0) return null;
-
-    const rowVisibleActions = visibleActions.filter(
-      (action) => !action.hidden || !action.hidden(row)
-    );
-
+  
+    const rowVisibleActions = visibleActions.filter((action) => {
+      if (!action.hidden) return true;
+      return !action.hidden(row);
+    });
+  
     if (rowVisibleActions.length === 0) return null;
-
+  
     if (rowVisibleActions.length === 1) {
       const action = rowVisibleActions[0];
       const isDisabled = action.disabled ? action.disabled(row) : false;
-
+      
+      const actionLabel = typeof action.label === "function" 
+        ? action.label(row) 
+        : action.label;
+  
       return (
         <Button
           variant={action.variant || "ghost"}
@@ -128,11 +131,11 @@ export function DynamicTable<T = any>({
           className={`cursor-pointer ${action.className || ""}`}
         >
           {typeof action.icon === "function" ? action.icon(row) : action.icon}
-          {action.render ? action.render(row) : action.label}
+          {action.render ? action.render(row) : actionLabel}
         </Button>
       );
     }
-
+  
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="cursor-pointer">
@@ -143,7 +146,11 @@ export function DynamicTable<T = any>({
         <DropdownMenuContent align="end">
           {rowVisibleActions.map((action, index) => {
             const isDisabled = action.disabled ? action.disabled(row) : false;
-
+            
+            const actionLabel = typeof action.label === "function" 
+              ? action.label(row) 
+              : action.label;
+  
             return (
               <DropdownMenuItem
                 key={index}
@@ -154,7 +161,7 @@ export function DynamicTable<T = any>({
                 {typeof action.icon === "function"
                   ? action.icon(row)
                   : action.icon}
-                {action.render ? action.render(row) : action.label}
+                {action.render ? action.render(row) : actionLabel}
               </DropdownMenuItem>
             );
           })}

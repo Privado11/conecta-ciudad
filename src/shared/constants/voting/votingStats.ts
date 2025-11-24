@@ -1,0 +1,72 @@
+import type { StatConfig } from "@/shared/components/molecules/StatsGrid";
+import { BarChart3, CheckCircle, XCircle, Users } from "lucide-react";
+
+export const VOTING_STATS: StatConfig[] = [
+  {
+    key: "totalVotations",
+    label: "Total Votaciones",
+    icon: BarChart3,
+    iconColor: "text-blue-500",
+    valueColor: "text-blue-600",
+    valueKey: "totalVotations",
+  },
+  {
+    key: "openVotations",
+    label: "Votaciones Abiertas",
+    icon: BarChart3,
+    iconColor: "text-green-500",
+    valueColor: "text-green-600",
+    valueKey: "openVotations",
+  },
+  {
+    key: "closedVotations",
+    label: "Votaciones Cerradas",
+    icon: BarChart3,
+    iconColor: "text-gray-500",
+    valueColor: "text-gray-600",
+    valueKey: "closedVotations",
+  },
+  {
+    key: "totalVotesCast",
+    label: "Total Votos Emitidos",
+    icon: Users,
+    iconColor: "text-purple-500",
+    valueColor: "text-purple-600",
+    valueKey: "totalVotesCast",
+  },
+  {
+    key: "averageParticipationRate",
+    label: "Participación Promedio",
+    icon: Users,
+    iconColor: "text-blue-500",
+    valueColor: "text-blue-600",
+    valueKey: "averageParticipationRate",
+    description: "%",
+  },
+  {
+    key: "approvalRate",
+    label: "Tasa de Aprobación",
+    icon: CheckCircle,
+    iconColor: "text-green-500",
+    valueColor: "text-green-600",
+    valueKey: "approvalRate",
+    description: "%",
+  },
+  {
+    key: "rejectionRate",
+    label: "Tasa de Rechazo",
+    icon: XCircle,
+    iconColor: "text-red-500",
+    valueColor: "text-red-600",
+    valueKey: "rejectionRate",
+    description: "%",
+  },
+  {
+    key: "averageVotesPerProject",
+    label: "Votos Promedio por Proyecto",
+    icon: BarChart3,
+    iconColor: "text-orange-500",
+    valueColor: "text-orange-600",
+    valueKey: "averageVotesPerProject",
+  },
+];

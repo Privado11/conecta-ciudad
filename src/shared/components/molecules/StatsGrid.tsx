@@ -1,6 +1,12 @@
 import type { LucideIcon } from "lucide-react";
 import { StatCard } from "../atoms/StatCard";
 
+export interface SubStat {
+  label: string;
+  value: string;
+  suffix?: string; 
+}
+
 export interface StatConfig {
   key: string;
   label: string;
@@ -9,6 +15,7 @@ export interface StatConfig {
   valueColor?: string;
   valueKey: string;
   description?: string;
+  subStats?: SubStat[]; 
   trend?: {
     value: number;
     isPositive?: boolean;
@@ -22,7 +29,7 @@ interface StatsGridProps {
     metrics?: Record<string, string | number | boolean | null>;
   };
   loading?: boolean;
-  columns?: 2 | 3 | 4;
+  columns?: 2 | 3 | 4 | 5 | 6;
 }
 
 export function StatsGrid({
@@ -39,6 +46,10 @@ export function StatsGrid({
         return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
       case 4:
         return "grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
+      case 5:
+        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-5";
+      case 6:
+        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-6";
       default:
         return "grid-cols-1 md:grid-cols-3";
     }
@@ -53,6 +64,12 @@ export function StatsGrid({
             ? data.totalElements || 0
             : (data.metrics?.[stat.valueKey] as number) || 0;
 
+        const subStatsData = stat.subStats?.map((subStat) => ({
+          label: subStat.label,
+          value: (data.metrics?.[subStat.value] as number) || 0,
+          suffix: subStat.suffix, 
+        }));
+
         return (
           <StatCard
             key={stat.key}
@@ -62,6 +79,7 @@ export function StatsGrid({
             iconColor={stat.iconColor}
             valueColor={stat.valueColor}
             description={stat.description}
+            subStats={subStatsData} 
             trend={stat.trend}
             loading={loading}
           />

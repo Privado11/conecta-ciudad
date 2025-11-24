@@ -33,7 +33,7 @@ export const createAuditTableConfig = (
         label: action.actionType,
         variant: "outline",
       }),
-      className: "font-mono text-xs",
+      className: "font-mono text-xs max-w-[10rem] truncate",
     },
     {
       key: "description",

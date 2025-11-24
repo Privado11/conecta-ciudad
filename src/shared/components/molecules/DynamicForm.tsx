@@ -192,11 +192,9 @@ export function DynamicForm<T = any>({
 
   const hasErrors = Object.keys(form.formState.errors).length > 0;
 
-  console.log(hasErrors, loading, form.formState.isValid, hasChanges);
   const isSubmitDisabled =
     loading || hasErrors || !form.formState.isValid || !hasChanges;
 
-  console.log("isSubmitDisabled", isSubmitDisabled);
   return (
     <Form {...form}>
       <form
