@@ -15,6 +15,8 @@ import ProjectPendingReviewManagementPage from "./views/curator/ProjectPendingRe
 import ReviewHistoryManagementPage from "./views/curator/ReviewHistoryManagementPage";
 import ReadyProjectsView from "./views/citizen/ReadyProjectsView";
 import VotingProjectsView from "./views/citizen/VotingProjectsView";
+import VotingResultsView from "./views/citizen/VotingResultsView";
+import VotingHistoryView from "./views/citizen/VotingHistoryView";
 import VotingManagementPage from "./views/admin/voting/VotingManagementPage";
 import Projects from "./views/projects/Pojects";
 import VotingResults from "./views/projects/VotingResults";
@@ -70,13 +72,16 @@ function AppUI() {
           path="/citizen/projects/voting"
           element={<VotingProjectsView />}
         />
+
+        <Route path="/leader/projects/" element={<Projects />} />
+
+        <Route path="/lider/results" element={<VotingResults />} />
+
+        <Route path="/citizen/my-votes" element={<VotingResultsView />} />
+
         <Route
-          path="/leader/projects/"
-          element={<Projects />}
-        />
-        <Route
-          path="/lider/results"
-          element={<VotingResults />}
+          path="/citizen/projects/results"
+          element={<VotingHistoryView />}
         />
       </Route>
 

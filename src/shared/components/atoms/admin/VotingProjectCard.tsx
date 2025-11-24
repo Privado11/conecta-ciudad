@@ -33,13 +33,6 @@ export function VotingProjectCard({
       ? (project.votesInFavor / project.totalVotes) * 100
       : 0;
 
-  const subtractOneDay = (localDate: string) => {
-    const [y, m, d] = localDate.split("-").map(Number);
-    const date = new Date(y, m - 1, d);
-    date.setDate(date.getDate() - 1);
-
-    return date.toISOString().split("T")[0]; 
-  };
 
   const getUrgencyColor = (level?: string) => {
     switch (level) {
@@ -207,7 +200,7 @@ export function VotingProjectCard({
           <Button
             onClick={() => onViewDetails(project)}
             variant="outline"
-            className="w-full gap-2"
+            className="w-full gap-2 cursor-pointer"
           >
             <Eye className="w-4 h-4" />
             Ver Detalles

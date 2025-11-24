@@ -3,6 +3,7 @@ import type {
   LoadingVotingState,
   VotingProjectDto,
   VotingStats,
+  CitizenVotingStats,
 } from "@/shared/types/votingTypes";
 import { createContext, useState, useCallback, useEffect } from "react";
 import type { ReactNode } from "react";
@@ -14,10 +15,20 @@ type VotingContextType = {
   selectedProject: VotingProjectDto | null;
   loading: LoadingVotingState;
 
+  // Citizen-specific state
+  votingHistory: VotingProjectDto[];
+  votingResults: VotingProjectDto[];
+  citizenStats: CitizenVotingStats | null;
+
   fetchVotingProjects: () => Promise<void>;
   fetchVotingStatistics: () => Promise<void>;
   fetchOpenVotingProjects: () => Promise<void>;
   fetchClosedVotingProjects: () => Promise<void>;
+
+  // Citizen-specific methods
+  fetchVotingHistory: () => Promise<void>;
+  fetchClosedVotingResults: () => Promise<void>;
+  fetchCitizenVotingStats: () => Promise<void>;
 
   setSelectedProject: (project: VotingProjectDto | null) => void;
 };
@@ -30,9 +41,19 @@ export const VotingProvider = ({ children }: { children: ReactNode }) => {
   const [selectedProject, setSelectedProject] =
     useState<VotingProjectDto | null>(null);
 
+  // Citizen-specific state
+  const [votingHistory, setVotingHistory] = useState<VotingProjectDto[]>([]);
+  const [votingResults, setVotingResults] = useState<VotingProjectDto[]>([]);
+  const [citizenStats, setCitizenStats] = useState<CitizenVotingStats | null>(
+    null
+  );
+
   const [loading, setLoading] = useState<LoadingVotingState>({
     fetching: false,
     fetchingStats: false,
+    fetchingHistory: false,
+    fetchingResults: false,
+    fetchingCitizenStats: false,
   });
 
   const updateLoadingState = useCallback(
@@ -125,13 +146,67 @@ export const VotingProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [handleError, updateLoadingState]);
 
+  const fetchVotingHistory = useCallback(async (): Promise<void> => {
+    updateLoadingState("fetchingHistory", true);
+    try {
+      const history = await VotingService.getVotingHistory();
+      setVotingHistory(history);
+    } catch (error: any) {
+      handleError(
+        error,
+        "Error al obtener historial de votaciones",
+        fetchVotingHistory
+      );
+    } finally {
+      updateLoadingState("fetchingHistory", false);
+    }
+  }, [handleError, updateLoadingState]);
+
+  const fetchClosedVotingResults = useCallback(async (): Promise<void> => {
+    updateLoadingState("fetchingResults", true);
+    try {
+      const results = await VotingService.getClosedVotingResults();
+      setVotingResults(results);
+    } catch (error: any) {
+      handleError(
+        error,
+        "Error al obtener resultados de votaciones",
+        fetchClosedVotingResults
+      );
+    } finally {
+      updateLoadingState("fetchingResults", false);
+    }
+  }, [handleError, updateLoadingState]);
+
+  const fetchCitizenVotingStats = useCallback(async (): Promise<void> => {
+    updateLoadingState("fetchingCitizenStats", true);
+    try {
+      const stats = await VotingService.getCitizenVotingStats();
+      setCitizenStats(stats);
+    } catch (error: any) {
+      handleError(
+        error,
+        "Error al obtener estadísticas de votación",
+        fetchCitizenVotingStats
+      );
+    } finally {
+      updateLoadingState("fetchingCitizenStats", false);
+    }
+  }, [handleError, updateLoadingState]);
+
   const resetVotingState = useCallback(() => {
     setProjects([]);
     setStats(null);
     setSelectedProject(null);
+    setVotingHistory([]);
+    setVotingResults([]);
+    setCitizenStats(null);
     setLoading({
       fetching: false,
       fetchingStats: false,
+      fetchingHistory: false,
+      fetchingResults: false,
+      fetchingCitizenStats: false,
     });
   }, []);
 
@@ -143,7 +218,6 @@ export const VotingProvider = ({ children }: { children: ReactNode }) => {
     const handleUserLoggedOut = () => {
       resetVotingState();
     };
-
 
     const user = localStorage.getItem("user");
     if (user) {
@@ -166,10 +240,16 @@ export const VotingProvider = ({ children }: { children: ReactNode }) => {
         stats,
         selectedProject,
         loading,
+        votingHistory,
+        votingResults,
+        citizenStats,
         fetchVotingProjects,
         fetchVotingStatistics,
         fetchOpenVotingProjects,
         fetchClosedVotingProjects,
+        fetchVotingHistory,
+        fetchClosedVotingResults,
+        fetchCitizenVotingStats,
         setSelectedProject,
       }}
     >

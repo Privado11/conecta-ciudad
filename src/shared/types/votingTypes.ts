@@ -17,19 +17,16 @@ export interface VotingProjectDto {
   creator: User;
   version: number;
 
-  // Voting specific data
   votingStatus: "OPEN" | "CLOSED";
   votesInFavor: number;
   votesAgainst: number;
   totalVotes: number;
   participationRate: number;
 
-  
   daysRemaining?: number;
   hoursRemaining?: number;
   urgencyLevel?: "CRITICAL" | "HIGH" | "NORMAL";
 
- 
   finalResult?: "APPROVED" | "REJECTED";
   closedAt?: string;
   approvalPercentage?: number;
@@ -60,6 +57,38 @@ export interface VoteResults {
 export interface LoadingVotingState {
   fetching: boolean;
   fetchingStats: boolean;
+  fetchingHistory: boolean;
+  fetchingResults: boolean;
+  fetchingCitizenStats: boolean;
 }
 
 export type VotingFilter = "all" | "open" | "closed";
+
+export interface VotingHistoryDto {
+  voteId: number;
+  projectId: number;
+  projectName: string;
+  projectDescription: string;
+  votingStartAt: string;
+  votingEndAt: string;
+  voteDate: string;
+  voteDecision: boolean;
+  hashVerificacion: string;
+  projectStatus: ProjectStatus;
+  votingStatus: "OPEN" | "CLOSED";
+  finalResult: "APPROVED" | "REJECTED" | null;
+  totalVotes: number | null;
+  votesInFavor: number | null;
+  votesAgainst: number | null;
+  approvalPercentage: number | null;
+}
+
+export interface CitizenVotingStats {
+  totalVotes: number;
+  votesInFavor: number;
+  votesAgainst: number;
+  participationRate: number;
+}
+
+export type VotingResultFilter = "all" | "approved" | "rejected";
+export type VotingDecisionFilter = "all" | "favor" | "against";

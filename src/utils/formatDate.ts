@@ -11,3 +11,14 @@ export const formatDate = (dateString: string) => {
 export const formatCurrency = (amount: number): string => {
   return `$${amount.toLocaleString("es-ES")}`;
 };
+
+export const formatDateTime = (dateTimeString: string): string => {
+  const date = new Date(dateTimeString);
+  return date.toLocaleString("es-ES", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
