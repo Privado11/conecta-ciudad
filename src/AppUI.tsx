@@ -17,6 +17,7 @@ import ReadyProjectsView from "./views/citizen/ReadyProjectsView";
 import VotingProjectsView from "./views/citizen/VotingProjectsView";
 import VotingManagementPage from "./views/admin/voting/VotingManagementPage";
 import Projects from "./views/projects/Pojects";
+import VotingResults from "./views/projects/VotingResults";
 
 function AppUI() {
   return (
@@ -72,6 +73,10 @@ function AppUI() {
         <Route
           path="/leader/projects/"
           element={<Projects />}
+        />
+        <Route
+          path="/lider/results"
+          element={<VotingResults />}
         />
       </Route>
 

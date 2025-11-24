@@ -1,5 +1,6 @@
 import { AdminDashboard } from '@/shared/components/organisms/dashboard/AdminDashboard';
 import { CuratorDashboard } from '@/shared/components/organisms/dashboard/CuratorDashboard';
+import { LeaderDashboard } from '@/shared/components/organisms/dashboard/LeaderDashboard';
 import { useAuth } from '@/hooks/useAuth';
 
 function Home() {
@@ -7,6 +8,7 @@ function Home() {
 
   const isAdmin = user?.roles?.includes('ADMIN');
   const isCurator = user?.roles?.includes('CURATOR');
+  const isLeader = user?.roles?.includes('LIDER_COMUNITARIO');
 
 
   if (isAdmin) {
@@ -15,6 +17,10 @@ function Home() {
 
   if (isCurator) {
     return <CuratorDashboard />;
+  }
+
+  if (isLeader) {
+    return <LeaderDashboard />;
   }
 
   return (

@@ -36,3 +36,22 @@ export interface ProjectCreateDTO {
   startAt: string;
   endAt: string;
 }
+
+export interface ProjectVotingResult {
+  projectId: number;
+  projectName: string;
+  description: string;
+  objectives: string;
+  beneficiaryPopulations: string;
+  budget: number;
+  projectStartAt: string;
+  projectEndAt: string;
+  votingStartAt: string;
+  votingEndAt: string;
+  closedAt: string;
+  votesInFavor: number;
+  votesAgainst: number;
+  totalVotes: number;
+  approvalPercentage: number;
+  finalResult: string;
+}

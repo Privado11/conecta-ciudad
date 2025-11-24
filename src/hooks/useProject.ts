@@ -227,6 +227,20 @@ export default function useProject() {
   const end = start + pageSize;
   const pagedProjects = sortedAndFiltered.slice(start, end);
 
+  const [votingResults, setVotingResults] = useState<any[]>([]);
+
+  const fetchVotingResults = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get("/api/v1/leader/projects/voting-results");
+      setVotingResults(response.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     projects: pagedProjects,
     setProjects,
@@ -257,5 +271,7 @@ export default function useProject() {
     sortDirection,
     totalFiltered,
     projectsFilter,
+    votingResults,
+    fetchVotingResults,
   };
 }

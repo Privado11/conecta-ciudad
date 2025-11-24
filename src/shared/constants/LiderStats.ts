@@ -4,7 +4,7 @@ import type { ProjectStatus } from "../interface/Projects";
 
 export const LIDER_STATS: StatCardProps[] = [
   {
-    label: "Total Lideres",
+    label: "Total Proyectos",
     icon: Users,
     color: "text-blue-500",
     valueKey: "total",
