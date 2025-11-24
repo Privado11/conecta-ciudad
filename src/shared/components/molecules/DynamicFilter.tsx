@@ -26,7 +26,7 @@ import {
 import { useState, type ReactNode } from "react";
 import type { FilterGroup } from "@/shared/interface/Filters";
 
-interface DynamicFilterProps<T extends Record<string, any>> {
+interface DynamicFilterProps {
   title: string;
   searchTerm: string;
   onSearchChange: (value: string) => void;
@@ -46,7 +46,7 @@ interface DynamicFilterProps<T extends Record<string, any>> {
   onClearDateFilters?: () => void;
 }
 
-export function DynamicFilter<T extends Record<string, any>>({
+export function DynamicFilter({
   title,
   searchTerm,
   onSearchChange,
@@ -63,7 +63,7 @@ export function DynamicFilter<T extends Record<string, any>>({
   onEndDateChange,
   onApplyDateFilter,
   onClearDateFilters,
-}: DynamicFilterProps<T>) {
+}: DynamicFilterProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const activeFiltersCount =

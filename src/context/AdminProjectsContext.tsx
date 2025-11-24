@@ -73,6 +73,7 @@ export const AdminProjectsProvider = ({
     deleting: false,
     fetchingDetails: false,
     assigningCurator: false,
+    voting: false,
   });
 
   const hasActiveFilters = useMemo(() => {

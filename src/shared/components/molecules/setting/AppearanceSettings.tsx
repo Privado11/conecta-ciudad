@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,7 +11,6 @@ import { Moon, Sun, Palette, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AppearanceSettings() {
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
 
   const handleUnavailableFeature = (): void => {
     toast(

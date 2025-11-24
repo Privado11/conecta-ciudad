@@ -73,7 +73,7 @@ export function ReviewCard({ review, isLatest }: ReviewCardProps) {
                     : "text-slate-900 dark:text-slate-50"
                 }`}
               >
-                {formatDate(review.dueAt)}
+                {formatDate(review.dueAt || "")}
               </p>
             </div>
           </div>

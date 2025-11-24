@@ -147,7 +147,7 @@ export default function Projects() {
                         setSelectProject(project);
                         setOpenModalCreate(true);
                     }}
-                    onView={(project: any) => { }}
+                    onView={(_project: any) => { }}
                     pagination={{
                         currentPage: currentPage,
                         pageSize: pageSize,
@@ -176,7 +176,7 @@ export default function Projects() {
                     setSelectProject(null);
                 }}
                 config={projectFormConfig}
-                onValidate={async (data) => {
+                onValidate={async (_data) => {
                     return { available: true, message: "" }
                 }}
                 onSubmit={onSubmitCreate}

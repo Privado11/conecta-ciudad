@@ -28,9 +28,8 @@ export function VotingHistoryCard({
   const projectName = project.projectName || projectData.name || "Sin nombre";
   const projectDescription =
     project.projectDescription || projectData.description || "Sin descripción";
-  const voteDecision = project.voteDecision ?? projectData.voteDecision ?? true;
 
-  const isInFavor = voteDecision;
+
   const isClosed = project.votingStatus === "CLOSED";
 
   return (

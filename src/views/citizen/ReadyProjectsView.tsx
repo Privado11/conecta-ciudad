@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2, Calendar } from "lucide-react";
+import {  Calendar } from "lucide-react";
 import { useProjectContext } from "@/hooks/useProjectContext";
 import type { ProjectReadyDto } from "@/shared/types/projectTypes";
 import { ReadyProjectCard } from "@/shared/components/atoms/citizen/ReadyProjectCard";
