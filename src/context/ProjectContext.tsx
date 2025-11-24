@@ -243,7 +243,8 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             ? "Voto a favor registrado exitosamente"
             : "Voto en contra registrado exitosamente"
         );
-        await fetchOpenForVoting();
+
+        setVotingProjects((prev) => prev.filter((p) => p.id !== projectId));
 
         return true;
       } catch (error: any) {
@@ -253,7 +254,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         updateLoadingState("voting", false);
       }
     },
-    [handleError, updateLoadingState, fetchOpenForVoting]
+    [handleError, updateLoadingState]
   );
 
   return (

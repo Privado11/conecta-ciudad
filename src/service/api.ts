@@ -3,7 +3,7 @@ import { isTokenExpired } from "@/utils/tokenUtils";
 import axios from "axios";
 import { toast } from "sonner";
 
-const API_URL = import.meta.env.VITE_API_URL_DEV;
+const API_URL = import.meta.env.VITE_API_URL;
 const VOTING_API_URL = import.meta.env.VITE_VOTING_API_URL;
 
 const createInterceptors = (instance: ReturnType<typeof axios.create>) => {

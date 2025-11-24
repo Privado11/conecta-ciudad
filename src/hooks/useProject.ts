@@ -2,11 +2,14 @@ import { useContext, useEffect, useState } from "react";
 import { contextApp } from "../shared/provider/store/ContextApp";
 import type { IProject, ProjectCreateDTO } from "@/shared/interface/Projects";
 import api from "@/service/api";
+import { toast } from "sonner";
 
 export default function useProject() {
   const { state, dispatch } = useContext(contextApp);
   const [projects, setProjects] = useState<IProject[]>(state.projects);
-  const [projectsFilter, setProjectsFilter] = useState<IProject[] | null>(state.projects);
+  const [projectsFilter, setProjectsFilter] = useState<IProject[] | null>(
+    state.projects
+  );
   const [openModalCreate, setOpenModalCreate] = useState<boolean>(false);
   const [openModalDelete, setOpenModalDelete] = useState<boolean>(false);
   const [selectProject, setSelectProject] = useState<IProject | null>(null);
@@ -33,6 +36,12 @@ export default function useProject() {
     openForVoting: 0,
     votingClosed: 0,
   });
+
+  const handleError = (error: any, defaultMessage: string) => {
+    const errorMessage =
+      error.response?.data?.message || error.message || defaultMessage;
+    toast.error(errorMessage);
+  };
 
   const fetchProjects = async () => {
     setLoading(true);
@@ -65,19 +74,33 @@ export default function useProject() {
         setProjectsFilter(null);
         break;
       case "DRAFT":
-        setProjectsFilter(state.projects.filter((project) => project.status === "DRAFT"));
+        setProjectsFilter(
+          state.projects.filter((project) => project.status === "DRAFT")
+        );
         break;
       case "IN_REVIEW":
-        setProjectsFilter(state.projects.filter((project) => project.status === "IN_REVIEW"));
+        setProjectsFilter(
+          state.projects.filter((project) => project.status === "IN_REVIEW")
+        );
         break;
       case "RETURNED_WITH_OBSERVATIONS":
-        setProjectsFilter(state.projects.filter((project) => project.status === "RETURNED_WITH_OBSERVATIONS"));
+        setProjectsFilter(
+          state.projects.filter(
+            (project) => project.status === "RETURNED_WITH_OBSERVATIONS"
+          )
+        );
         break;
       case "OPEN_FOR_VOTING":
-        setProjectsFilter(state.projects.filter((project) => project.status === "OPEN_FOR_VOTING"));
+        setProjectsFilter(
+          state.projects.filter(
+            (project) => project.status === "OPEN_FOR_VOTING"
+          )
+        );
         break;
       case "VOTING_CLOSED":
-        setProjectsFilter(state.projects.filter((project) => project.status === "VOTING_CLOSED"));
+        setProjectsFilter(
+          state.projects.filter((project) => project.status === "VOTING_CLOSED")
+        );
         break;
       default:
         break;
@@ -86,9 +109,6 @@ export default function useProject() {
 
   const onSubmitCreate = async (data: any) => {
     setLoading(true);
-    if (/^[0-9]{10}$/.test(data.budgets)) {
-      throw new Error("El presupuesto debe ser un número válido");
-    }
     const dataCreate: ProjectCreateDTO = {
       name: data.name,
       description: data.description,
@@ -101,13 +121,17 @@ export default function useProject() {
     try {
       if (selectProject) {
         await api.put(`/api/v1/leader/project/${selectProject.id}`, dataCreate);
+        toast.success("Proyecto actualizado exitosamente");
       } else {
         await api.post("/api/v1/leader/projects", dataCreate);
+        toast.success("Proyecto creado exitosamente");
       }
       await fetchProjects();
+
       setOpenModalCreate(false);
       setSelectProject(null);
     } catch (error) {
+      handleError(error, "Error al guardar el proyecto");
       console.error(error);
     } finally {
       setLoading(false);
@@ -120,15 +144,17 @@ export default function useProject() {
     try {
       await api.delete(`/api/v1/leader/project/${selectProject.id}`);
       dispatch({ type: "DELETE_PROJECT", payload: selectProject.id });
-      setProjects((prev) => prev.filter(p => p.id !== selectProject.id));
+      setProjects((prev) => prev.filter((p) => p.id !== selectProject.id));
+      toast.success("Proyecto eliminado exitosamente");
       setOpenModalDelete(false);
       setSelectProject(null);
     } catch (error) {
+      handleError(error, "Error al eliminar el proyecto");
       console.error(error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const submitProject = async (id: number) => {
     setLoading(true);
@@ -136,13 +162,17 @@ export default function useProject() {
       const response = await api.put(`/api/v1/leader/project/${id}/submit`);
       const updatedProject = await response.data;
       dispatch({ type: "UPDATE_PROJECT", payload: updatedProject });
-      setProjects((prev) => prev.map(p => p.id === updatedProject.id ? updatedProject : p));
+      setProjects((prev) =>
+        prev.map((p) => (p.id === updatedProject.id ? updatedProject : p))
+      );
+      toast.success("Proyecto enviado a revisión exitosamente");
     } catch (error) {
+      handleError(error, "Error al enviar el proyecto a revisión");
       console.error(error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const convertToIsoDate = (date: string) => {
     const [year, month, day] = date.split("-");
@@ -152,9 +182,8 @@ export default function useProject() {
   const setValueStats = (projects: IProject[]) => {
     setStats({
       total: projects.length,
-      draft: projects.filter(
-        (project: IProject) => project.status === "DRAFT"
-      ).length,
+      draft: projects.filter((project: IProject) => project.status === "DRAFT")
+        .length,
       inReview: projects.filter(
         (project: IProject) => project.status === "IN_REVIEW"
       ).length,
