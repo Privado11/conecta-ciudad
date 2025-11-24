@@ -5,12 +5,11 @@ export interface IUser {
 }
 
 export type ProjectStatus =
-  | "PENDIENTE"
-  | "EN_REVISION"
-  | "OBSERVACIONES"
-  | "LISTO_PARA_PUBLICAR"
-  | "PUBLICADO"
-  | "DEVUELTO";
+  | "DRAFT"
+  | "RETURNED_WITH_OBSERVATIONS"
+  | "OPEN_FOR_VOTING"
+  | "VOTING_CLOSED"
+  | "IN_REVIEW";
 
 export interface IProject {
   id: number;
@@ -30,9 +29,10 @@ export interface IProject {
 
 export interface ProjectCreateDTO {
   name: string;
+  description: string;
   objectives: string;
   beneficiaryPopulations: string;
-  budgets: string;
+  budget: number;
   startAt: string;
   endAt: string;
 }

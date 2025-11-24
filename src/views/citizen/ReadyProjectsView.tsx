@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Loader2, Calendar } from "lucide-react";
-import { useProject } from "@/hooks/useProject";
+import { useProjectContext } from "@/hooks/useProjectContext";
 import type { ProjectReadyDto } from "@/shared/types/projectTypes";
 import { ReadyProjectCard } from "@/shared/components/atoms/citizen/ReadyProjectCard";
 import { ReadyProjectDetailsModal } from "@/shared/components/molecules/citizen/ReadyProjectDetailsModal";
@@ -11,7 +11,7 @@ interface ReadyFilters {
 }
 
 export default function ReadyProjectsView() {
-  const { readyProjects, loading, fetchReadyToPublishNotOpen } = useProject();
+  const { readyProjects, loading, fetchReadyToPublishNotOpen } = useProjectContext();
   const [selectedProject, setSelectedProject] = useState<ProjectReadyDto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState<ReadyFilters>({

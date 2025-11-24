@@ -20,6 +20,7 @@ import {
     ArrowUpDown,
     ArrowUp,
     ArrowDown,
+    Send,
 } from "lucide-react";
 import {
     DropdownMenu,
@@ -28,7 +29,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import type { LoadingState } from "@/shared/types/loadingTypes";
+import type { LoadingUserState as LoadingState } from "@/shared/types/loadingTypes";
 import type { IProject } from "@/shared/interface/Projects";
 
 // Interfaz del proyecto
@@ -66,7 +67,17 @@ interface ProjectTableProps {
     onEdit: (project: IProject) => void;
     onView: (project: IProject) => void;
     onDelete: (project: IProject) => void;
+    onSubmit?: (project: IProject) => void;
 }
+
+// Mapa de estados
+const STATUS_MAP: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" }> = {
+    DRAFT: { label: "Borrador", variant: "secondary" },
+    RETURNED_WITH_OBSERVATIONS: { label: "Devuelto", variant: "destructive" },
+    OPEN_FOR_VOTING: { label: "Abierto a votación", variant: "success" },
+    VOTING_CLOSED: { label: "Votación cerrada", variant: "default" },
+    IN_REVIEW: { label: "En revisión", variant: "warning" },
+};
 
 export function ProjectTable({
     projects,
@@ -80,6 +91,7 @@ export function ProjectTable({
     onEdit,
     onView,
     onDelete,
+    onSubmit,
 }: ProjectTableProps) {
     const isAnyOperationLoading = loading.deleting || loading.updating;
 
@@ -170,8 +182,8 @@ export function ProjectTable({
                                                     {new Date(project.endAt).toLocaleDateString("es-ES")}
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Badge variant="secondary">
-                                                        {project.status || "Pendiente"}
+                                                    <Badge variant={STATUS_MAP[project.status || "DRAFT"]?.variant as any || "secondary"}>
+                                                        {STATUS_MAP[project.status || "DRAFT"]?.label || project.status}
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell>
@@ -203,6 +215,16 @@ export function ProjectTable({
                                                             >
                                                                 <Edit className="w-4 h-4 mr-2" /> Editar
                                                             </DropdownMenuItem>
+
+                                                            {onSubmit && (project.status === "DRAFT" || project.status === "RETURNED_WITH_OBSERVATIONS") && (
+                                                                <DropdownMenuItem
+                                                                    onClick={() => onSubmit(project)}
+                                                                    disabled={loading.updating}
+                                                                    className="cursor-pointer hover:!text-yellow-600 transition-colors data-highlighted:bg-yellow-100 dark:data-highlighted:bg-yellow-900/30"
+                                                                >
+                                                                    <Send className="w-4 h-4 mr-2" /> Enviar a revisión
+                                                                </DropdownMenuItem>
+                                                            )}
 
                                                             <DropdownMenuItem
                                                                 onClick={() => onDelete(project)}

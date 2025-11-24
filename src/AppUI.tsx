@@ -16,6 +16,7 @@ import ReviewHistoryManagementPage from "./views/curator/ReviewHistoryManagement
 import ReadyProjectsView from "./views/citizen/ReadyProjectsView";
 import VotingProjectsView from "./views/citizen/VotingProjectsView";
 import VotingManagementPage from "./views/admin/voting/VotingManagementPage";
+import Projects from "./views/projects/Pojects";
 
 function AppUI() {
   return (
@@ -67,6 +68,10 @@ function AppUI() {
         <Route
           path="/citizen/projects/voting"
           element={<VotingProjectsView />}
+        />
+        <Route
+          path="/leader/projects/"
+          element={<Projects />}
         />
       </Route>
 

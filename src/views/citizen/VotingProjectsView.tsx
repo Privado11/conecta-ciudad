@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Vote } from "lucide-react";
-import { useProject } from "@/hooks/useProject";
+import { useProjectContext } from "@/hooks/useProjectContext";
 import type { ProjectVotingDto } from "@/shared/types/projectTypes";
 import { ProjectCard } from "@/shared/components/atoms/citizen/ProjectCard";
 import { ProjectDetailsModal } from "@/shared/components/molecules/citizen/ProjectDetailsModal";
@@ -12,7 +12,7 @@ interface VotingFilters {
 }
 
 export default function VotingProjectsView() {
-  const { votingProjects, loading, fetchOpenForVoting, voteOnProject } = useProject();
+  const { votingProjects, loading, fetchOpenForVoting, voteOnProject } = useProjectContext();
   const [selectedProject, setSelectedProject] = useState<ProjectVotingDto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState<VotingFilters>({
@@ -26,7 +26,7 @@ export default function VotingProjectsView() {
 
   const handleVote = async (projectId: number, decision: boolean) => {
     const success = await voteOnProject(projectId, decision);
-    
+
     if (success && isModalOpen) {
       setIsModalOpen(false);
     }

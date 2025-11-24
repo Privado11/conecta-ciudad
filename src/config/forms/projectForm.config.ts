@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { DynamicFormConfig } from "@/shared/types/dynamicForm.types";
+import type { DynamicFormConfig } from "@/shared/types/dynamicFormTypes";
 
 export const projectFormConfig: DynamicFormConfig = {
   title: "Proyecto",
@@ -15,6 +15,14 @@ export const projectFormConfig: DynamicFormConfig = {
           type: "text",
           placeholder: "Ej. Parque Comunal La Esperanza",
           validation: z.string().min(3, "El nombre es requerido"),
+          cols: 2,
+        },
+        {
+          name: "description",
+          label: "Descripción",
+          type: "textarea",
+          placeholder: "Descripción detallada del proyecto",
+          validation: z.string().min(10, "La descripción es requerida"),
           cols: 2,
         },
         {
@@ -46,7 +54,7 @@ export const projectFormConfig: DynamicFormConfig = {
             .union([
               z
                 .string()
-                .regex(/^[0-9]{10}$/, "El presupuesto debe ser un número válido")
+                .regex(/^[0-9]+$/, "El presupuesto debe ser un número válido")
                 .transform((val) => Number(val)),
               z.number(),
             ])
@@ -78,6 +86,7 @@ export const projectFormConfig: DynamicFormConfig = {
   ],
   schema: z.object({
     name: z.string().min(3, "El nombre es requerido"),
+    description: z.string().min(10, "La descripción es requerida"),
     objectives: z.string().min(5, "Debe especificar los objetivos"),
     beneficiaryPopulations: z
       .string()

@@ -33,7 +33,9 @@ export default function Projects() {
         sortBy,
         sortDirection,
         totalFiltered,
-        projectsFilter
+        projectsFilter,
+        deleteProject,
+        submitProject
     } = useProject();
     return (
         <div className="p-6 max-w-7xl mx-auto flex flex-col gap-6">
@@ -63,16 +65,16 @@ export default function Projects() {
                         icon={<Icon className="w-8 h-8" />}
                         iconColor={color}
                         valueColor={
-                            valueKey === "enRevision"
-                                ? "text-green-600"
-                                : valueKey === "devuelto"
+                            valueKey === "inReview"
+                                ? "text-yellow-600"
+                                : valueKey === "returned"
                                     ? "text-red-600"
-                                    : valueKey === "publicado"
-                                        ? "text-yellow-600"
-                                        : valueKey === "pendiente"
-                                            ? "text-blue-600"
-                                            : valueKey === "listoParaPublicar"
-                                                ? "text-purple-600"
+                                    : valueKey === "votingClosed"
+                                        ? "text-purple-600"
+                                        : valueKey === "draft"
+                                            ? "text-gray-600"
+                                            : valueKey === "openForVoting"
+                                                ? "text-green-600"
                                                 : ""
                         }
                     />
@@ -130,12 +132,22 @@ export default function Projects() {
             <section>
                 <ProjectTable
                     projects={projectsFilter ? projectsFilter : projects}
-                    loading={{ addingRole: false, creating: false, deleting: false, fetching: false, removingRole: false, togglingActive: false, updating: false }}
+                    loading={{
+                        addingRole: false,
+                        creating: false,
+                        deleting: loading,
+                        fetching: loading,
+                        removingRole: false,
+                        togglingActive: false,
+                        updating: loading,
+                        fetchingCurators: false,
+                        assigningCurator: false
+                    }}
                     onEdit={(project) => {
                         setSelectProject(project);
                         setOpenModalCreate(true);
                     }}
-                    onView={(project) => { }}
+                    onView={(project: any) => { }}
                     pagination={{
                         currentPage: currentPage,
                         pageSize: pageSize,
@@ -147,6 +159,9 @@ export default function Projects() {
                     onDelete={(project) => {
                         setSelectProject(project);
                         setOpenModalDelete(true);
+                    }}
+                    onSubmit={(project) => {
+                        submitProject(project.id);
                     }}
                     onPageSizeChange={handlePageSizeChange}
                     onPageChange={handlePageChange}
@@ -185,7 +200,7 @@ export default function Projects() {
                     </Button>
                     <Button
                         variant="destructive"
-                        onClick={() => { setOpenModalDelete(false) }}
+                        onClick={() => { deleteProject() }}
                     >
                         Eliminar
                     </Button>

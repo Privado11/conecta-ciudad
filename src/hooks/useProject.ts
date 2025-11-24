@@ -20,35 +20,36 @@ export default function useProject() {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [stats, setStats] = useState<{
     total: number;
-    pendiente: number;
-    enRevision: number;
-    devuelto: number;
-    publicado: number;
-    listoParaPublicar: number;
+    draft: number;
+    inReview: number;
+    returned: number;
+    openForVoting: number;
+    votingClosed: number;
   }>({
     total: 0,
-    pendiente: 0,
-    enRevision: 0,
-    devuelto: 0,
-    publicado: 0,
-    listoParaPublicar: 0,
+    draft: 0,
+    inReview: 0,
+    returned: 0,
+    openForVoting: 0,
+    votingClosed: 0,
   });
 
+  const fetchProjects = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get("/api/v1/leader/projects");
+      const projectsData = await response.data;
+      setProjects(projectsData);
+      dispatch({ type: "SET_PROJECTS", payload: projectsData });
+      setValueStats(projectsData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProjects = async () => {
-      setLoading(true);
-      try {
-        const response = await api.get("/api/v1/projects/my-projects");
-        const projectsData = await response.data;
-        setProjects(projectsData);
-        dispatch({ type: "SET_PROJECTS", payload: projectsData });
-        setValueStats(projectsData);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
     if (state.projects.length === 0) {
       fetchProjects();
     } else {
@@ -63,48 +64,85 @@ export default function useProject() {
       case "all":
         setProjectsFilter(null);
         break;
-      case "pendiente":
-        setProjectsFilter(state.projects.filter((project) => project.status === "PENDIENTE"));
+      case "DRAFT":
+        setProjectsFilter(state.projects.filter((project) => project.status === "DRAFT"));
         break;
-      case "enRevision":
-        setProjectsFilter(state.projects.filter((project) => project.status === "EN_REVISION"));
+      case "IN_REVIEW":
+        setProjectsFilter(state.projects.filter((project) => project.status === "IN_REVIEW"));
         break;
-      case "devuelto":
-        setProjectsFilter(state.projects.filter((project) => project.status === "DEVUELTO"));
+      case "RETURNED_WITH_OBSERVATIONS":
+        setProjectsFilter(state.projects.filter((project) => project.status === "RETURNED_WITH_OBSERVATIONS"));
         break;
-      case "publicado":
-        setProjectsFilter(state.projects.filter((project) => project.status === "PUBLICADO"));
+      case "OPEN_FOR_VOTING":
+        setProjectsFilter(state.projects.filter((project) => project.status === "OPEN_FOR_VOTING"));
+        break;
+      case "VOTING_CLOSED":
+        setProjectsFilter(state.projects.filter((project) => project.status === "VOTING_CLOSED"));
         break;
       default:
         break;
     }
-  }, [filter]);
+  }, [filter, state.projects]);
 
-  const onSubmitCreate = async (data: ProjectCreateDTO) => {
+  const onSubmitCreate = async (data: any) => {
     setLoading(true);
     if (/^[0-9]{10}$/.test(data.budgets)) {
       throw new Error("El presupuesto debe ser un número válido");
     }
     const dataCreate: ProjectCreateDTO = {
       name: data.name,
+      description: data.description,
       objectives: data.objectives,
       beneficiaryPopulations: data.beneficiaryPopulations,
-      budgets: data.budgets,
+      budget: Number(data.budgets),
       startAt: convertToIsoDate(data.startAt),
       endAt: convertToIsoDate(data.endAt),
     };
     try {
-      const response = await api.post("/api/v1/projects", dataCreate);
-      const project = await response.data;
-      dispatch({ type: "ADD_PROJECT", payload: project });
+      if (selectProject) {
+        await api.put(`/api/v1/leader/project/${selectProject.id}`, dataCreate);
+      } else {
+        await api.post("/api/v1/leader/projects", dataCreate);
+      }
+      await fetchProjects();
       setOpenModalCreate(false);
-      setProjects((prevProjects) => [...prevProjects, project]);
+      setSelectProject(null);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
   };
+
+  const deleteProject = async () => {
+    if (!selectProject) return;
+    setLoading(true);
+    try {
+      await api.delete(`/api/v1/leader/project/${selectProject.id}`);
+      dispatch({ type: "DELETE_PROJECT", payload: selectProject.id });
+      setProjects((prev) => prev.filter(p => p.id !== selectProject.id));
+      setOpenModalDelete(false);
+      setSelectProject(null);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const submitProject = async (id: number) => {
+    setLoading(true);
+    try {
+      const response = await api.put(`/api/v1/leader/project/${id}/submit`);
+      const updatedProject = await response.data;
+      dispatch({ type: "UPDATE_PROJECT", payload: updatedProject });
+      setProjects((prev) => prev.map(p => p.id === updatedProject.id ? updatedProject : p));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const convertToIsoDate = (date: string) => {
     const [year, month, day] = date.split("-");
@@ -114,20 +152,20 @@ export default function useProject() {
   const setValueStats = (projects: IProject[]) => {
     setStats({
       total: projects.length,
-      pendiente: projects.filter(
-        (project: IProject) => project.status === "PENDIENTE"
+      draft: projects.filter(
+        (project: IProject) => project.status === "DRAFT"
       ).length,
-      enRevision: projects.filter(
-        (project: IProject) => project.status === "EN_REVISION"
+      inReview: projects.filter(
+        (project: IProject) => project.status === "IN_REVIEW"
       ).length,
-      devuelto: projects.filter(
-        (project: IProject) => project.status === "DEVUELTO"
+      returned: projects.filter(
+        (project: IProject) => project.status === "RETURNED_WITH_OBSERVATIONS"
       ).length,
-      publicado: projects.filter(
-        (project: IProject) => project.status === "PUBLICADO"
+      openForVoting: projects.filter(
+        (project: IProject) => project.status === "OPEN_FOR_VOTING"
       ).length,
-      listoParaPublicar: projects.filter(
-        (project: IProject) => project.status === "LISTO_PARA_PUBLICAR"
+      votingClosed: projects.filter(
+        (project: IProject) => project.status === "VOTING_CLOSED"
       ).length,
     });
   };
@@ -206,6 +244,8 @@ export default function useProject() {
     search,
     setSearch,
     onSubmitCreate,
+    deleteProject,
+    submitProject,
     stats,
     setStats,
     handlePageChange,
