@@ -1,3 +1,4 @@
+/*
 import { useState, useEffect } from 'react';
 
 interface Project {
@@ -102,7 +103,7 @@ export default function PublicProjects() {
         <p className="text-gray-600">Consulta todos los proyectos ciudadanos y sus estados</p>
       </div>
 
-      {/* Filtros */}
+      {/* Filtros */ /*}
       <div className="mb-6 flex gap-3 flex-wrap">
         <button
           onClick={() => setFilter('todos')}
@@ -156,7 +157,7 @@ export default function PublicProjects() {
         </button>
       </div>
 
-      {/* Lista de proyectos */}
+      {/* Lista de proyectos */ /*}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProjects.map(project => (
           <div key={project.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
@@ -197,3 +198,4 @@ export default function PublicProjects() {
     </div>
   );
 }
+*/

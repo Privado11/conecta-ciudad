@@ -1,136 +1,58 @@
 import { useState, useEffect } from 'react';
-import { History, Mail, Send, CheckCircle, XCircle, Clock, Filter, Search } from 'lucide-react';
-
-interface Communication {
-  id: number;
-  tipo: 'email' | 'push' | 'sms';
-  destinatario: string;
-  asunto: string;
-  mensaje: string;
-  estado: 'enviado' | 'fallido' | 'pendiente';
-  fechaEnvio: string;
-  evento: string;
-}
+import { History, Mail, CheckCircle, XCircle, Clock, Search } from 'lucide-react';
+import Grupo1Service, { type NotificationLog } from '../services/Grupo1Service';
 
 export default function CommunicationsHistory() {
-  const [communications, setCommunications] = useState<Communication[]>([]);
+  const [communications, setCommunications] = useState<NotificationLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterEstado, setFilterEstado] = useState<string>('todos');
-  const [filterTipo, setFilterTipo] = useState<string>('todos');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Datos mock - Reemplazar con llamada al backend del Grupo 1
   useEffect(() => {
-    const mockCommunications: Communication[] = [
-      {
-        id: 1,
-        tipo: 'email',
-        destinatario: 'usuario1@example.com',
-        asunto: 'Nuevo proyecto publicado',
-        mensaje: 'El proyecto "Parque Comunitario" ha sido publicado y está abierto a votación.',
-        estado: 'enviado',
-        fechaEnvio: '2025-11-15T10:30:00',
-        evento: 'proyecto_publicado'
-      },
-      {
-        id: 2,
-        tipo: 'push',
-        destinatario: 'usuario2@example.com',
-        asunto: 'Confirmación de voto',
-        mensaje: 'Tu voto en el proyecto "Rehabilitación de Vías" ha sido registrado exitosamente.',
-        estado: 'enviado',
-        fechaEnvio: '2025-11-15T09:15:00',
-        evento: 'voto_confirmado'
-      },
-      {
-        id: 3,
-        tipo: 'email',
-        destinatario: 'usuario3@example.com',
-        asunto: 'Votación cerrada',
-        mensaje: 'La votación del proyecto "Centro Cultural" ha finalizado. Consulta los resultados.',
-        estado: 'enviado',
-        fechaEnvio: '2025-11-14T18:00:00',
-        evento: 'votacion_cerrada'
-      },
-      {
-        id: 4,
-        tipo: 'sms',
-        destinatario: '+57 300 123 4567',
-        asunto: 'Proyecto aprobado',
-        mensaje: 'El proyecto "Parque La Esperanza" ha sido aprobado con 84% de votos a favor.',
-        estado: 'fallido',
-        fechaEnvio: '2025-11-14T15:45:00',
-        evento: 'proyecto_aprobado'
-      },
-      {
-        id: 5,
-        tipo: 'email',
-        destinatario: 'lider@example.com',
-        asunto: 'Proyecto en revisión',
-        mensaje: 'Tu proyecto ha sido enviado a revisión por un curador.',
-        estado: 'enviado',
-        fechaEnvio: '2025-11-13T14:20:00',
-        evento: 'proyecto_revision'
-      },
-      {
-        id: 6,
-        tipo: 'push',
-        destinatario: 'usuario4@example.com',
-        asunto: 'Recordatorio de votación',
-        mensaje: 'Quedan 24 horas para votar en el proyecto "Ciclovía Turística".',
-        estado: 'pendiente',
-        fechaEnvio: '2025-11-16T08:00:00',
-        evento: 'recordatorio_votacion'
+    const fetchCommunications = async () => {
+      setLoading(true);
+      try {
+        const data = await Grupo1Service.getAllCommunications();
+        setCommunications(data);
+      } catch (error) {
+        console.error('Error al cargar comunicaciones:', error);
+      } finally {
+        setLoading(false);
       }
-    ];
+    };
 
-    setTimeout(() => {
-      setCommunications(mockCommunications);
-      setLoading(false);
-    }, 800);
+    fetchCommunications();
   }, []);
 
   const filteredCommunications = communications.filter(comm => {
-    const matchEstado = filterEstado === 'todos' || comm.estado === filterEstado;
-    const matchTipo = filterTipo === 'todos' || comm.tipo === filterTipo;
-    const matchSearch = comm.destinatario.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                       comm.asunto.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchEstado && matchTipo && matchSearch;
+    const matchEstado = filterEstado === 'todos' || comm.status.toLowerCase() === filterEstado.toLowerCase();
+    const matchSearch = comm.sendTo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       comm.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       comm.projectName.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchEstado && matchSearch;
   });
 
-  const getStatusIcon = (estado: string) => {
-    switch(estado) {
-      case 'enviado': return <CheckCircle className="w-5 h-5 text-green-600" />;
-      case 'fallido': return <XCircle className="w-5 h-5 text-red-600" />;
-      case 'pendiente': return <Clock className="w-5 h-5 text-yellow-600" />;
-      default: return null;
+  const getStatusIcon = (status: string) => {
+    switch(status.toUpperCase()) {
+      case 'SENT': return <CheckCircle className="w-5 h-5 text-green-600" />;
+      case 'FAILED': return <XCircle className="w-5 h-5 text-red-600" />;
+      default: return <Clock className="w-5 h-5 text-yellow-600" />;
     }
   };
 
-  const getStatusColor = (estado: string) => {
-    switch(estado) {
-      case 'enviado': return 'bg-green-100 text-green-800 border-green-200';
-      case 'fallido': return 'bg-red-100 text-red-800 border-red-200';
-      case 'pendiente': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+  const getStatusColor = (status: string) => {
+    switch(status.toUpperCase()) {
+      case 'SENT': return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800';
+      case 'FAILED': return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getTipoIcon = (tipo: string) => {
-    switch(tipo) {
-      case 'email': return <Mail className="w-4 h-4" />;
-      case 'push': return <Send className="w-4 h-4" />;
-      case 'sms': return <Mail className="w-4 h-4" />;
-      default: return null;
-    }
-  };
-
-  const getTipoColor = (tipo: string) => {
-    switch(tipo) {
-      case 'email': return 'bg-blue-100 text-blue-800';
-      case 'push': return 'bg-purple-100 text-purple-800';
-      case 'sms': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const getStatusText = (status: string) => {
+    switch(status.toUpperCase()) {
+      case 'SENT': return 'Enviado';
+      case 'FAILED': return 'Fallido';
+      default: return status;
     }
   };
 
@@ -162,7 +84,7 @@ export default function CommunicationsHistory() {
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-4">
           <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Enviados</p>
           <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-1">
@@ -172,19 +94,13 @@ export default function CommunicationsHistory() {
         <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-4">
           <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Exitosos</p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
-            {communications.filter(c => c.estado === 'enviado').length}
+            {communications.filter(c => c.status === 'SENT').length}
           </p>
         </div>
         <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-4">
           <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Fallidos</p>
           <p className="text-2xl font-bold text-red-600 dark:text-red-400 mt-1">
-            {communications.filter(c => c.estado === 'fallido').length}
-          </p>
-        </div>
-        <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-4">
-          <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Pendientes</p>
-          <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mt-1">
-            {communications.filter(c => c.estado === 'pendiente').length}
+            {communications.filter(c => c.status === 'FAILED').length}
           </p>
         </div>
       </div>
@@ -197,7 +113,7 @@ export default function CommunicationsHistory() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
                 type="text"
-                placeholder="Buscar por destinatario o asunto..."
+                placeholder="Buscar por destinatario, asunto o proyecto..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -212,20 +128,8 @@ export default function CommunicationsHistory() {
               className="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
             >
               <option value="todos">Todos los estados</option>
-              <option value="enviado">Enviados</option>
-              <option value="fallido">Fallidos</option>
-              <option value="pendiente">Pendientes</option>
-            </select>
-
-            <select
-              value={filterTipo}
-              onChange={(e) => setFilterTipo(e.target.value)}
-              className="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="todos">Todos los tipos</option>
-              <option value="email">Email</option>
-              <option value="push">Push</option>
-              <option value="sms">SMS</option>
+              <option value="sent">Enviados</option>
+              <option value="failed">Fallidos</option>
             </select>
           </div>
         </div>
@@ -247,30 +151,36 @@ export default function CommunicationsHistory() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${getTipoColor(comm.tipo)} flex items-center gap-1`}>
-                      {getTipoIcon(comm.tipo)}
-                      {comm.tipo.toUpperCase()}
+                    <span className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 flex items-center gap-1">
+                      <Mail className="w-4 h-4" />
+                      {comm.channel}
                     </span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(comm.estado)} flex items-center gap-1`}>
-                      {getStatusIcon(comm.estado)}
-                      {comm.estado.charAt(0).toUpperCase() + comm.estado.slice(1)}
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(comm.status)} flex items-center gap-1`}>
+                      {getStatusIcon(comm.status)}
+                      {getStatusText(comm.status)}
                     </span>
                     <span className="text-xs text-slate-500 dark:text-slate-400">
-                      {new Date(comm.fechaEnvio).toLocaleString('es-ES')}
+                      {new Date(comm.sendAt).toLocaleString('es-ES')}
                     </span>
                   </div>
                   
                   <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-1">
-                    {comm.asunto}
+                    {comm.subject}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
-                    {comm.mensaje}
+                    {comm.body}
                   </p>
                   
                   <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
-                    <span>📧 {comm.destinatario}</span>
-                    <span>📌 {comm.evento.replace('_', ' ')}</span>
+                    <span>📧 {comm.sendTo}</span>
+                    <span>📌 {comm.projectName}</span>
                   </div>
+
+                  {comm.errorMessage && (
+                    <div className="mt-2 p-2 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded text-xs text-red-700 dark:text-red-400">
+                      <strong>Error:</strong> {comm.errorMessage}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

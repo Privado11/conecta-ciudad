@@ -1,3 +1,4 @@
+/*
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { BarChart3, TrendingUp, Users, CheckCircle, XCircle, Clock } from 'lucide-react';
@@ -127,7 +128,7 @@ export default function VotingResults() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header */ /*}
       <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
         <div className="flex items-center gap-3 mb-2">
           <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
@@ -144,7 +145,7 @@ export default function VotingResults() {
         </div>
       </div>
 
-      {/* Estadísticas Generales */}
+      {/* Estadísticas Generales */ /*}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 p-6">
           <div className="flex items-center justify-between">
@@ -187,7 +188,7 @@ export default function VotingResults() {
         </div>
       </div>
 
-      {/* Lista de Resultados */}
+      {/* Lista de Resultados */ /*}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Resultados por Proyecto</h2>
         
@@ -217,7 +218,7 @@ export default function VotingResults() {
               </div>
             </div>
 
-            {/* Barra de progreso */}
+            {/* Barra de progreso */ /*}
             <div className="space-y-3">
               <div className="flex justify-between items-center text-sm">
                 <span className="font-medium text-slate-700 dark:text-slate-300">Resultados</span>
@@ -269,3 +270,4 @@ export default function VotingResults() {
     </div>
   );
 }
+  */
