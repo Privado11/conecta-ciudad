@@ -42,7 +42,7 @@ export function AdminDashboard() {
     <div className="space-y-6 p-6">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">
-          Dashboard de Administrador cambio de titulo
+          Dashboard de Administrador
         </h1>
         <p className="text-muted-foreground">
           Bienvenido a Conecta Ciudad. Aquí tienes un resumen de la actividad
