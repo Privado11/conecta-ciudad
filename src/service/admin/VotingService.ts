@@ -1,8 +1,7 @@
-import api from "./api";
+import api from "../api";
 import type {
   VotingProjectDto,
   VotingStats,
-
   CitizenVotingStats,
 } from "@/shared/types/votingTypes";
 
@@ -26,8 +25,6 @@ class VotingService {
     const response = await api.get("/api/v1/admin/voting/projects/closed");
     return response.data;
   }
-
-
 
   async getClosedVotingResults(): Promise<VotingProjectDto[]> {
     const response = await api.get("/api/v1/admin/voting/my-votes");

@@ -1,4 +1,4 @@
-import api from "./api";
+import api from "../api";
 
 export interface DashboardStats {
   totalUsers: number;
@@ -32,7 +32,7 @@ export interface RecentActivity {
   user: string;
   action: string;
   timestamp: string;
-  status: 'success' | 'warning' | 'error';
+  status: "success" | "warning" | "error";
 }
 
 export interface UserRoleDistribution {
@@ -63,14 +63,19 @@ class DashboardService {
   }
 
   async getRecentActivity(limit: number = 10): Promise<RecentActivity[]> {
-    const response = await api.get("/api/v1/admin/dashboard/recent-activities", {
-      params: { limit },
-    });
+    const response = await api.get(
+      "/api/v1/admin/dashboard/recent-activities",
+      {
+        params: { limit },
+      }
+    );
     return response.data;
   }
 
   async getUserRoleDistribution(): Promise<UserRoleDistribution[]> {
-    const response = await api.get("/api/v1/admin/dashboard/user-role-distribution");
+    const response = await api.get(
+      "/api/v1/admin/dashboard/user-role-distribution"
+    );
     return response.data;
   }
 }

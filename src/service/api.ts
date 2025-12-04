@@ -4,7 +4,6 @@ import axios from "axios";
 import { toast } from "sonner";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const VOTING_API_URL = import.meta.env.VITE_VOTING_API_URL;
 
 const createInterceptors = (instance: ReturnType<typeof axios.create>) => {
   instance.interceptors.request.use(
@@ -63,12 +62,4 @@ const api = axios.create({
 
 createInterceptors(api);
 
-const votingApi = axios.create({
-  baseURL: VOTING_API_URL,
-  headers: { "Content-Type": "application/json" },
-});
-
-createInterceptors(votingApi);
-
-export { votingApi };
 export default api;

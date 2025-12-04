@@ -1,5 +1,5 @@
 import type { Permission, Role } from "@/shared/types/PermissionTypes";
-import api from "./api";
+import api from "../api";
 
 class PermissionService {
   async getAllRoles(): Promise<Role[]> {

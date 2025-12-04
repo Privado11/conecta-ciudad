@@ -6,7 +6,7 @@ import type {
   Permission,
   Role,
 } from "@/shared/types/PermissionTypes";
-import PermissionService from "@/service/PermissionService";
+import PermissionService from "@/service/admin/PermissionService";
 
 type PermissionContextType = {
   roles: Role[];
