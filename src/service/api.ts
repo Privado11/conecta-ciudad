@@ -1,7 +1,7 @@
-import { handleApiError } from "@/utils/handleApiError";
 import { isTokenExpired } from "@/utils/tokenUtils";
 import axios from "axios";
 import { toast } from "sonner";
+import { translateError } from "@/utils/errorUtils";
 
 const API_URL = import.meta.env.VITE_API_URL_DEV;
 
@@ -33,7 +33,7 @@ const createInterceptors = (instance: ReturnType<typeof axios.create>) => {
   instance.interceptors.response.use(
     (response) => response,
     (error) => {
-      const message = handleApiError(error);
+      const message = translateError(error);
 
       if (error.response?.status === 401) {
         const msg = error.response?.data?.message?.toLowerCase() ?? "";

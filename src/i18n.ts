@@ -1,10 +1,23 @@
-// src/i18n.js
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
-import es from "./locales/es.json";
-import en from "./locales/en.json";
+import esErrors from "./locales/es/error.json";
+import enErrors from "./locales/en/error.json";
+
+// Combinar todas las traducciones
+const es = {
+  ...esErrors,
+  // Aquí puedes agregar más namespaces
+  // common: esCommon,
+  // forms: esForms,
+};
+
+const en = {
+  ...enErrors,
+  // common: enCommon,
+  // forms: enForms,
+};
 
 i18n
   .use(LanguageDetector)
@@ -34,7 +47,7 @@ i18n
       suffix: "}}",
     },
 
-    debug: process.env.NODE_ENV === "development",
+    debug: import.meta.env.DEV,
 
     defaultNS: "translation",
 

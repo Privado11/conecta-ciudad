@@ -5,6 +5,7 @@ import type { User, UserRole, CuratorInfoDto } from "@/shared/types/userTYpes";
 import type { PagedResponse } from "@/shared/interface/PaginatedResponse";
 import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
 import { toast } from "sonner";
+import i18n from "@/i18n";
 
 interface LoadingState {
   fetching: boolean;
@@ -43,6 +44,19 @@ interface AdminUsersState {
   setSelectedUser: (user: User | null) => void;
 }
 
+const translateError = (error: any): string => {
+  const errorCode = error.response?.data?.errorCode;
+  const parameters = error.response?.data?.parameters || {};
+
+  if (errorCode) {
+    return i18n.t(`errors.${errorCode}`, parameters) as string;
+  }
+
+  return (
+    error.response?.data?.message || (i18n.t("errors.UNKNOWN_ERROR") as string)
+  );
+};
+
 const initialLoadingState: LoadingState = {
   fetching: false,
   creating: false,
@@ -75,7 +89,7 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: result as User });
           }
         } catch (error: any) {
-          toast.error(error.message || "Error al obtener usuarios");
+          toast.error(translateError(error));
         } finally {
           set((state) => ({ loading: { ...state.loading, fetching: false } }));
         }
@@ -85,10 +99,13 @@ export const useAdminUsersStore = create<AdminUsersState>()(
         set((state) => ({ loading: { ...state.loading, creating: true } }));
         try {
           const newUser = await AdminUserService.createUser(data);
-          toast.success(`Usuario ${newUser.name} creado exitosamente`);
+          toast.success(
+            (i18n.t("users.createSuccess", { name: newUser.name }) as string) ||
+              `Usuario ${newUser.name} creado exitosamente`
+          );
           return newUser;
         } catch (error: any) {
-          toast.error(error.message || "Error al crear usuario");
+          toast.error(translateError(error));
           return null;
         } finally {
           set((state) => ({ loading: { ...state.loading, creating: false } }));
@@ -107,9 +124,14 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: updatedUser });
           }
 
-          toast.success(`Usuario ${updatedUser.name} actualizado exitosamente`);
+          toast.success(
+            (i18n.t("users.updateSuccess", {
+              name: updatedUser.name,
+            }) as string) ||
+              `Usuario ${updatedUser.name} actualizado exitosamente`
+          );
         } catch (error: any) {
-          toast.error(error.message || "Error al actualizar usuario");
+          toast.error(translateError(error));
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, updating: false } }));
@@ -120,9 +142,12 @@ export const useAdminUsersStore = create<AdminUsersState>()(
         set((state) => ({ loading: { ...state.loading, deleting: true } }));
         try {
           await AdminUserService.deleteUser(id);
-          toast.success("Usuario eliminado exitosamente");
+          toast.success(
+            (i18n.t("users.deleteSuccess") as string) ||
+              "Usuario eliminado exitosamente"
+          );
         } catch (error: any) {
-          toast.error(error.message || "Error al eliminar usuario");
+          toast.error(translateError(error));
         } finally {
           set((state) => ({ loading: { ...state.loading, deleting: false } }));
         }
@@ -139,9 +164,12 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: updatedUser });
           }
 
-          toast.success("Estado del usuario actualizado");
+          toast.success(
+            (i18n.t("users.statusChanged") as string) ||
+              "Estado del usuario actualizado"
+          );
         } catch (error: any) {
-          toast.error(error.message || "Error al cambiar estado");
+          toast.error(translateError(error));
         } finally {
           set((state) => ({
             loading: { ...state.loading, togglingActive: false },
@@ -158,9 +186,11 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: updatedUser });
           }
 
-          toast.success("Rol agregado exitosamente");
+          toast.success(
+            (i18n.t("users.roleAdded") as string) || "Rol agregado exitosamente"
+          );
         } catch (error: any) {
-          toast.error(error.message || "Error al agregar rol");
+          toast.error(translateError(error));
         } finally {
           set((state) => ({
             loading: { ...state.loading, addingRole: false },
@@ -177,9 +207,12 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: updatedUser });
           }
 
-          toast.success("Rol removido exitosamente");
+          toast.success(
+            (i18n.t("users.roleRemoved") as string) ||
+              "Rol removido exitosamente"
+          );
         } catch (error: any) {
-          toast.error(error.message || "Error al remover rol");
+          toast.error(translateError(error));
         } finally {
           set((state) => ({
             loading: { ...state.loading, removingRole: false },
@@ -195,7 +228,7 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           );
           set({ curators });
         } catch (error: any) {
-          toast.error(error.message || "Error al obtener curadores");
+          toast.error(translateError(error));
         } finally {
           set((state) => ({ loading: { ...state.loading, fetching: false } }));
         }
@@ -207,7 +240,7 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           const blob = await AdminUserService.exportUsers(filters);
           return blob;
         } catch (error: any) {
-          toast.error(error.message || "Error al exportar usuarios");
+          toast.error(translateError(error));
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, exporting: false } }));
@@ -220,7 +253,7 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           const blob = await AdminUserService.exportAllUsers();
           return blob;
         } catch (error: any) {
-          toast.error(error.message || "Error al exportar todos los usuarios");
+          toast.error(translateError(error));
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, exporting: false } }));
@@ -232,11 +265,14 @@ export const useAdminUsersStore = create<AdminUsersState>()(
         try {
           const result = await AdminUserService.importUsers(file);
           toast.success(
-            `${result.successfulImports} usuarios importados exitosamente`
+            (i18n.t("users.importSuccess", {
+              count: result.successfulImports,
+            }) as string) ||
+              `${result.successfulImports} usuarios importados exitosamente`
           );
           return result;
         } catch (error: any) {
-          toast.error(error.message || "Error al importar usuarios");
+          toast.error(translateError(error));
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, importing: false } }));
