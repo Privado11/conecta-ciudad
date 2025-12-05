@@ -41,7 +41,7 @@ export interface UserRoleDistribution {
   color: string;
 }
 
-class DashboardService {
+class AdminDashboardService {
   async getStatistics(): Promise<DashboardStats> {
     const response = await api.get("/api/v1/admin/dashboard/stats");
     return response.data;
@@ -80,4 +80,4 @@ class DashboardService {
   }
 }
 
-export default new DashboardService();
+export default new AdminDashboardService();

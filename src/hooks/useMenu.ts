@@ -1,12 +1,5 @@
-import { useContext } from "react";
-import { MenuContext } from "@/context/MenuContext";
+import { useMenuStore } from "@/stores/menuStore";
 
-export function useMenu() {
-  const context = useContext(MenuContext);
-
-  if (!context) {
-    throw new Error("useMenu debe usarse dentro de un <MenuProvider>");
-  }
-
-  return context;
-}
+export const useMenu = () => {
+  return useMenuStore();
+};

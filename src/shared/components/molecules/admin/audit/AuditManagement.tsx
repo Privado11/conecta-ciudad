@@ -20,16 +20,12 @@ import { ActionDetailsModal } from "./ActionDetailsModal";
 
 export default function AuditManagement() {
   const {
-    actions,
-    actionDetails,
-    loading,
-    pagination,
-    statistics,
-    searchActions,
+    auditLogs,
     selectedAction,
-    setSelectedAction,
-    hasActiveFilters,
+    loading,
+    searchActions,
     getActionDetails,
+    setSelectedAction,
   } = useAudit();
 
   const {
@@ -195,10 +191,10 @@ export default function AuditManagement() {
         <StatsGrid
           stats={AUDIT_STATS}
           data={{
-            totalElements: pagination.totalElements,
-            metrics: statistics?.metrics,
+            totalElements: auditLogs?.page?.totalElements || 0,
+            metrics: auditLogs?.statistics?.metrics,
           }}
-          loading={loading.fetching && actions.length === 0}
+          loading={loading.fetching && !auditLogs}
           columns={4}
         />
 
@@ -209,7 +205,7 @@ export default function AuditManagement() {
         />
       </div>
 
-      {hasActiveFilters && activeFiltersMessage && (
+      {activeFiltersMessage && (
         <div className="mb-4 p-3 bg-muted/50 rounded-lg border border-border">
           <p className="text-sm text-muted-foreground">
             <span className="font-medium">Filtros activos:</span>{" "}
@@ -219,7 +215,8 @@ export default function AuditManagement() {
               <span className="text-muted-foreground italic">Cargando...</span>
             ) : (
               <>
-                <strong>{pagination.totalElements}</strong> resultado(s)
+                <strong>{auditLogs?.page?.totalElements || 0}</strong>{" "}
+                resultado(s)
               </>
             )}
           </p>
@@ -228,23 +225,23 @@ export default function AuditManagement() {
 
       <DynamicTable
         config={auditTableConfig}
-        data={actions}
+        data={auditLogs?.page?.content || []}
         loading={loading.fetching}
         pagination={{
-          currentPage: pagination.currentPage,
-          totalPages: pagination.totalPages,
-          totalElements: pagination.totalElements,
-          pageSize: pagination.pageSize,
+          currentPage: auditLogs?.page?.number || 0,
+          totalPages: auditLogs?.page?.totalPages || 0,
+          totalElements: auditLogs?.page?.totalElements || 0,
+          pageSize: auditLogs?.page?.size || 10,
         }}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
       />
 
       <ActionDetailsModal
-        action={actionDetails}
+        action={selectedAction}
         open={!!selectedAction}
         onClose={() => setSelectedAction(null)}
-        loading={loading.fetchingDetails}
+        loading={loading.fetching}
       />
     </div>
   );

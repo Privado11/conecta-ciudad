@@ -1,12 +1,5 @@
-import { useContext } from "react";
-import { AuthContext } from "@/context/AuthContext";
+import { useAuthStore } from "@/stores/authStore";
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth debe usarse dentro de un <AuthProvider>");
-  }
-
-  return context;
-}
+export const useAuth = () => {
+  return useAuthStore();
+};

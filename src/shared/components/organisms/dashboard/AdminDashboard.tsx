@@ -8,7 +8,7 @@ import { Users, FolderKanban, Vote, TrendingUp, UserPlus } from "lucide-react";
 import { StatCard } from "../../atoms/dashboard/StatCard";
 
 export function AdminDashboard() {
-  const { stats, loading, error } = useDashboard();
+  const { stats, loading } = useDashboard();
 
   if (loading) {
     return (
@@ -16,19 +16,6 @@ export function AdminDashboard() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="mt-4 text-muted-foreground">Cargando dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-destructive text-lg">{error}</p>
-          <p className="text-muted-foreground mt-2">
-            Por favor, intenta recargar la página
-          </p>
         </div>
       </div>
     );

@@ -25,22 +25,15 @@ export default function ProjectManagement() {
   const {
     projects,
     selectedProject,
-    loadingProjects,
-    pagination,
-    statisticsProjects,
+    loading: loadingProjects,
+    stats: statisticsProjects,
     searchProjects,
-    getStatistics,
+    fetchProjectStatistics: getStatistics,
     deleteProject,
     assignCurator,
     setSelectedProject,
   } = useProjectsAdmin();
-  const {
-    curatorsActive,
-    currentCurator,
-    getCuratorsWithStats,
-    clearCurators,
-    loading: userLoading,
-  } = useUsersAdmin();
+  const { curators, loading: userLoading, fetchCurators } = useUsersAdmin();
   const [tempDateFilters, setTempDateFilters] = useState<TempDateFilters>({
     dateType: "projectStart",
     startDate: undefined,
@@ -88,7 +81,7 @@ export default function ProjectManagement() {
 
   useEffect(() => {
     if (modalType === "assignCurator" && selectedProject?.id) {
-      getCuratorsWithStats(selectedProject.id);
+      fetchCurators(selectedProject.id);
     }
   }, [modalType, selectedProject?.id]);
 
@@ -271,9 +264,6 @@ export default function ProjectManagement() {
   const handleCloseAssignCurator = () => {
     setModalType(null);
     setSelectedProject(null);
-    setTimeout(() => {
-      clearCurators();
-    }, 300);
   };
 
   const handleAssignCurator = async (curatorId: string) => {
@@ -326,7 +316,9 @@ export default function ProjectManagement() {
             totalElements: statisticsProjects?.total,
             metrics: statisticsProjects?.metrics,
           }}
-          loading={loadingProjects.fetching && projects.length === 0}
+          loading={
+            loadingProjects.fetching && (projects?.content?.length || 0) === 0
+          }
           columns={4}
         />
 
@@ -346,7 +338,7 @@ export default function ProjectManagement() {
               <span className="italic">Cargando...</span>
             ) : (
               <>
-                <strong>{pagination.totalElements}</strong> resultado(s)
+                <strong>{projects?.totalElements || 0}</strong> resultado(s)
               </>
             )}
           </p>
@@ -355,12 +347,12 @@ export default function ProjectManagement() {
 
       <DynamicTable
         config={projectTableConfig}
-        data={projects}
+        data={projects?.content || []}
         loading={loadingProjects.fetching}
         pagination={{
           currentPage,
-          totalPages: pagination.totalPages,
-          totalElements: pagination.totalElements,
+          totalPages: projects?.totalPages || 0,
+          totalElements: projects?.totalElements || 0,
           pageSize,
         }}
         sortBy={sortBy}
@@ -395,10 +387,22 @@ export default function ProjectManagement() {
         isOpen={modalType === "assignCurator"}
         onClose={handleCloseAssignCurator}
         project={selectedProject}
-        currentCurator={currentCurator}
-        curators={curatorsActive}
+        currentCurator={
+          selectedProject?.reviews?.[selectedProject.reviews.length - 1]
+            ?.curator
+            ? {
+                curator:
+                  selectedProject.reviews[selectedProject.reviews.length - 1]
+                    .curator,
+                activeProjects: 0,
+                completedProjects: 0,
+                totalProjects: 0,
+              }
+            : null
+        }
+        curators={curators?.activeCurators || []}
         onAssign={handleAssignCurator}
-        loadingFetchingCurators={userLoading.fetchingCurators}
+        loadingFetchingCurators={userLoading.fetching}
         loadingAssigningCurator={loadingProjects.assigningCurator}
       />
     </div>

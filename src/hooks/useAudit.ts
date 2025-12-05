@@ -1,12 +1,5 @@
-import { useContext } from "react";
-import { AuditContext } from "@/context/AuditContext";
+import { useAdminAuditStore } from "@/stores/admin/adminAuditStore";
 
-export function useAudit() {
-  const context = useContext(AuditContext);
-
-  if (!context) {
-    throw new Error("useAudit debe usarse dentro de un <AuditProvider>");
-  }
-
-  return context;
-}
+export const useAudit = () => {
+  return useAdminAuditStore();
+};

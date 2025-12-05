@@ -1,22 +1,29 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { useDashboard } from '@/hooks/useDashboard';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
+import { useDashboard } from "@/hooks/useDashboard";
 
 const statusLabels: Record<string, string> = {
-  DRAFT: 'Borrador',
-  PENDING_REVIEW: 'Pendiente Revisión',
-  IN_REVIEW: 'En Revisión',
-  PUBLISHED: 'Publicado',
-  OPEN_FOR_VOTING: 'Votación Abierta',
-  VOTING_CLOSED: 'Votación Cerrada',
-  RETURNED_WITH_OBSERVATIONS: 'Devuelto con Observaciones',
-  READY_TO_PUBLISH: 'Listo para Publicar',
+  DRAFT: "Borrador",
+  PENDING_REVIEW: "Pendiente Revisión",
+  IN_REVIEW: "En Revisión",
+  PUBLISHED: "Publicado",
+  OPEN_FOR_VOTING: "Votación Abierta",
+  VOTING_CLOSED: "Votación Cerrada",
+  RETURNED_WITH_OBSERVATIONS: "Devuelto con Observaciones",
+  READY_TO_PUBLISH: "Listo para Publicar",
 };
 
 export function ProjectStatusChart() {
-  const { projectStatusData } = useDashboard();
+  const { projectStatus } = useDashboard();
 
-  const data = projectStatusData.map(item => ({
+  const data = projectStatus.map((item: any) => ({
     name: statusLabels[item.status] || item.status,
     value: item.count,
     color: item.color,
@@ -29,7 +36,9 @@ export function ProjectStatusChart() {
           <CardTitle>Distribución de Proyectos por Estado</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-center text-muted-foreground py-8">No hay datos disponibles</p>
+          <p className="text-center text-muted-foreground py-8">
+            No hay datos disponibles
+          </p>
         </CardContent>
       </Card>
     );
@@ -48,12 +57,14 @@ export function ProjectStatusChart() {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
+              label={({ name, percent }) =>
+                `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`
+              }
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
             >
-              {data.map((entry, index) => (
+              {data.map((entry: any, index: number) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>

@@ -1,10 +1,5 @@
-import { DashboardContext } from "@/context/DashboardContext";
-import { useContext } from "react";
+import { useAdminDashboardStore } from "@/stores/admin/adminDashboardStore";
 
 export const useDashboard = () => {
-  const context = useContext(DashboardContext);
-  if (!context) {
-    throw new Error("useDashboard must be used within a DashboardProvider");
-  }
-  return context;
+  return useAdminDashboardStore();
 };

@@ -40,27 +40,20 @@ export default function ProjectPendingReviewManagement() {
   }) => {
     if (!selectedReview) return;
 
-    const result = await approveProject(selectedReview.projectId, dates);
-
-    if (result) {
-      setModalType(null);
-    }
+    await approveProject(selectedReview.projectId, dates);
+    setModalType(null);
+    await getPendingReviewQueue(); // Refresh queue
   };
 
   const handleObservations = async (observations: string) => {
     if (!selectedReview) return;
 
-    const result = await addObservations(
-      selectedReview.projectId,
-      observations
-    );
-
-    if (result) {
-      setModalType(null);
-    }
+    await addObservations(selectedReview.projectId, observations);
+    setModalType(null);
+    await getPendingReviewQueue(); // Refresh queue
   };
 
-  const filteredReviews = pendingQueue?.reviews?.filter((review) => {
+  const filteredReviews = pendingQueue?.reviews?.filter((review: any) => {
     const search = filters.searchTerm.toLowerCase();
 
     const matchesSearch =
@@ -123,7 +116,7 @@ export default function ProjectPendingReviewManagement() {
             <ProjectCardSkeleton />
           </>
         ) : filteredReviews && filteredReviews.length > 0 ? (
-          filteredReviews.map((review) => (
+          filteredReviews.map((review: any) => (
             <ProjectCard
               key={review.projectId}
               project={review}

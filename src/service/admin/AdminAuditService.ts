@@ -13,7 +13,7 @@ export interface SearchFilters {
   size?: number;
 }
 
-class AuditService {
+class AdminAuditService {
   private buildQueryParams(filters: SearchFilters): URLSearchParams {
     const params = new URLSearchParams();
 
@@ -60,4 +60,4 @@ class AuditService {
   }
 }
 
-export default new AuditService();
+export default new AdminAuditService();

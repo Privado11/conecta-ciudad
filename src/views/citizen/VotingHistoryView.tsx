@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { History, Loader2 } from "lucide-react";
 import { useVoting } from "@/hooks/useVoting";
-import type {
-  VotingProjectDto,
-} from "@/shared/types/votingTypes";
+import { useCitizenVoting } from "@/hooks/useCitizenVoting";
+import type { VotingProjectDto } from "@/shared/types/votingTypes";
 import { VotingProjectCard } from "@/shared/components/atoms/admin/VotingProjectCard";
 import { CitizenVotingStatsCard } from "@/shared/components/atoms/citizen/CitizenVotingStatsCard";
 
@@ -20,16 +19,25 @@ interface VotingFilters {
 export default function VotingHistoryView() {
   const {
     votingHistory,
-    citizenStats,
-    loading,
+    loading: votingLoading,
     fetchVotingHistory,
-    fetchCitizenVotingStats,
   } = useVoting();
+
+  const {
+    citizenStats,
+    loading: citizenLoading,
+    fetchCitizenVotingStats,
+  } = useCitizenVoting();
+
+  const loading = {
+    fetchingHistory: votingLoading.fetchingHistory,
+    fetchingCitizenStats: citizenLoading.fetchingStats,
+    fetching: votingLoading.fetching,
+  };
 
   const [selectedProject, setSelectedProject] =
     useState<VotingProjectDto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
 
   useEffect(() => {
     fetchVotingHistory();
@@ -41,70 +49,68 @@ export default function VotingHistoryView() {
     setIsModalOpen(true);
   };
 
-   const { filters, debouncedSearchTerm, handleFilterChange } =
-      useManagement<VotingFilters>({
-        initialFilters: {
-          searchTerm: "",
-          status: "all",
-        },
-        defaultSort: { sortBy: "createdAt", sortDirection: "desc" },
-        searchField: "searchTerm",
-      });
-  
-    const getFilteredProjects = (): VotingProjectDto[] => {
-      let filtered = votingHistory;
-  
-      if (debouncedSearchTerm.trim()) {
-        const searchLower = debouncedSearchTerm.toLowerCase();
-        filtered = filtered.filter((p) =>
-          p.name.toLowerCase().includes(searchLower)
-        );
-      }
-  
-      switch (filters.status) {
-        case "open":
-          return filtered.filter((p) => p.votingStatus === "OPEN");
-        case "closed":
-          return filtered.filter((p) => p.votingStatus === "CLOSED");
-        case "approved":
-          return filtered.filter((p) => p.finalResult === "APPROVED");
-        case "rejected":
-          return filtered.filter((p) => p.finalResult === "REJECTED");
-        default:
-          return filtered;
-      }
-    };
+  const { filters, debouncedSearchTerm, handleFilterChange } =
+    useManagement<VotingFilters>({
+      initialFilters: {
+        searchTerm: "",
+        status: "all",
+      },
+      defaultSort: { sortBy: "createdAt", sortDirection: "desc" },
+      searchField: "searchTerm",
+    });
 
-    const filteredProjects = getFilteredProjects();
+  const getFilteredProjects = (): VotingProjectDto[] => {
+    let filtered = votingHistory;
 
-    const filterHandlers = {
-      onSearchChange: (value: string) =>
-        handleFilterChange("searchTerm", value),
-      onStatusChange: (value: VotingStatusFilter) =>
-        handleFilterChange("status", value),
-    };
+    if (debouncedSearchTerm.trim()) {
+      const searchLower = debouncedSearchTerm.toLowerCase();
+      filtered = filtered.filter((p) =>
+        p.name.toLowerCase().includes(searchLower)
+      );
+    }
 
-    const getActiveFiltersMessage = () => {
-      const msgs: string[] = [];
+    switch (filters.status) {
+      case "open":
+        return filtered.filter((p) => p.votingStatus === "OPEN");
+      case "closed":
+        return filtered.filter((p) => p.votingStatus === "CLOSED");
+      case "approved":
+        return filtered.filter((p) => p.finalResult === "APPROVED");
+      case "rejected":
+        return filtered.filter((p) => p.finalResult === "REJECTED");
+      default:
+        return filtered;
+    }
+  };
 
-      if (debouncedSearchTerm) msgs.push(`"${debouncedSearchTerm}"`);
+  const filteredProjects = getFilteredProjects();
 
-      if (filters.status !== "all") {
-        const statusLabels: Record<VotingStatusFilter, string> = {
-          all: "Todas",
-          open: "Abiertas",
-          closed: "Cerradas",
-          approved: "Aprobadas",
-          rejected: "Rechazadas",
-        };
-        msgs.push(`estado: ${statusLabels[filters.status]}`);
-      }
+  const filterHandlers = {
+    onSearchChange: (value: string) => handleFilterChange("searchTerm", value),
+    onStatusChange: (value: VotingStatusFilter) =>
+      handleFilterChange("status", value),
+  };
 
-      return msgs.length ? msgs.join(" · ") : null;
-    };
+  const getActiveFiltersMessage = () => {
+    const msgs: string[] = [];
 
-    const activeFiltersMessage = getActiveFiltersMessage();
+    if (debouncedSearchTerm) msgs.push(`"${debouncedSearchTerm}"`);
 
+    if (filters.status !== "all") {
+      const statusLabels: Record<VotingStatusFilter, string> = {
+        all: "Todas",
+        open: "Abiertas",
+        closed: "Cerradas",
+        approved: "Aprobadas",
+        rejected: "Rechazadas",
+      };
+      msgs.push(`estado: ${statusLabels[filters.status]}`);
+    }
+
+    return msgs.length ? msgs.join(" · ") : null;
+  };
+
+  const activeFiltersMessage = getActiveFiltersMessage();
 
   if (loading.fetchingHistory) {
     return (
@@ -138,27 +144,27 @@ export default function VotingHistoryView() {
         loading={loading.fetchingCitizenStats}
       />
 
-       <VotingSearchAndFilters
-              searchTerm={filters.searchTerm}
-              statusFilter={filters.status}
-              handlers={filterHandlers}
-            />
-      
-            {activeFiltersMessage && (
-              <div className="p-3 bg-muted/50 rounded-lg border border-border">
-                <p className="text-sm text-muted-foreground">
-                  <span className="font-medium">Filtros activos:</span>{" "}
-                  {activeFiltersMessage} ·{" "}
-                  {loading.fetching ? (
-                    <span className="italic">Cargando...</span>
-                  ) : (
-                    <>
-                      <strong>{filteredProjects.length}</strong> resultado(s)
-                    </>
-                  )}
-                </p>
-              </div>
+      <VotingSearchAndFilters
+        searchTerm={filters.searchTerm}
+        statusFilter={filters.status}
+        handlers={filterHandlers}
+      />
+
+      {activeFiltersMessage && (
+        <div className="p-3 bg-muted/50 rounded-lg border border-border">
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium">Filtros activos:</span>{" "}
+            {activeFiltersMessage} ·{" "}
+            {loading.fetching ? (
+              <span className="italic">Cargando...</span>
+            ) : (
+              <>
+                <strong>{filteredProjects.length}</strong> resultado(s)
+              </>
             )}
+          </p>
+        </div>
+      )}
 
       {filteredProjects.length === 0 ? (
         <div className="flex flex-col items-center justify-center min-h-[300px] text-gray-500">

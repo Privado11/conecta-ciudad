@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Vote } from "lucide-react";
 import { useProjectContext } from "@/hooks/useProjectContext";
+import { useCitizenVoting } from "@/hooks/useCitizenVoting";
 import type { ProjectVotingDto } from "@/shared/types/projectTypes";
 import { ProjectCard } from "@/shared/components/atoms/citizen/ProjectCard";
 import { ProjectDetailsModal } from "@/shared/components/molecules/citizen/ProjectDetailsModal";
@@ -12,8 +13,15 @@ interface VotingFilters {
 }
 
 export default function VotingProjectsView() {
-  const { votingProjects, loading, fetchOpenForVoting, voteOnProject } = useProjectContext();
-  const [selectedProject, setSelectedProject] = useState<ProjectVotingDto | null>(null);
+  const { votingProjects, loading, fetchOpenForVoting } = useProjectContext();
+  const { voteOnProject, loading: votingLoading } = useCitizenVoting();
+
+  const combinedLoading = {
+    fetching: loading.fetching,
+    voting: votingLoading.voting,
+  };
+  const [selectedProject, setSelectedProject] =
+    useState<ProjectVotingDto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState<VotingFilters>({
     searchTerm: "",
@@ -106,7 +114,7 @@ export default function VotingProjectsView() {
               project={project}
               onViewDetails={handleViewDetails}
               onVote={handleVote}
-              loading={loading.voting}
+              loading={combinedLoading.voting}
             />
           ))}
         </div>

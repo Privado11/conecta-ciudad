@@ -19,21 +19,19 @@ import { ConfirmModal } from "../../../atoms/ConfirmModal";
 import { useUsersAdmin } from "@/hooks/admin/useUsersAdmin";
 import { useUser } from "@/hooks/useUser";
 
-
 export default function UserManagement() {
   const { validateUniqueFields } = useUser();
   const {
     users,
-    getUsers,
+    fetchUsers,
     selectedUser,
     loading,
-    pagination,
-    statistics,
+    pagedUsers,
     createUser,
     updateUser,
     deleteUser,
     addRole,
-    toggleActive,
+    toggleUserActive,
     setSelectedUser,
     exportUsers,
     exportAllUsers,
@@ -99,7 +97,7 @@ export default function UserManagement() {
       apiFilters.active = filters.status === "active";
     }
 
-    getUsers(apiFilters);
+    fetchUsers(apiFilters);
   };
 
   const filteredUsers = users.filter((user) => {
@@ -131,7 +129,7 @@ export default function UserManagement() {
   const toggleUserStatus = (userId: number) => {
     const user = users.find((u) => u.id === userId);
     if (!user) return;
-    toggleActive(userId).then(() => {
+    toggleUserActive(userId).then(() => {
       loadUsers();
     });
   };
@@ -250,8 +248,8 @@ export default function UserManagement() {
         <StatsGrid
           stats={USER_STATS}
           data={{
-            totalElements: pagination.totalElements,
-            metrics: statistics?.metrics,
+            totalElements: pagedUsers?.page?.totalElements || 0,
+            metrics: undefined,
           }}
           loading={loading.fetching && users.length === 0}
           columns={3}
@@ -271,7 +269,8 @@ export default function UserManagement() {
                 </span>
               ) : (
                 <>
-                  <strong>{pagination.totalElements}</strong> resultado(s)
+                  <strong>{pagedUsers?.page?.totalElements || 0}</strong>{" "}
+                  resultado(s)
                 </>
               )}
             </p>
@@ -284,10 +283,10 @@ export default function UserManagement() {
         data={filteredUsers}
         loading={loading.fetching}
         pagination={{
-          currentPage: pagination.currentPage,
-          totalPages: pagination.totalPages,
-          totalElements: pagination.totalElements,
-          pageSize: pagination.pageSize,
+          currentPage: pagedUsers?.page?.number || 0,
+          totalPages: pagedUsers?.page?.totalPages || 0,
+          totalElements: pagedUsers?.page?.totalElements || 0,
+          pageSize: pagedUsers?.page?.size || 10,
         }}
         sortBy={sortBy}
         sortDirection={sortDirection}

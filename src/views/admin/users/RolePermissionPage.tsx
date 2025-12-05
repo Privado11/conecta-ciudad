@@ -3,7 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { usePermission } from "@/hooks/usePermission";
 import { PERMISSION_GROUPS } from "@/shared/constants/permission/permissions";
 import { Loader2, ShieldCheck } from "lucide-react";
-import type { PermissionCode, Role } from "@/shared/types/PermissionTypes";
+import type {
+  Permission,
+  PermissionCode,
+  Role,
+} from "@/shared/types/PermissionTypes";
 import { RoleSelector } from "@/shared/components/atoms/RoleSelector";
 import { PermissionTabs } from "@/shared/components/atoms/PermissionTabs";
 import { EmptyState } from "@/shared/components/atoms/EmptyState";
@@ -40,7 +44,9 @@ export default function RolePermissionPage() {
 
   useEffect(() => {
     if (selectedRole) {
-      const codes = new Set(selectedRole.permissions.map((p) => p.code));
+      const codes = new Set(
+        selectedRole.permissions.map((p: Permission) => p.code)
+      );
       setLocalPermissions(codes);
       setPendingChanges(new Set());
     }
@@ -60,7 +66,7 @@ export default function RolePermissionPage() {
     setLocalPermissions(updated);
 
     const originallyHadPermission = selectedRole?.permissions.some(
-      (p) => p.code === code
+      (p: Permission) => p.code === code
     );
     const nowHasPermission = updated.has(code);
 
@@ -87,7 +93,9 @@ export default function RolePermissionPage() {
 
   const handleCancelChanges = () => {
     if (selectedRole) {
-      const codes = new Set(selectedRole.permissions.map((p) => p.code));
+      const codes = new Set(
+        selectedRole.permissions.map((p: Permission) => p.code)
+      );
       setLocalPermissions(codes);
       setPendingChanges(new Set());
     }

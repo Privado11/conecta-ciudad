@@ -1,7 +1,7 @@
 import type { Permission, Role } from "@/shared/types/PermissionTypes";
 import api from "../api";
 
-class PermissionService {
+class AdminPermissionService {
   async getAllRoles(): Promise<Role[]> {
     const response = await api.get("/api/v1/roles");
     return response.data;
@@ -47,4 +47,4 @@ class PermissionService {
   }
 }
 
-export default new PermissionService();
+export default new AdminPermissionService();

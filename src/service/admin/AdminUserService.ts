@@ -3,7 +3,7 @@ import type { User, UserRole, CuratorInfoDto } from "@/shared/types/userTYpes";
 import type { PagedResponse } from "@/shared/interface/PaginatedResponse";
 import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
 
-class UserService {
+class AdminUserService {
   async getUsers(filters?: any): Promise<User | PagedResponse<User>> {
     const params = new URLSearchParams();
 
@@ -93,4 +93,4 @@ class UserService {
   }
 }
 
-export default new UserService();
+export default new AdminUserService();

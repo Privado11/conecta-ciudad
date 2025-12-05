@@ -33,7 +33,7 @@ export interface ProjectSearchFilters {
   sortDirection?: "asc" | "desc";
 }
 
-class ProjectService {
+class AdminProjectService {
   private buildQueryParams(filters: any): URLSearchParams {
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
@@ -89,4 +89,4 @@ class ProjectService {
   }
 }
 
-export default new ProjectService();
+export default new AdminProjectService();

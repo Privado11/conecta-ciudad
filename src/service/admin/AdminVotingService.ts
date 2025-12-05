@@ -5,7 +5,7 @@ import type {
   CitizenVotingStats,
 } from "@/shared/types/votingTypes";
 
-class VotingService {
+class AdminVotingService {
   async getVotingProjects(): Promise<VotingProjectDto[]> {
     const response = await api.get("/api/v1/admin/voting/projects");
     return response.data;
@@ -42,4 +42,4 @@ class VotingService {
   }
 }
 
-export default new VotingService();
+export default new AdminVotingService();
