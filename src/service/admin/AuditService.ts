@@ -1,5 +1,5 @@
 import type { PagedResponse } from "@/shared/interface/PaginatedResponse";
-import api from "./api";
+import api from "../api";
 import type { ActionDetails, ActionDto, ActionResult, ActionType, EntityType } from "@/shared/types/auditTypes";
 
 export interface SearchFilters {
