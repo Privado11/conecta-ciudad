@@ -1,0 +1,30 @@
+{
+  "fields": {
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "phone": "Phone",
+    "nationalId": "National ID",
+    "description": "Description",
+    "objectives": "Objectives",
+    "beneficiaryPopulations": "Beneficiary population",
+    "budget": "Budget",
+    "startAt": "Start date",
+    "endAt": "End date",
+    "votingStartAt": "Voting start",
+    "votingEndAt": "Voting end",
+    "notes": "Observations",
+    "projectId": "Project",
+    "voterId": "Voter",
+    "decision": "Decision",
+    "status": "Status",
+    "creator": "Creator",
+    "curator": "Curator",
+    "role": "Role",
+    "roles": "Roles",
+    "active": "Active",
+    "oldPassword": "Current password",
+    "newPassword": "New password"
+  }
+}

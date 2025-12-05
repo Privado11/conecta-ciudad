@@ -4,19 +4,18 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import esErrors from "./locales/es/error.json";
 import enErrors from "./locales/en/error.json";
+import esFields from "./locales/es/fields.json";
+import enFields from "./locales/en/fields.json";
 
 // Combinar todas las traducciones
 const es = {
-  ...esErrors,
-  // Aquí puedes agregar más namespaces
-  // common: esCommon,
-  // forms: esForms,
+  errors: esErrors.errors,
+  fields: esFields.fields,
 };
 
 const en = {
-  ...enErrors,
-  // common: enCommon,
-  // forms: enForms,
+  errors: enErrors.errors,
+  fields: enFields.fields,
 };
 
 i18n

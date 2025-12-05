@@ -67,24 +67,33 @@
     "CANNOT_DEACTIVATE_SELF": "You cannot deactivate yourself",
     "ACTION_TYPE_REQUIRED": "Action type is required",
 
-    "VALIDATION_FAILED": "Validation error in submitted data",
+    "VALIDATION_FAILED": "Validation errors found in form",
     "FIELD_REQUIRED": "This field is required",
     "FIELD_INVALID": "This field contains an invalid value",
-    "STRING_TOO_SHORT": "Text is too short (minimum: {{min}} characters)",
-    "STRING_TOO_LONG": "Text is too long (maximum: {{max}} characters)",
-    "STRING_PATTERN_MISMATCH": "Text format is invalid",
-    "STRING_BLANK": "Field cannot be blank",
+
+    "STRING_TOO_SHORT": "Must be at least {{min}} characters",
+    "STRING_TOO_LONG": "Cannot exceed {{max}} characters",
+    "STRING_BLANK": "This field cannot be empty",
+
+    "STRING_PATTERN_MISMATCH": "The format is not valid",
+    "STRING_PATTERN_MISMATCH_phone": "Phone must be 10 digits (example: 3001234567)",
+    "STRING_PATTERN_MISMATCH_nationalId": "National ID must contain only numbers",
+    "STRING_PATTERN_MISMATCH_email": "Email format is not valid",
+
     "EMAIL_INVALID_FORMAT": "Email format is invalid",
     "EMAIL_REQUIRED": "Email is required",
-    "NUMBER_TOO_SMALL": "Number is too small (minimum: {{min}})",
-    "NUMBER_TOO_LARGE": "Number is too large (maximum: {{max}})",
-    "NUMBER_INVALID": "Number is invalid",
+
+    "NUMBER_TOO_SMALL": "Minimum value is {{min}}",
+    "NUMBER_TOO_LARGE": "Maximum value is {{max}}",
+    "NUMBER_INVALID": "Must be a valid number",
+
     "DATE_REQUIRED": "Date is required",
-    "DATE_INVALID": "Date is invalid",
+    "DATE_INVALID": "Date is not valid",
     "DATE_PAST": "Date must be in the past",
     "DATE_FUTURE": "Date must be in the future",
-    "INVALID_DATE_RANGE": "Date range is invalid",
-    "INVALID_LENGTH": "Length is invalid",
+
+    "INVALID_DATE_RANGE": "Date range is not valid",
+    "INVALID_LENGTH": "Length is not valid",
     "REQUIRED_FIELD": "This field is required",
 
     "UNKNOWN_ERROR": "An unknown error has occurred",

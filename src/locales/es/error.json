@@ -67,22 +67,31 @@
     "CANNOT_DEACTIVATE_SELF": "No puedes desactivarte a ti mismo",
     "ACTION_TYPE_REQUIRED": "El tipo de acción es requerido",
 
-    "VALIDATION_FAILED": "Error de validación en los datos enviados",
+    "VALIDATION_FAILED": "Se encontraron errores en el formulario",
     "FIELD_REQUIRED": "Este campo es requerido",
     "FIELD_INVALID": "Este campo contiene un valor inválido",
-    "STRING_TOO_SHORT": "El texto es demasiado corto (mínimo: {{min}} caracteres)",
-    "STRING_TOO_LONG": "El texto es demasiado largo (máximo: {{max}} caracteres)",
-    "STRING_PATTERN_MISMATCH": "El formato del texto no es válido",
-    "STRING_BLANK": "El campo no puede estar en blanco",
-    "EMAIL_INVALID_FORMAT": "El formato del email es inválido",
-    "EMAIL_REQUIRED": "El email es requerido",
-    "NUMBER_TOO_SMALL": "El número es demasiado pequeño (mínimo: {{min}})",
-    "NUMBER_TOO_LARGE": "El número es demasiado grande (máximo: {{max}})",
-    "NUMBER_INVALID": "El número no es válido",
+
+    "STRING_TOO_SHORT": "Debe tener al menos {{min}} caracteres",
+    "STRING_TOO_LONG": "No puede exceder {{max}} caracteres",
+    "STRING_BLANK": "Este campo no puede estar vacío",
+
+    "STRING_PATTERN_MISMATCH": "El formato no es válido",
+    "STRING_PATTERN_MISMATCH_phone": "El teléfono debe tener 10 dígitos (ejemplo: 3001234567)",
+    "STRING_PATTERN_MISMATCH_nationalId": "La cédula debe contener solo números",
+    "STRING_PATTERN_MISMATCH_email": "El formato del correo electrónico no es válido",
+
+    "EMAIL_INVALID_FORMAT": "El formato del correo electrónico no es válido",
+    "EMAIL_REQUIRED": "El correo electrónico es requerido",
+
+    "NUMBER_TOO_SMALL": "El valor mínimo es {{min}}",
+    "NUMBER_TOO_LARGE": "El valor máximo es {{max}}",
+    "NUMBER_INVALID": "Debe ser un número válido",
+
     "DATE_REQUIRED": "La fecha es requerida",
     "DATE_INVALID": "La fecha no es válida",
     "DATE_PAST": "La fecha debe ser anterior a hoy",
     "DATE_FUTURE": "La fecha debe ser posterior a hoy",
+
     "INVALID_DATE_RANGE": "El rango de fechas no es válido",
     "INVALID_LENGTH": "La longitud no es válida",
     "REQUIRED_FIELD": "Este campo es obligatorio",

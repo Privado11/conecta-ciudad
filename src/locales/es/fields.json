@@ -1,0 +1,30 @@
+{
+  "fields": {
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "phone": "Teléfono",
+    "nationalId": "Cédula",
+    "description": "Descripción",
+    "objectives": "Objetivos",
+    "beneficiaryPopulations": "Población beneficiaria",
+    "budget": "Presupuesto",
+    "startAt": "Fecha de inicio",
+    "endAt": "Fecha de fin",
+    "votingStartAt": "Inicio de votación",
+    "votingEndAt": "Fin de votación",
+    "notes": "Observaciones",
+    "projectId": "Proyecto",
+    "voterId": "Votante",
+    "decision": "Decisión",
+    "status": "Estado",
+    "creator": "Creador",
+    "curator": "Curador",
+    "role": "Rol",
+    "roles": "Roles",
+    "active": "Activo",
+    "oldPassword": "Contraseña actual",
+    "newPassword": "Nueva contraseña"
+  }
+}

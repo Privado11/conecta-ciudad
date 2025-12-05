@@ -1,3 +1,4 @@
+// src/stores/admin/adminUsersStore.ts
 import { create } from "zustand";
 import { logger } from "../middleware/logger";
 import AdminUserService from "@/service/admin/AdminUserService";
@@ -6,6 +7,11 @@ import type { PagedResponse } from "@/shared/interface/PaginatedResponse";
 import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
 import { toast } from "sonner";
 import i18n from "@/i18n";
+import {
+  translateError,
+  isValidationError,
+  getValidationErrorsList,
+} from "@/utils/errorUtils";
 
 interface LoadingState {
   fetching: boolean;
@@ -44,19 +50,6 @@ interface AdminUsersState {
   setSelectedUser: (user: User | null) => void;
 }
 
-const translateError = (error: any): string => {
-  const errorCode = error.response?.data?.errorCode;
-  const parameters = error.response?.data?.parameters || {};
-
-  if (errorCode) {
-    return i18n.t(`errors.${errorCode}`, parameters) as string;
-  }
-
-  return (
-    error.response?.data?.message || (i18n.t("errors.UNKNOWN_ERROR") as string)
-  );
-};
-
 const initialLoadingState: LoadingState = {
   fetching: false,
   creating: false,
@@ -89,7 +82,8 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: result as User });
           }
         } catch (error: any) {
-          toast.error(translateError(error));
+          const errorMessage = translateError(error);
+          toast.error(errorMessage);
         } finally {
           set((state) => ({ loading: { ...state.loading, fetching: false } }));
         }
@@ -105,7 +99,23 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           );
           return newUser;
         } catch (error: any) {
-          toast.error(translateError(error));
+          if (isValidationError(error)) {
+            const validationErrors = getValidationErrorsList(error);
+            if (validationErrors.length > 1) {
+              toast.error("Errores de validación:", {
+                description: validationErrors
+                  .map((err) => `• ${err.field}: ${err.message}`)
+                  .join("\n"),
+                duration: 6000,
+              });
+            } else if (validationErrors.length === 1) {
+              const err = validationErrors[0];
+              toast.error(`${err.field}: ${err.message}`);
+            }
+          } else {
+            const errorMessage = translateError(error);
+            toast.error(errorMessage);
+          }
           return null;
         } finally {
           set((state) => ({ loading: { ...state.loading, creating: false } }));
@@ -131,7 +141,15 @@ export const useAdminUsersStore = create<AdminUsersState>()(
               `Usuario ${updatedUser.name} actualizado exitosamente`
           );
         } catch (error: any) {
-          toast.error(translateError(error));
+          if (isValidationError(error)) {
+            const validationErrors = getValidationErrorsList(error);
+            validationErrors.forEach((err) => {
+              toast.error(`${err.field}: ${err.message}`);
+            });
+          } else {
+            const errorMessage = translateError(error);
+            toast.error(errorMessage);
+          }
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, updating: false } }));
@@ -147,7 +165,8 @@ export const useAdminUsersStore = create<AdminUsersState>()(
               "Usuario eliminado exitosamente"
           );
         } catch (error: any) {
-          toast.error(translateError(error));
+          const errorMessage = translateError(error);
+          toast.error(errorMessage);
         } finally {
           set((state) => ({ loading: { ...state.loading, deleting: false } }));
         }
@@ -169,7 +188,8 @@ export const useAdminUsersStore = create<AdminUsersState>()(
               "Estado del usuario actualizado"
           );
         } catch (error: any) {
-          toast.error(translateError(error));
+          const errorMessage = translateError(error);
+          toast.error(errorMessage);
         } finally {
           set((state) => ({
             loading: { ...state.loading, togglingActive: false },
@@ -190,7 +210,8 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             (i18n.t("users.roleAdded") as string) || "Rol agregado exitosamente"
           );
         } catch (error: any) {
-          toast.error(translateError(error));
+          const errorMessage = translateError(error);
+          toast.error(errorMessage);
         } finally {
           set((state) => ({
             loading: { ...state.loading, addingRole: false },
@@ -212,7 +233,8 @@ export const useAdminUsersStore = create<AdminUsersState>()(
               "Rol removido exitosamente"
           );
         } catch (error: any) {
-          toast.error(translateError(error));
+          const errorMessage = translateError(error);
+          toast.error(errorMessage);
         } finally {
           set((state) => ({
             loading: { ...state.loading, removingRole: false },
@@ -228,7 +250,8 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           );
           set({ curators });
         } catch (error: any) {
-          toast.error(translateError(error));
+          const errorMessage = translateError(error);
+          toast.error(errorMessage);
         } finally {
           set((state) => ({ loading: { ...state.loading, fetching: false } }));
         }
@@ -240,7 +263,8 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           const blob = await AdminUserService.exportUsers(filters);
           return blob;
         } catch (error: any) {
-          toast.error(translateError(error));
+          const errorMessage = translateError(error);
+          toast.error(errorMessage);
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, exporting: false } }));
@@ -253,7 +277,8 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           const blob = await AdminUserService.exportAllUsers();
           return blob;
         } catch (error: any) {
-          toast.error(translateError(error));
+          const errorMessage = translateError(error);
+          toast.error(errorMessage);
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, exporting: false } }));
@@ -272,7 +297,8 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           );
           return result;
         } catch (error: any) {
-          toast.error(translateError(error));
+          const errorMessage = translateError(error);
+          toast.error(errorMessage);
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, importing: false } }));
