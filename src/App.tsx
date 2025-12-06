@@ -1,6 +1,7 @@
 import "./App.css";
 import { BrowserRouter } from "react-router-dom";
 import AppUI from "./AppUI";
+import { Toaster } from "sonner";
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
       <BrowserRouter>
         <AppUI />
       </BrowserRouter>
+      <Toaster />
     </>
   );
 }

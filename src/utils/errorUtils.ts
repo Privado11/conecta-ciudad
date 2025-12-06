@@ -1,4 +1,3 @@
-// src/utils/errorUtils.ts
 import i18n from "@/i18n";
 import type { AxiosError } from "axios";
 
@@ -19,10 +18,6 @@ interface ErrorResponse {
   message?: string;
 }
 
-/**
- * Traduce un error del backend usando i18n
- * Maneja tanto errores simples como errores de validación
- */
 export function translateError(
   error: AxiosError<ErrorResponse> | Error | any
 ): string {
@@ -35,40 +30,32 @@ export function translateError(
     });
   }
 
-  // Si es un error de Axios
   if (error.response?.data) {
     const errorData = error.response.data;
 
-    // 1. Si es un error de validación con múltiples campos
     if (
       errorData.errorCode === "VALIDATION_FAILED" &&
       errorData.validationErrors &&
       errorData.validationErrors.length > 0
     ) {
-      // Retornar el primer error de validación traducido
       const firstError = errorData.validationErrors[0];
       const translatedError = i18n.t(
         `errors.${firstError.errorCode}`,
         firstError.parameters || {}
       );
 
-      // Incluir el nombre del campo si es posible
       const fieldName = firstError.field;
       return `${fieldName}: ${translatedError}`;
     }
 
-    // 2. Si hay un errorCode estructurado (no validación)
     if (errorData.errorCode && errorData.errorCode !== "VALIDATION_FAILED") {
       const parameters = errorData.parameters || {};
       return i18n.t(`errors.${errorData.errorCode}`, parameters) as string;
     }
 
-    // 3. Fallback a mensaje del servidor
     if (errorData.message) {
       return errorData.message;
     }
-
-    // 4. Mapear por status HTTP
     const status = errorData.status || error.response?.status;
     const statusMap: Record<number, string> = {
       400: "BAD_REQUEST",
@@ -84,19 +71,12 @@ export function translateError(
     }
   }
 
-  // 5. Si es un error simple con mensaje
   if (error.message) {
     return error.message;
   }
-
-  // 6. Error genérico
   return i18n.t("errors.UNKNOWN_ERROR");
 }
 
-/**
- * Obtiene todos los errores de validación traducidos
- * Útil para mostrar errores por campo en formularios
- */
 export function getValidationErrors(
   error: AxiosError<ErrorResponse> | any
 ): Record<string, string> {
@@ -120,10 +100,6 @@ export function getValidationErrors(
   return result;
 }
 
-/**
- * Obtiene todos los errores de validación como array
- * Útil para mostrar una lista de todos los errores
- */
 export function getValidationErrorsList(
   error: AxiosError<ErrorResponse> | any
 ): Array<{ field: string; message: string }> {
@@ -149,12 +125,6 @@ export function getValidationErrorsList(
       err.parameters || {}
     ) as string;
 
-    if (import.meta.env.DEV) {
-      console.log(
-        `  📝 Campo: ${err.field}, Código: ${err.errorCode}, Mensaje: ${message}`
-      );
-    }
-
     return {
       field: err.field,
       message,
@@ -164,9 +134,6 @@ export function getValidationErrorsList(
   return result;
 }
 
-/**
- * Obtiene un mensaje amigable con todos los errores de validación
- */
 export function getValidationErrorsMessage(
   error: AxiosError<ErrorResponse> | any
 ): string {
@@ -180,15 +147,11 @@ export function getValidationErrorsMessage(
     return `${errors[0].field}: ${errors[0].message}`;
   }
 
-  // Múltiples errores
   return `Se encontraron ${errors.length} errores:\n${errors
     .map((e) => `• ${e.field}: ${e.message}`)
     .join("\n")}`;
 }
 
-/**
- * Verifica si un error es de un código específico
- */
 export function isErrorCode(
   error: AxiosError<ErrorResponse> | any,
   code: string
@@ -197,28 +160,15 @@ export function isErrorCode(
   return errorData?.errorCode === code;
 }
 
-/**
- * Verifica si un error es de tipo validación
- */
 export function isValidationError(
   error: AxiosError<ErrorResponse> | any
 ): boolean {
   const result = isErrorCode(error, "VALIDATION_FAILED");
 
-  if (import.meta.env.DEV) {
-    console.log("🔍 isValidationError:", {
-      result,
-      errorCode: error.response?.data?.errorCode,
-      hasValidationErrors: !!error.response?.data?.validationErrors,
-    });
-  }
-
   return result;
 }
 
-/**
- * Extrae los parámetros de un error
- */
+
 export function getErrorParameters(
   error: AxiosError<ErrorResponse> | any
 ): Record<string, any> {
@@ -226,9 +176,7 @@ export function getErrorParameters(
   return errorData?.parameters || {};
 }
 
-/**
- * Obtiene el status HTTP del error
- */
+
 export function getErrorStatus(
   error: AxiosError<ErrorResponse> | any
 ): number | undefined {
@@ -236,9 +184,6 @@ export function getErrorStatus(
   return errorData?.status || error.response?.status;
 }
 
-/**
- * Formatea un mensaje de éxito con parámetros
- */
 export function formatSuccessMessage(
   key: string,
   params?: Record<string, any>
@@ -246,9 +191,6 @@ export function formatSuccessMessage(
   return i18n.t(key, params) as string;
 }
 
-/**
- * Verifica si un campo específico tiene error de validación
- */
 export function hasFieldError(
   error: AxiosError<ErrorResponse> | any,
   fieldName: string
@@ -265,9 +207,6 @@ export function hasFieldError(
   );
 }
 
-/**
- * Obtiene el error de un campo específico
- */
 export function getFieldError(
   error: AxiosError<ErrorResponse> | any,
   fieldName: string
@@ -293,7 +232,6 @@ export function getFieldError(
   ) as string;
 }
 
-// Export default para compatibilidad
 export default {
   translateError,
   getValidationErrors,

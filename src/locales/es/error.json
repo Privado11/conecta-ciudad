@@ -76,7 +76,7 @@
     "STRING_BLANK": "Este campo no puede estar vacío",
 
     "STRING_PATTERN_MISMATCH": "El formato no es válido",
-    "STRING_PATTERN_MISMATCH_phone": "El teléfono debe tener 10 dígitos (ejemplo: 3001234567)",
+    "STRING_PATTERN_MISMATCH_phone": "El teléfono solo debe contener números (ejemplo: 3001234567)",
     "STRING_PATTERN_MISMATCH_nationalId": "La cédula debe contener solo números",
     "STRING_PATTERN_MISMATCH_email": "El formato del correo electrónico no es válido",
 

@@ -2,7 +2,6 @@ import { Sidebar } from "../components/organisms/Sidebar";
 import { Header } from "../components/organisms/Header";
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
-import { Toaster } from "sonner";
 
 interface LayoutProps {
   actionButton?: {
@@ -35,7 +34,6 @@ export const Layout = ({ actionButton }: LayoutProps) => {
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>
-          <Toaster />
         </main>
       </div>
     </div>

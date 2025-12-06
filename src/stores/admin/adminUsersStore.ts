@@ -1,4 +1,3 @@
-// src/stores/admin/adminUsersStore.ts
 import { create } from "zustand";
 import { logger } from "../middleware/logger";
 import AdminUserService from "@/service/admin/AdminUserService";
@@ -6,12 +5,6 @@ import type { User, UserRole, CuratorInfoDto } from "@/shared/types/userTYpes";
 import type { PagedResponse } from "@/shared/interface/PaginatedResponse";
 import type { BulkUserImportResult } from "@/shared/interface/ImporAndExport";
 import { toast } from "sonner";
-import i18n from "@/i18n";
-import {
-  translateError,
-  isValidationError,
-  getValidationErrorsList,
-} from "@/utils/errorUtils";
 
 interface LoadingState {
   fetching: boolean;
@@ -32,7 +25,6 @@ interface AdminUsersState {
   curators: CuratorInfoDto | null;
   loading: LoadingState;
 
-  // Actions
   fetchUsers: (filters?: any) => Promise<void>;
   createUser: (data: any) => Promise<User | null>;
   updateUser: (
@@ -82,8 +74,7 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: result as User });
           }
         } catch (error: any) {
-          const errorMessage = translateError(error);
-          toast.error(errorMessage);
+          throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, fetching: false } }));
         }
@@ -93,29 +84,11 @@ export const useAdminUsersStore = create<AdminUsersState>()(
         set((state) => ({ loading: { ...state.loading, creating: true } }));
         try {
           const newUser = await AdminUserService.createUser(data);
-          toast.success(
-            (i18n.t("users.createSuccess", { name: newUser.name }) as string) ||
-              `Usuario ${newUser.name} creado exitosamente`
-          );
+
+          toast.success(`Usuario ${newUser.name} creado exitosamente`);
+
           return newUser;
         } catch (error: any) {
-          if (isValidationError(error)) {
-            const validationErrors = getValidationErrorsList(error);
-            if (validationErrors.length > 1) {
-              toast.error("Errores de validación:", {
-                description: validationErrors
-                  .map((err) => `• ${err.field}: ${err.message}`)
-                  .join("\n"),
-                duration: 6000,
-              });
-            } else if (validationErrors.length === 1) {
-              const err = validationErrors[0];
-              toast.error(`${err.field}: ${err.message}`);
-            }
-          } else {
-            const errorMessage = translateError(error);
-            toast.error(errorMessage);
-          }
           return null;
         } finally {
           set((state) => ({ loading: { ...state.loading, creating: false } }));
@@ -134,22 +107,8 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: updatedUser });
           }
 
-          toast.success(
-            (i18n.t("users.updateSuccess", {
-              name: updatedUser.name,
-            }) as string) ||
-              `Usuario ${updatedUser.name} actualizado exitosamente`
-          );
+          toast.success(`Usuario ${updatedUser.name} actualizado exitosamente`);
         } catch (error: any) {
-          if (isValidationError(error)) {
-            const validationErrors = getValidationErrorsList(error);
-            validationErrors.forEach((err) => {
-              toast.error(`${err.field}: ${err.message}`);
-            });
-          } else {
-            const errorMessage = translateError(error);
-            toast.error(errorMessage);
-          }
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, updating: false } }));
@@ -160,13 +119,10 @@ export const useAdminUsersStore = create<AdminUsersState>()(
         set((state) => ({ loading: { ...state.loading, deleting: true } }));
         try {
           await AdminUserService.deleteUser(id);
-          toast.success(
-            (i18n.t("users.deleteSuccess") as string) ||
-              "Usuario eliminado exitosamente"
-          );
+
+          toast.success("Usuario eliminado exitosamente");
         } catch (error: any) {
-          const errorMessage = translateError(error);
-          toast.error(errorMessage);
+          throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, deleting: false } }));
         }
@@ -183,13 +139,9 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: updatedUser });
           }
 
-          toast.success(
-            (i18n.t("users.statusChanged") as string) ||
-              "Estado del usuario actualizado"
-          );
+          toast.success("Estado del usuario actualizado");
         } catch (error: any) {
-          const errorMessage = translateError(error);
-          toast.error(errorMessage);
+          throw error;
         } finally {
           set((state) => ({
             loading: { ...state.loading, togglingActive: false },
@@ -206,12 +158,9 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: updatedUser });
           }
 
-          toast.success(
-            (i18n.t("users.roleAdded") as string) || "Rol agregado exitosamente"
-          );
+          toast.success("Rol agregado exitosamente");
         } catch (error: any) {
-          const errorMessage = translateError(error);
-          toast.error(errorMessage);
+          throw error;
         } finally {
           set((state) => ({
             loading: { ...state.loading, addingRole: false },
@@ -228,13 +177,9 @@ export const useAdminUsersStore = create<AdminUsersState>()(
             set({ selectedUser: updatedUser });
           }
 
-          toast.success(
-            (i18n.t("users.roleRemoved") as string) ||
-              "Rol removido exitosamente"
-          );
+          toast.success("Rol removido exitosamente");
         } catch (error: any) {
-          const errorMessage = translateError(error);
-          toast.error(errorMessage);
+          throw error;
         } finally {
           set((state) => ({
             loading: { ...state.loading, removingRole: false },
@@ -250,8 +195,7 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           );
           set({ curators });
         } catch (error: any) {
-          const errorMessage = translateError(error);
-          toast.error(errorMessage);
+          throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, fetching: false } }));
         }
@@ -263,8 +207,6 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           const blob = await AdminUserService.exportUsers(filters);
           return blob;
         } catch (error: any) {
-          const errorMessage = translateError(error);
-          toast.error(errorMessage);
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, exporting: false } }));
@@ -277,8 +219,6 @@ export const useAdminUsersStore = create<AdminUsersState>()(
           const blob = await AdminUserService.exportAllUsers();
           return blob;
         } catch (error: any) {
-          const errorMessage = translateError(error);
-          toast.error(errorMessage);
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, exporting: false } }));
@@ -289,16 +229,13 @@ export const useAdminUsersStore = create<AdminUsersState>()(
         set((state) => ({ loading: { ...state.loading, importing: true } }));
         try {
           const result = await AdminUserService.importUsers(file);
+
           toast.success(
-            (i18n.t("users.importSuccess", {
-              count: result.successfulImports,
-            }) as string) ||
-              `${result.successfulImports} usuarios importados exitosamente`
+            `${result.successfulImports} usuarios importados exitosamente`
           );
+
           return result;
         } catch (error: any) {
-          const errorMessage = translateError(error);
-          toast.error(errorMessage);
           throw error;
         } finally {
           set((state) => ({ loading: { ...state.loading, importing: false } }));

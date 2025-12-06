@@ -1,109 +1,29 @@
 import type React from "react";
 import { useState } from "react";
-import {
-  Mail,
-  Lock,
-  Handshake,
-  ArrowRight,
-  AlertCircle,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Mail, Lock, Handshake, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
-interface LoginFormData {
-  email: string;
-  password: string;
-}
-
-interface ValidationErrors {
-  email: string;
-  password: string;
-  general: string;
-}
-
-type ValidationResult = {
-  isValid: boolean;
-  errors: ValidationErrors;
-};
-
 function LoginPage() {
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [errors, setErrors] = useState<ValidationErrors>({
-    email: "",
-    password: "",
-    general: "",
-  });
 
   const year: number = new Date().getFullYear();
 
-  const validateEmail = (email: string): string => {
-    if (!email.trim()) {
-      return "El email es requerido";
-    }
-
-    const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return "Formato de email inválido";
-    }
-
-    return "";
-  };
-
-  const validatePassword = (password: string): string => {
-    if (!password) {
-      return "La contraseña es requerida";
-    }
-
-    if (password.length < 6) {
-      return "Mínimo 6 caracteres";
-    }
-
-    return "";
-  };
-
-  const validateForm = (data: LoginFormData): ValidationResult => {
-    const emailError = validateEmail(data.email);
-    const passwordError = validatePassword(data.password);
-
-    return {
-      isValid: !emailError && !passwordError,
-      errors: {
-        email: emailError,
-        password: passwordError,
-        general: "",
-      },
-    };
-  };
-
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const value: string = e.target.value;
-    setEmail(value);
-
-    if (errors.email) {
-      setErrors((prev) => ({ ...prev, email: "", general: "" }));
-    }
+    setEmail(e.target.value);
   };
 
   const handlePasswordChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    const value: string = e.target.value;
-    setPassword(value);
-
-    if (errors.password) {
-      setErrors((prev) => ({ ...prev, password: "", general: "" }));
-    }
+    setPassword(e.target.value);
   };
 
   const handleSubmit = async (
@@ -111,29 +31,15 @@ function LoginPage() {
   ): Promise<void> => {
     e.preventDefault();
 
-    const validation: ValidationResult = validateForm({ email, password });
-
-    if (!validation.isValid) {
-      setErrors(validation.errors);
-      return;
-    }
-
-    setLoading(true);
-    setErrors({ email: "", password: "", general: "" });
-
     try {
       await login(email, password);
       navigate("/dashboard");
-    } catch (err: any) {
+    } catch (err) {
       setPassword("");
-      setErrors((prev) => ({
-        ...prev,
-        general: err.message || "Error al iniciar sesión",
-      }));
-    } finally {
-      setLoading(false);
     }
   };
+
+  const isFormValid = email.trim() !== "" && password.trim() !== "";
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
@@ -171,16 +77,10 @@ function LoginPage() {
                     value={email}
                     onChange={handleEmailChange}
                     placeholder="tu@email.com"
-                    className={`pl-10 ${errors.email ? "border-red-500" : ""}`}
+                    className="pl-10"
                     disabled={loading}
                   />
                 </div>
-                {errors.email && (
-                  <p className="text-red-500 text-sm flex items-center gap-1">
-                    <AlertCircle size={14} />
-                    {errors.email}
-                  </p>
-                )}
               </div>
 
               <div className="space-y-2">
@@ -196,9 +96,7 @@ function LoginPage() {
                     value={password}
                     onChange={handlePasswordChange}
                     placeholder="••••••••"
-                    className={`pl-10 pr-10 ${
-                      errors.password ? "border-red-500" : ""
-                    }`}
+                    className="pl-10 pr-10"
                     disabled={loading}
                   />
                   <button
@@ -210,24 +108,11 @@ function LoginPage() {
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="text-red-500 text-sm flex items-center gap-1">
-                    <AlertCircle size={14} />
-                    {errors.password}
-                  </p>
-                )}
               </div>
-
-              {errors.general && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{errors.general}</AlertDescription>
-                </Alert>
-              )}
 
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !isFormValid}
                 onClick={handleSubmit}
                 className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >

@@ -86,6 +86,7 @@ function AppUI() {
       </Route>
 
       <Route path="*" element={<Navigate to="/auth/login" replace />} />
+      
     </Routes>
   );
 }
